@@ -78,9 +78,48 @@
         .auth-toggle { margin-bottom: 20px; }
         .auth-toggle button { background: none; border: none; color: var(--accent); cursor: pointer; font-weight: bold; }
         .auth-error { color: #ff5e5e; margin-bottom: 10px; font-size: 1rem; min-height: 1rem; }
+        /* --- MEDIA QUERIES FOR MOBILE --- */
+@media (max-width: 768px) {
+    body {
+        font-size: 15px; /* Lekko mniejszy tekst bazowy na mobile */
+    }
+
+    .controls {
+        flex-direction: column; /* Ułóż kontrolki daty i akcje pionowo */
+        align-items: stretch;   /* Rozciągnij je na całą szerokość */
+    }
+
+    .actions {
+        justify-content: center; /* Wyśrodkuj przyciski akcji */
+    }
+
+    .tabs {
+        gap: 8px; /* Zmniejsz odstępy między zakładkami */
+    }
+
+    .tab {
+        padding: 10px 20px; /* Zmniejsz padding zakładek */
+        font-size: 0.9rem;
+    }
+
+    .time-section {
+        padding: 20px; /* Mniejszy padding w sekcjach */
+    }
+
+    .btn {
+        /* Zapewnij, że przyciski są łatwe do kliknięcia palcem */
+        min-height: 44px;
+        padding: 10px 16px;
+    }
+}
     </style>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ff9f43">
+    <!-- iOS specific meta tags for a native-like experience -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Daily Growth">
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
 </head>
 <body>
 
