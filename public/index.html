@@ -6,18 +6,15 @@
     <title>Daily Growth 2.0 🌱 – Wersja Stabilna</title>
     <meta name="description" content="Aplikacja Daily Growth to Twój osobisty dziennik rozwoju. Śledź postępy, nawyki, analizuj trendy i buduj lepszą wersję siebie.">
     
-    <!-- Ikona i Manifest PWA -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#2c6e49">
     
-    <!-- Meta tagi dla iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Daily Growth">
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
 
-    <!-- Zewnętrzne skrypty -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -71,9 +68,9 @@
         .time-section, .auth-container, .statistics, .modal-content { background: var(--card-light); padding: 40px; border-radius: var(--border-radius-md); margin-bottom: 25px; box-shadow: var(--box-shadow); border: 1px solid var(--border-color-light); }
         .time-header { font-size: 1.8rem; margin-bottom: 30px; color: var(--primary); font-weight: 700; padding-bottom: 10px; border-bottom: 2px solid var(--border-color-light); }
         
-        textarea, input[type="date"], select, .auth-form input { width: 100%; padding: 15px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color-light); background: var(--bg-light); color: var(--text-light); font-size: 1rem; }
-        textarea:focus, input[type="date"]:focus, select:focus, .auth-form input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 110, 73, 0.15); }
-        html.dark-mode textarea:focus, html.dark-mode input[type="date"]:focus, html.dark-mode select:focus, html.dark-mode .auth-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249, 166, 32, 0.2); }
+        textarea, input[type="date"], select, .auth-form input, .settings-item input { width: 100%; padding: 15px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color-light); background: var(--bg-light); color: var(--text-light); font-size: 1rem; }
+        textarea:focus, input[type="date"]:focus, select:focus, .auth-form input:focus, .settings-item input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 110, 73, 0.15); }
+        html.dark-mode textarea:focus, html.dark-mode input[type="date"]:focus, html.dark-mode select:focus, html.dark-mode .auth-form input:focus, html.dark-mode .settings-item input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249, 166, 32, 0.2); }
         textarea { min-height: 120px; resize: vertical; }
         label.question { display: block; font-weight: 600; margin-bottom: 10px; }
         .question-group { margin-bottom: 30px; }
@@ -87,8 +84,31 @@
         .sentiment-star.active { color: var(--accent); }
         .habit-tracker .habit-item { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
         .habit-tracker input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { max-width: 600px; width: 90%; margin: auto; padding: 25px; border-radius: var(--border-radius-md); animation: fadeIn 0.3s; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 1.5rem; }
+        .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
 
-        .modal { backdrop-filter: blur(5px); }
+        .modal-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color-light); }
+        .modal-tab { padding: 10px 15px; cursor: pointer; border-bottom: 3px solid transparent; }
+        .modal-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+        html.dark-mode .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .modal-tab-panel { display: none; }
+        .modal-tab-panel.active { display: block; }
+
+        /* NOWE style dla Ustawień */
+        .modal-tab-panel h4 { margin-bottom: 20px; font-weight: 600; color: var(--primary); }
+        .settings-list { display: flex; flex-direction: column; gap: 15px; }
+        .settings-item { display: flex; gap: 10px; align-items: center; }
+        .settings-item input { flex-grow: 1; padding: 12px; font-size: 1rem; }
+        .settings-item button { padding: 8px 12px; background-color: #dc3545; color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: background-color var(--transition-speed); }
+        .settings-item button:hover { background-color: #c82333; }
+        html.dark-mode .modal-tab-panel h4 { color: var(--accent); }
+
         .auth-container { border: none; text-align: center; }
         .auth-toggle button { color: var(--primary); }
 
@@ -230,12 +250,13 @@
         static getDayEntry(date) { const user = sessionStorage.getItem('dg_user'); try { return JSON.parse(localStorage.getItem(`dg_entry_${user}_${date}`)) || {}; } catch (e) { return {}; } }
         static saveDayEntry(date, entry) { const user = sessionStorage.getItem('dg_user'); try { localStorage.setItem(`dg_entry_${user}_${date}`, JSON.stringify(entry)); showNotification("Auto-zapisano ✅"); } catch (e) { showNotification("Błąd zapisu."); } }
         static getSetting(key) { const user = sessionStorage.getItem('dg_user'); try { return JSON.parse(localStorage.getItem(`dg_settings_${user}`))[key]; } catch (e) { return null; } }
-        static setSetting(key, value) { let s = {}; try { s = JSON.parse(localStorage.getItem(`dg_settings_${user}`)) || {}; } catch (e) {} s[key] = value; localStorage.setItem(`dg_settings_${user}`, JSON.stringify(s)); }
+        static setSetting(key, value) { const user = sessionStorage.getItem('dg_user'); let s = {}; try { s = JSON.parse(localStorage.getItem(`dg_settings_${user}`)) || {}; } catch (e) {} s[key] = value; localStorage.setItem(`dg_settings_${user}`, JSON.stringify(s)); }
         static getQuestions() { let q = JSON.parse(localStorage.getItem(`dg_questions_${sessionStorage.getItem('dg_user')}`)); return q && q.morning ? q : initialQuestions; }
         static saveQuestions(q) { localStorage.setItem(`dg_questions_${sessionStorage.getItem('dg_user')}`, JSON.stringify(q)); }
         static getHabits() { return JSON.parse(localStorage.getItem(`dg_habits_${sessionStorage.getItem('dg_user')}`)) || initialHabits; }
         static saveHabits(h) { localStorage.setItem(`dg_habits_${sessionStorage.getItem('dg_user')}`, JSON.stringify(h)); }
     }
+
     class UI {
         static buildSection(sectionId, title, emoji, containerSelector) {
             const panel = document.querySelector(containerSelector);
@@ -261,23 +282,121 @@
             panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', (e) => UI.setSentiment(e.currentTarget)));
         }
         static buildStatsSection(containerSelector) { const el = document.querySelector(containerSelector); if (el) el.innerHTML = `<div class="statistics"><div class="stats-header"><h2>📊 Analiza</h2><select id="statsPeriod"><option value="7">7 dni</option><option value="30" selected>30 dni</option><option value="90">90 dni</option></select></div><h3>Oceny</h3><div class="chart-container"><canvas id="sentimentChart"></canvas></div><h3>Sentyment tekstu</h3><div class="chart-container"><canvas id="textSentimentChart"></canvas></div></div>`; }
-        static loadSectionData(date, sectionId) { const entry = AppStorage.getDayEntry(date), data = entry[sectionId] || {}; document.querySelectorAll(`#${sectionId}-panel textarea, #${sectionId}-panel select`).forEach(el => { const id = el.dataset.id; if (!id) return; el.value = data[id] || ''; }); if (sectionId === 'evening') { const habits = data.habits || {}; currentHabits.forEach(h => { const cb = document.querySelector(`[data-habit-name="${h}"]`); if (cb) cb.checked = habits[h] || false; }); sentimentQuestions.forEach(sq => { const val = data[sq.id + 'Sent']; if (val) UI.updateStars(document.querySelector(`.sentiment-buttons[data-id="${sq.id}"]`), val); }); } }
+        static loadSectionData(sectionId, date) { const entry = AppStorage.getDayEntry(date); const data = entry[sectionId] || {}; document.querySelectorAll(`#${sectionId}-panel textarea, #${sectionId}-panel select`).forEach(el => { const id = el.dataset.id; if (!id) return; el.value = data[id] || ''; }); if (sectionId === 'evening') { const habits = entry.evening?.habits || {}; currentHabits.forEach(h => { const cb = document.querySelector(`#evening-panel [data-habit-name="${h}"]`); if (cb) cb.checked = habits[h] || false; }); sentimentQuestions.forEach(sq => { const val = entry.evening?.[sq.id + 'Sent']; if (val) UI.updateStars(document.querySelector(`#evening-panel .sentiment-buttons[data-id="${sq.id}"]`), val); }); } }
         static saveInput(sectionId, target) { const id = target.dataset.id, entry = AppStorage.getDayEntry(currentDate); if (!entry[sectionId]) entry[sectionId] = {}; entry[sectionId][id] = target.value; AppStorage.saveDayEntry(currentDate, entry); }
         static saveHabitStatus(checkbox) { const name = checkbox.dataset.habitName, entry = AppStorage.getDayEntry(currentDate); if (!entry.evening) entry.evening = {}; if (!entry.evening.habits) entry.evening.habits = {}; entry.evening.habits[name] = checkbox.checked; AppStorage.saveDayEntry(currentDate, entry); }
         static handleAffirmationChange(select) { const textarea = select.parentElement.querySelector('.hidden-textarea'); if (select.value === 'custom') textarea.classList.remove('hidden'); else textarea.classList.add('hidden'); }
         static setSentiment(starEl) { const value = starEl.dataset.value; const container = starEl.parentElement; const catId = container.dataset.id; UI.updateStars(container, value); const entry = AppStorage.getDayEntry(currentDate); if (!entry.evening) entry.evening = {}; entry.evening[catId + 'Sent'] = value; AppStorage.saveDayEntry(currentDate, entry); }
-        static updateStars(container, value) { const stars = container.querySelectorAll('.sentiment-star'); stars.forEach(star => { star.classList.remove('active'); star.textContent = '☆'; if (parseInt(star.dataset.value) <= parseInt(value)) { star.classList.add('active'); star.textContent = '★'; } }); }
+        static updateStars(container, value) { if (!container) return; const stars = container.querySelectorAll('.sentiment-star'); stars.forEach(star => { star.classList.remove('active'); star.textContent = '☆'; if (parseInt(star.dataset.value) <= parseInt(value)) { star.classList.add('active'); star.textContent = '★'; } }); }
     }
 
     class Stats { /* ... Implementacja Stats ... */ }
     
+    // ZAKTUALIZOWANA klasa Settings
     class Settings {
-        static tempQuestions; static tempHabits;
-        static init() { document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose()); document.querySelectorAll('#settingsModal .modal-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchTab(e.target))); }
-        static open() { this.originalQuestions = AppStorage.getQuestions(); this.originalHabits = AppStorage.getHabits(); this.tempQuestions = JSON.parse(JSON.stringify(this.originalQuestions)); this.tempHabits = [...this.originalHabits]; this.switchTab(document.querySelector('#settingsModal .modal-tab.active')); openModal('settingsModal'); }
-        static switchTab(tabEl) { document.querySelectorAll('#settingsModal .modal-tab, #settingsModal .modal-tab-panel').forEach(el => el.classList.remove('active')); tabEl.classList.add('active'); const sectionId = tabEl.dataset.section; document.getElementById(`s-${sectionId}-panel`).classList.add('active'); this.render(sectionId); }
-        static render(sectionId) { const container = document.getElementById(`s-${sectionId}-panel`); container.innerHTML = "Tu będzie edycja pytań i nawyków."; }
-        static saveAndClose() { AppStorage.saveQuestions(this.tempQuestions); AppStorage.saveHabits(this.tempHabits); currentQuestions = AppStorage.getQuestions(); currentHabits = AppStorage.getHabits(); rebuildAllSections(); loadDate(); closeModal('settingsModal'); showNotification("Ustawienia zapisane! ✅"); }
+        static tempQuestions;
+        static tempHabits;
+        
+        static init() {
+            document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
+            document.querySelectorAll('#settingsModal .modal-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchTab(e.target)));
+            
+            const modal = document.getElementById('settingsModal');
+            // Delegowanie eventów dla dynamicznie tworzonych elementów
+            modal.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target.matches('.delete-question-btn')) {
+                    this.deleteQuestion(target.dataset.section, target.dataset.index);
+                } else if (target.matches('.add-question-btn')) {
+                    this.addQuestion(target.dataset.section);
+                } else if (target.matches('.delete-habit-btn')) {
+                    this.deleteHabit(target.dataset.index);
+                } else if (target.matches('.add-habit-btn')) {
+                    this.addHabit();
+                }
+            });
+
+            modal.addEventListener('input', (e) => {
+                const target = e.target;
+                if (target.matches('.question-input')) {
+                    this.updateQuestionText(target.dataset.section, target.dataset.index, target.value);
+                } else if (target.matches('.habit-input')) {
+                    this.updateHabitText(target.dataset.index, target.value);
+                }
+            });
+        }
+    
+        static open() {
+            // Głęboka kopia pytań, aby uniknąć modyfikacji oryginału przed zapisaniem
+            this.tempQuestions = JSON.parse(JSON.stringify(AppStorage.getQuestions()));
+            this.tempHabits = [...AppStorage.getHabits()];
+            
+            this.switchTab(document.querySelector('#settingsModal .modal-tab.active'));
+            openModal('settingsModal');
+        }
+    
+        static switchTab(tabEl) {
+            document.querySelectorAll('#settingsModal .modal-tab, #settingsModal .modal-tab-panel').forEach(el => el.classList.remove('active'));
+            tabEl.classList.add('active');
+            const sectionId = tabEl.dataset.section;
+            document.getElementById(`s-${sectionId}-panel`).classList.add('active');
+            this.render(sectionId);
+        }
+    
+        static render(sectionId) {
+            const container = document.getElementById(`s-${sectionId}-panel`);
+            let html = '';
+
+            if (sectionId === 'habits') {
+                html += `<h4>Edytuj swoje nawyki</h4><div class="settings-list">`;
+                this.tempHabits.forEach((habit, index) => {
+                    html += `
+                        <div class="settings-item">
+                            <input type="text" class="habit-input" data-index="${index}" value="${habit}" placeholder="Treść nawyku">
+                            <button class="delete-habit-btn btn" data-index="${index}">Usuń</button>
+                        </div>`;
+                });
+                html += `</div><button class="btn btn-secondary add-habit-btn" style="margin-top: 15px;">+ Dodaj nawyk</button>`;
+            } else if (this.tempQuestions[sectionId]) {
+                html += `<h4>Edytuj pytania dla sekcji "${sectionId}"</h4><div class="settings-list">`;
+                this.tempQuestions[sectionId].forEach((question, index) => {
+                    html += `
+                        <div class="settings-item">
+                            <input type="text" class="question-input" data-section="${sectionId}" data-index="${index}" value="${question.text}" placeholder="Treść pytania">
+                            <button class="delete-question-btn btn" data-section="${sectionId}" data-index="${index}">Usuń</button>
+                        </div>`;
+                });
+                html += `</div><button class="btn btn-secondary add-question-btn" data-section="${sectionId}" style="margin-top: 15px;">+ Dodaj pytanie</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        static updateQuestionText(section, index, newText) { this.tempQuestions[section][index].text = newText; }
+        static deleteQuestion(section, index) { this.tempQuestions[section].splice(index, 1); this.render(section); }
+        static addQuestion(section) { const newId = section.charAt(0) + Date.now(); this.tempQuestions[section].push({ id: newId, text: '' }); this.render(section); }
+        static updateHabitText(index, newText) { this.tempHabits[index] = newText; }
+        static deleteHabit(index) { this.tempHabits.splice(index, 1); this.render('habits'); }
+        static addHabit() { this.tempHabits.push(''); this.render('habits'); }
+
+        static saveAndClose() {
+            // Usuń puste pytania i nawyki przed zapisem
+            Object.keys(this.tempQuestions).forEach(section => {
+                this.tempQuestions[section] = this.tempQuestions[section].filter(q => q.text.trim() !== '');
+            });
+            this.tempHabits = this.tempHabits.filter(h => h.trim() !== '');
+
+            AppStorage.saveQuestions(this.tempQuestions);
+            AppStorage.saveHabits(this.tempHabits);
+
+            // Przeładuj dane i interfejs aplikacji
+            currentQuestions = AppStorage.getQuestions();
+            currentHabits = AppStorage.getHabits();
+            rebuildAllSections();
+            loadDate(currentDate); 
+
+            closeModal('settingsModal');
+            showNotification("Ustawienia zapisane! ✅");
+        }
     }
 
     function initializeAppLogic() {
@@ -289,14 +408,14 @@
         bindAppEventListeners();
         rebuildAllSections();
         UI.buildStatsSection('#stats-panel');
-        loadDate();
+        loadDate(currentDate);
         isAppInitialized = true;
     }
 
     function bindAppEventListeners() {
         document.getElementById('prev-day-btn').addEventListener('click', () => changeDate(-1));
         document.getElementById('next-day-btn').addEventListener('click', () => changeDate(1));
-        document.getElementById('currentDate').addEventListener('change', loadDate);
+        document.getElementById('currentDate').addEventListener('change', (e) => loadDate(e.target.value));
         document.getElementById('pdf-btn').addEventListener('click', exportPDF);
         document.getElementById('dark-mode-btn').addEventListener('click', toggleDarkMode);
         document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
@@ -313,8 +432,8 @@
     }
     
     function rebuildAllSections() { UI.buildSection('morning', 'Poranek', '🌅', '#morning-panel'); UI.buildSection('afternoon', 'Południe', '☀️', '#afternoon-panel'); UI.buildSection('evening', 'Wieczór', '🌙', '#evening-panel'); }
-    function loadDate() { document.getElementById('currentDate').value = currentDate; ['morning', 'afternoon', 'evening'].forEach(s => UI.loadSectionData(s, currentDate)); }
-    function changeDate(d) { const dt = new Date(currentDate); dt.setDate(dt.getDate() + d); currentDate = DateHelpers.formatDateISO(dt); loadDate(); }
+    function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['morning', 'afternoon', 'evening'].forEach(s => UI.loadSectionData(s, currentDate)); }
+    function changeDate(d) { const dt = new Date(currentDate); dt.setDate(dt.getDate() + d); loadDate(DateHelpers.formatDateISO(dt)); }
     function toggleDarkMode() { document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', document.documentElement.classList.contains('dark-mode')); }
     function showNotification(m, d = 3000) { const el = document.getElementById('notification'); el.textContent = m; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), d - 100); }
     function openModal(id) { document.getElementById(id)?.classList.add('active'); }
@@ -333,5 +452,3 @@
 </script>
 </body>
 </html>
-
-
