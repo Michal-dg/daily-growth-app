@@ -1,0 +1,23 @@
+{
+  "name": "daily-growth-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Daily Growth application.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "journal",
+    "self-development",
+    "pwa"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
