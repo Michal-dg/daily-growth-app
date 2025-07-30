@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" data-theme="las">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -21,103 +21,138 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
 
     <style>
-        /* === FINALNY, PROFESJONALNY STYL V3 === */
+        /* === SYSTEM MOTYWÓW I STYL PODSTAWOWY === */
         :root {
-            --bg-light: #f8f9fa; --card-light: #ffffff;
-            --text-light: #212529; --text-muted: #6c757d;
+            /* Domyślne zmienne (Motyw Las - Light) */
             --primary: #2c6e49; --accent: #f9a620;
-            --border-color-light: #dee2e6;
+            --bg: #f8f9fa; --card: #ffffff;
+            --text-main: #212529; --text-muted: #6c757d;
+            --border: #dee2e6;
             
-            --bg-dark: #12181b; --card-dark: #1a2226;
-            --text-dark: #e8e8e8; --text-muted-dark: #adb5bd;
-            --border-color-dark: #495057;
-
             --border-radius-sm: 8px; --border-radius-md: 16px;
             --box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
             --transition-speed: 0.2s ease-in-out;
         }
 
-        html.dark-mode { --bg-light: var(--bg-dark); --card-light: var(--card-dark); --text-light: var(--text-dark); --text-muted: var(--text-muted-dark); --border-color-light: var(--border-color-dark); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
-        body { background: var(--bg-light); color: var(--text-light); line-height: 1.6; }
+        /* Motyw Las (Dark) */
+        html[data-theme='las'].dark-mode {
+            --primary: #4a9d6b; --accent: #ffb03a;
+            --bg: #12181b; --card: #1a2226;
+            --text-main: #e8e8e8; --text-muted: #adb5bd;
+            --border: #495057;
+        }
+
+        /* Motyw Ocean */
+        html[data-theme='ocean'] {
+            --primary: #006f8a; --accent: #ee9b00;
+            --bg: #f0f8ff; --card: #ffffff;
+            --text-main: #023047; --text-muted: #5e7c8b;
+            --border: #cce6f4;
+        }
+        html[data-theme='ocean'].dark-mode {
+            --primary: #219ebc; --accent: #ffc254;
+            --bg: #012a40; --card: #013754;
+            --text-main: #e0f2f8; --text-muted: #a6bfcc;
+            --border: #025078;
+        }
+
+        /* Motyw Fokus */
+        html[data-theme='fokus'] {
+            --primary: #000000; --accent: #007aff;
+            --bg: #ffffff; --card: #ffffff;
+            --text-main: #000000; --text-muted: #555555;
+            --border: #dcdcdc;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        html[data-theme='fokus'].dark-mode {
+            --primary: #ffffff; --accent: #0a84ff;
+            --bg: #000000; --card: #1c1c1e;
+            --text-main: #ffffff; --text-muted: #aaaaaa;
+            --border: #38383a;
+        }
+
+        /* --- Globalne style --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed); }
+        body { background: var(--bg); color: var(--text-main); line-height: 1.6; }
         .hidden { display: none !important; }
 
         .container { max-width: 900px; margin: 0 auto; padding: 20px 15px; }
         header { background: var(--primary); color: white; border-radius: var(--border-radius-md); padding: 40px 30px; margin: 20px 0 40px 0; box-shadow: var(--box-shadow); text-align: center; }
+        html[data-theme='fokus'] header, html[data-theme='fokus'].dark-mode header { color: var(--bg); }
         header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 15px; }
-        .quote { font-style: italic; font-size: 1.1rem; opacity: 0.8; max-width: 600px; margin: 15px auto 0 auto; }
+        .quote { font-style: italic; font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 15px auto 0 auto; }
 
         .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; margin: 25px 0; }
         .btn { padding: 12px 24px; border-radius: var(--border-radius-sm); border: none; cursor: pointer; font-size: 1rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: all var(--transition-speed); }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #3a8d5f; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(44, 110, 73, 0.2); }
-        .btn-secondary { background: var(--accent); color: #12181b; }
-        .btn-secondary:hover { background: #ffb947; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(249, 166, 32, 0.2); }
+        html[data-theme='fokus'] .btn-primary, html[data-theme='fokus'].dark-mode .btn-primary { color: var(--bg); }
+        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-2px); }
+        .btn-secondary { background: var(--accent); color: var(--text-main); }
+        .btn-secondary:hover { filter: brightness(1.15); transform: translateY(-2px); }
 
         .tabs-container { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .tabs-container::-webkit-scrollbar { display: none; }
         .tabs { display: flex; gap: 12px; justify-content: flex-start; margin: 40px 0; padding-bottom: 10px; min-width: max-content; }
         .tab { padding: 10px 24px; border-radius: var(--border-radius-sm); background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 600; border: 2px solid transparent; flex-shrink: 0; }
-        .tab.active { background: var(--card-light); color: var(--primary); border: 2px solid var(--primary); box-shadow: 0 2px 8px rgba(44, 110, 73, 0.1); }
-        html.dark-mode .tab.active { color: var(--accent); border-color: var(--accent); }
+        .tab.active { background: var(--card); color: var(--primary); border: 2px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0, 0.05); }
+        html.dark-mode .tab.active, html[data-theme='ocean'] .tab.active, html[data-theme='fokus'] .tab.active { color: var(--accent); border-color: var(--accent); }
 
         .section { display: none; }
         .section.active { display: block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .time-section, .auth-container, .statistics, .modal-content { background: var(--card-light); padding: 40px; border-radius: var(--border-radius-md); margin-bottom: 25px; box-shadow: var(--box-shadow); border: 1px solid var(--border-color-light); }
-        .time-header { font-size: 1.8rem; margin-bottom: 30px; color: var(--primary); font-weight: 700; padding-bottom: 10px; border-bottom: 2px solid var(--border-color-light); }
+        .time-section, .auth-container, .statistics, .modal-content { background: var(--card); padding: 40px; border-radius: var(--border-radius-md); margin-bottom: 25px; box-shadow: var(--box-shadow); border: 1px solid var(--border); }
+        .time-header { font-size: 1.8rem; margin-bottom: 30px; color: var(--primary); font-weight: 700; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
         
-        textarea, input[type="date"], select, .auth-form input, .settings-item input { width: 100%; padding: 15px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color-light); background: var(--bg-light); color: var(--text-light); font-size: 1rem; }
-        textarea:focus, input[type="date"]:focus, select:focus, .auth-form input:focus, .settings-item input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 110, 73, 0.15); }
-        html.dark-mode textarea:focus, html.dark-mode input[type="date"]:focus, html.dark-mode select:focus, html.dark-mode .auth-form input:focus, html.dark-mode .settings-item input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249, 166, 32, 0.2); }
+        textarea, input[type="date"], select, .auth-form input, .settings-item input { width: 100%; padding: 15px; border-radius: var(--border-radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; }
+        textarea:focus, input[type="date"]:focus, select:focus, .auth-form input:focus, .settings-item input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
         textarea { min-height: 120px; resize: vertical; }
         label.question { display: block; font-weight: 600; margin-bottom: 10px; }
         .question-group { margin-bottom: 30px; }
 
-        .summary-block { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border-color-light); }
+        .summary-block { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border); }
         .summary-title { font-weight: 700; font-size: 1.3rem; margin-bottom: 25px; color: var(--primary); }
         
-        .sentiment-buttons { display: flex; gap: 8px; margin-top: 10px; }
-        .sentiment-star { font-size: 2rem; cursor: pointer; color: var(--border-color-light); transition: color 0.2s, transform 0.2s; }
+        .sentiment-star { font-size: 2rem; cursor: pointer; color: var(--border); transition: color 0.2s, transform 0.2s; }
         .sentiment-star:hover { transform: scale(1.2); }
         .sentiment-star.active { color: var(--accent); }
-        .habit-tracker .habit-item { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
         .habit-tracker input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); }
         
         /* Modal Styles */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: color-mix(in srgb, var(--bg) 50%, transparent); backdrop-filter: blur(5px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
         .modal-content { max-width: 600px; width: 90%; margin: auto; padding: 25px; border-radius: var(--border-radius-md); animation: fadeIn 0.3s; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h3 { font-size: 1.5rem; }
         .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
 
-        .modal-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color-light); }
+        .modal-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
         .modal-tab { padding: 10px 15px; cursor: pointer; border-bottom: 3px solid transparent; }
         .modal-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
-        html.dark-mode .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        html.dark-mode .modal-tab.active, html[data-theme='ocean'] .modal-tab.active, html[data-theme='fokus'] .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
         .modal-tab-panel { display: none; }
         .modal-tab-panel.active { display: block; }
 
-        /* NOWE style dla Ustawień */
         .modal-tab-panel h4 { margin-bottom: 20px; font-weight: 600; color: var(--primary); }
+        html.dark-mode .modal-tab-panel h4 { color: var(--accent); }
         .settings-list { display: flex; flex-direction: column; gap: 15px; }
         .settings-item { display: flex; gap: 10px; align-items: center; }
         .settings-item input { flex-grow: 1; padding: 12px; font-size: 1rem; }
-        .settings-item button { padding: 8px 12px; background-color: #dc3545; color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: background-color var(--transition-speed); }
-        .settings-item button:hover { background-color: #c82333; }
-        html.dark-mode .modal-tab-panel h4 { color: var(--accent); }
+        .settings-item button { padding: 8px 12px; background-color: #dc3545; color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+        
+        .theme-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; }
+        .theme-option { padding: 15px; border: 2px solid var(--border); border-radius: var(--border-radius-sm); cursor: pointer; text-align: center; }
+        .theme-option.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+        .theme-option span { font-size: 2rem; display: block; }
 
         .auth-container { border: none; text-align: center; }
         .auth-toggle button { color: var(--primary); }
+        .auth-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
 
         @media (max-width: 768px) {
-            body { font-size: 16px; }
-            .container { padding: 15px 10px; }
             .controls { flex-direction: column; align-items: stretch; gap: 20px; }
-            .actions, .date-controls { justify-content: center; width: 100%; }
-            .time-section, .auth-container { padding: 25px 20px; }
+            .actions, .date-controls { justify-content: center; width: 100%; display: flex; gap: 10px; }
+            .time-section, .auth-container, .modal-content { padding: 25px 20px; }
             header { padding: 30px 20px; }
             .btn { min-height: 48px; }
         }
@@ -181,12 +216,14 @@
             <div class="modal-content">
                 <div class="modal-header"><h3>⚙️ Ustawienia</h3><button class="close-modal-btn">✖</button></div>
                 <div class="modal-tabs">
-                    <div class="modal-tab active" data-section="morning">🌅 Poranek</div>
+                    <div class="modal-tab active" data-section="appearance">🎨 Wygląd</div>
+                    <div class="modal-tab" data-section="morning">🌅 Poranek</div>
                     <div class="modal-tab" data-section="afternoon">☀️ Południe</div>
                     <div class="modal-tab" data-section="evening">🌙 Wieczór</div>
                     <div class="modal-tab" data-section="habits">✅ Nawyki</div>
                 </div>
-                <div id="s-morning-panel" class="modal-tab-panel active"></div>
+                <div id="s-appearance-panel" class="modal-tab-panel active"></div>
+                <div id="s-morning-panel" class="modal-tab-panel"></div>
                 <div id="s-afternoon-panel" class="modal-tab-panel"></div>
                 <div id="s-evening-panel" class="modal-tab-panel"></div>
                 <div id="s-habits-panel" class="modal-tab-panel"></div>
@@ -227,7 +264,10 @@
         },
         showMainApp() { this.authPage.classList.add('hidden'); this.mainApp.classList.remove('hidden'); initializeAppLogic(); },
         logout() { sessionStorage.removeItem('isLoggedIn'); sessionStorage.removeItem('dg_user'); window.location.reload(); },
-        checkLoginStatus() { if (sessionStorage.getItem('isLoggedIn')) { this.showMainApp(); } else { this.authPage.classList.remove('hidden'); this.mainApp.classList.add('hidden'); } }
+        checkLoginStatus() { 
+            applyTheme();
+            if (sessionStorage.getItem('isLoggedIn')) { this.showMainApp(); } else { this.authPage.classList.remove('hidden'); this.mainApp.classList.add('hidden'); } 
+        }
     };
 
     const initialQuestions = {
@@ -249,7 +289,7 @@
     class AppStorage {
         static getDayEntry(date) { const user = sessionStorage.getItem('dg_user'); try { return JSON.parse(localStorage.getItem(`dg_entry_${user}_${date}`)) || {}; } catch (e) { return {}; } }
         static saveDayEntry(date, entry) { const user = sessionStorage.getItem('dg_user'); try { localStorage.setItem(`dg_entry_${user}_${date}`, JSON.stringify(entry)); showNotification("Auto-zapisano ✅"); } catch (e) { showNotification("Błąd zapisu."); } }
-        static getSetting(key) { const user = sessionStorage.getItem('dg_user'); try { return JSON.parse(localStorage.getItem(`dg_settings_${user}`))[key]; } catch (e) { return null; } }
+        static getSetting(key) { const user = sessionStorage.getItem('dg_user'); try { const settings = JSON.parse(localStorage.getItem(`dg_settings_${user}`)); return settings ? settings[key] : null; } catch (e) { return null; } }
         static setSetting(key, value) { const user = sessionStorage.getItem('dg_user'); let s = {}; try { s = JSON.parse(localStorage.getItem(`dg_settings_${user}`)) || {}; } catch (e) {} s[key] = value; localStorage.setItem(`dg_settings_${user}`, JSON.stringify(s)); }
         static getQuestions() { let q = JSON.parse(localStorage.getItem(`dg_questions_${sessionStorage.getItem('dg_user')}`)); return q && q.morning ? q : initialQuestions; }
         static saveQuestions(q) { localStorage.setItem(`dg_questions_${sessionStorage.getItem('dg_user')}`, JSON.stringify(q)); }
@@ -292,7 +332,6 @@
 
     class Stats { /* ... Implementacja Stats ... */ }
     
-    // ZAKTUALIZOWANA klasa Settings
     class Settings {
         static tempQuestions;
         static tempHabits;
@@ -302,10 +341,14 @@
             document.querySelectorAll('#settingsModal .modal-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchTab(e.target)));
             
             const modal = document.getElementById('settingsModal');
-            // Delegowanie eventów dla dynamicznie tworzonych elementów
+
             modal.addEventListener('click', (e) => {
                 const target = e.target;
-                if (target.matches('.delete-question-btn')) {
+                const themeOption = target.closest('.theme-option');
+
+                if (themeOption) {
+                    this.handleThemeChange(themeOption);
+                } else if (target.matches('.delete-question-btn')) {
                     this.deleteQuestion(target.dataset.section, target.dataset.index);
                 } else if (target.matches('.add-question-btn')) {
                     this.addQuestion(target.dataset.section);
@@ -327,11 +370,9 @@
         }
     
         static open() {
-            // Głęboka kopia pytań, aby uniknąć modyfikacji oryginału przed zapisaniem
             this.tempQuestions = JSON.parse(JSON.stringify(AppStorage.getQuestions()));
             this.tempHabits = [...AppStorage.getHabits()];
-            
-            this.switchTab(document.querySelector('#settingsModal .modal-tab.active'));
+            this.switchTab(document.querySelector('#settingsModal .modal-tab'));
             openModal('settingsModal');
         }
     
@@ -342,12 +383,35 @@
             document.getElementById(`s-${sectionId}-panel`).classList.add('active');
             this.render(sectionId);
         }
+
+        static handleThemeChange(optionElement) {
+            const themeName = optionElement.dataset.theme;
+            applyTheme(themeName);
+            AppStorage.setSetting('theme', themeName);
+            document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+            optionElement.classList.add('active');
+        }
     
         static render(sectionId) {
             const container = document.getElementById(`s-${sectionId}-panel`);
             let html = '';
 
-            if (sectionId === 'habits') {
+            if (sectionId === 'appearance') {
+                const currentTheme = AppStorage.getSetting('theme') || 'las';
+                html = `
+                    <h4>Wybierz motyw wizualny</h4>
+                    <div class="theme-selector">
+                        <div class="theme-option ${currentTheme === 'las' ? 'active' : ''}" data-theme="las">
+                            <span>🌱</span> Las
+                        </div>
+                        <div class="theme-option ${currentTheme === 'ocean' ? 'active' : ''}" data-theme="ocean">
+                            <span>🌊</span> Ocean
+                        </div>
+                        <div class="theme-option ${currentTheme === 'fokus' ? 'active' : ''}" data-theme="fokus">
+                            <span>⚡</span> Fokus
+                        </div>
+                    </div>`;
+            } else if (sectionId === 'habits') {
                 html += `<h4>Edytuj swoje nawyki</h4><div class="settings-list">`;
                 this.tempHabits.forEach((habit, index) => {
                     html += `
@@ -379,7 +443,6 @@
         static addHabit() { this.tempHabits.push(''); this.render('habits'); }
 
         static saveAndClose() {
-            // Usuń puste pytania i nawyki przed zapisem
             Object.keys(this.tempQuestions).forEach(section => {
                 this.tempQuestions[section] = this.tempQuestions[section].filter(q => q.text.trim() !== '');
             });
@@ -388,7 +451,6 @@
             AppStorage.saveQuestions(this.tempQuestions);
             AppStorage.saveHabits(this.tempHabits);
 
-            // Przeładuj dane i interfejs aplikacji
             currentQuestions = AppStorage.getQuestions();
             currentHabits = AppStorage.getHabits();
             rebuildAllSections();
@@ -401,9 +463,14 @@
 
     function initializeAppLogic() {
         if (isAppInitialized) return;
+        
+        const isDarkMode = AppStorage.getSetting('darkMode') || false;
+        document.documentElement.classList.toggle('dark-mode', isDarkMode);
+        
         currentQuestions = AppStorage.getQuestions();
         currentHabits = AppStorage.getHabits();
         currentDate = DateHelpers.formatDateISO(new Date());
+        
         document.getElementById('dailyQuote').textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
         bindAppEventListeners();
         rebuildAllSections();
@@ -415,11 +482,12 @@
     function bindAppEventListeners() {
         document.getElementById('prev-day-btn').addEventListener('click', () => changeDate(-1));
         document.getElementById('next-day-btn').addEventListener('click', () => changeDate(1));
-        document.getElementById('currentDate').addEventListener('change', (e) => loadDate(e.target.value));
+        document.getElementById('currentDate').addEventListener('input', (e) => loadDate(e.target.value));
         document.getElementById('pdf-btn').addEventListener('click', exportPDF);
         document.getElementById('dark-mode-btn').addEventListener('click', toggleDarkMode);
         document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
         document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+        
         document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', (e) => {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
@@ -427,6 +495,7 @@
             const sId = e.currentTarget.dataset.section;
             document.getElementById(`${sId}-panel`).classList.add('active');
         }));
+        
         document.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', (e) => closeModal(e.target.closest('.modal').id)));
         Settings.init();
     }
@@ -434,8 +503,24 @@
     function rebuildAllSections() { UI.buildSection('morning', 'Poranek', '🌅', '#morning-panel'); UI.buildSection('afternoon', 'Południe', '☀️', '#afternoon-panel'); UI.buildSection('evening', 'Wieczór', '🌙', '#evening-panel'); }
     function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['morning', 'afternoon', 'evening'].forEach(s => UI.loadSectionData(s, currentDate)); }
     function changeDate(d) { const dt = new Date(currentDate); dt.setDate(dt.getDate() + d); loadDate(DateHelpers.formatDateISO(dt)); }
-    function toggleDarkMode() { document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', document.documentElement.classList.contains('dark-mode')); }
-    function showNotification(m, d = 3000) { const el = document.getElementById('notification'); el.textContent = m; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), d - 100); }
+    
+    function applyTheme(themeName = null) {
+        const themeToApply = themeName || AppStorage.getSetting('theme') || 'las';
+        document.documentElement.dataset.theme = themeToApply;
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if(metaThemeColor) {
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+            metaThemeColor.setAttribute('content', primaryColor.trim());
+        }
+    }
+
+    function toggleDarkMode() {
+        const isDarkMode = document.documentElement.classList.toggle('dark-mode');
+        AppStorage.setSetting('darkMode', isDarkMode);
+        applyTheme();
+    }
+    
+    function showNotification(m, d = 3000) { const el = document.getElementById('notification'); if(el) { el.textContent = m; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), d - 100); } }
     function openModal(id) { document.getElementById(id)?.classList.add('active'); }
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
     async function exportPDF() { showNotification("Funkcja PDF w budowie."); }
