@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="las">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Daily Growth 2.0 🌱 – Wersja Stabilna</title>
+    <meta name="description" content="Aplikacja Daily Growth to Twój osobisty dziennik rozwoju. Śledź postępy, nawyki, analizuj trendy i buduj lepszą wersję siebie.">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2c6e49">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Daily Growth">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
+
+    <style>
+        /* === SYSTEM MOTYWÓW I STYL PODSTAWOWY === */
+        :root {
+            /* Domyślne zmienne (Motyw Las - Light) */
+            --primary: #2c6e49; --accent: #f9a620;
+            --bg: #f8f9fa; --card: #ffffff;
+            --text-main: #212529; --text-muted: #6c757d;
+            --border: #dee2e6;
+            
+            --border-radius-sm: 8px; --border-radius-md: 16px;
+            --box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+            --transition-speed: 0.2s ease-in-out;
+        }
+
+        /* Motyw Las (Dark) */
+        html[data-theme='las'].dark-mode {
+            --primary: #4a9d6b; --accent: #ffb03a;
+            --bg: #12181b; --card: #1a2226;
+            --text-main: #e8e8e8; --text-muted: #adb5bd;
+            --border: #495057;
+        }
+
+        /* Motyw Ocean */
+        html[data-theme='ocean'] {
+            --primary: #006f8a; --accent: #ee9b00;
+            --bg: #f0f8ff; --card: #ffffff;
+            --text-main: #023047; --text-muted: #5e7c8b;
+            --border: #cce6f4;
+        }
+        html[data-theme='ocean'].dark-mode {
+            --primary: #219ebc; --accent: #ffc254;
+            --bg: #012a40; --card: #013754;
+            --text-main: #e0f2f8; --text-muted: #a6bfcc;
+            --border: #025078;
+        }
+
+        /* Motyw Fokus */
+        html[data-theme='fokus'] {
+            --primary: #000000; --accent: #007aff;
+            --bg: #ffffff; --card: #ffffff;
+            --text-main: #000000; --text-muted: #555555;
+            --border: #dcdcdc;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        html[data-theme='fokus'].dark-mode {
+            --primary: #ffffff; --accent: #0a84ff;
+            --bg: #000000; --card: #1c1c1e;
+            --text-main: #ffffff; --text-muted: #aaaaaa;
+            --border: #38383a;
+        }
+
+        /* --- Globalne style --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed); }
+        body { background: var(--bg); color: var(--text-main); line-height: 1.6; }
+        .hidden { display: none !important; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 20px 15px; }
+        header { background: var(--primary); color: white; border-radius: var(--border-radius-md); padding: 40px 30px; margin: 20px 0 40px 0; box-shadow: var(--box-shadow); text-align: center; }
+        html[data-theme='fokus'] header, html[data-theme='fokus'].dark-mode header { color: var(--bg); }
+        header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 15px; }
+        .quote { font-style: italic; font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 15px auto 0 auto; }
+
+        .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; margin: 25px 0; }
+        .btn { padding: 12px 24px; border-radius: var(--border-radius-sm); border: none; cursor: pointer; font-size: 1rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: all var(--transition-speed); }
+        .btn-primary { background: var(--primary); color: white; }
+        html[data-theme='fokus'] .btn-primary, html[data-theme='fokus'].dark-mode .btn-primary { color: var(--bg); }
+        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-2px); }
+        .btn-secondary { background: var(--accent); color: var(--text-main); }
+        .btn-secondary:hover { filter: brightness(1.15); transform: translateY(-2px); }
+
+        .tabs-container { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .tabs-container::-webkit-scrollbar { display: none; }
+        .tabs { display: flex; gap: 12px; justify-content: flex-start; margin: 40px 0; padding-bottom: 10px; min-width: max-content; }
+        .tab { padding: 10px 24px; border-radius: var(--border-radius-sm); background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 600; border: 2px solid transparent; flex-shrink: 0; }
+        .tab.active { background: var(--card); color: var(--primary); border: 2px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0, 0.05); }
+        html.dark-mode .tab.active, html[data-theme='ocean'] .tab.active, html[data-theme='fokus'] .tab.active { color: var(--accent); border-color: var(--accent); }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .time-section, .auth-container, .statistics, .modal-content { background: var(--card); padding: 40px; border-radius: var(--border-radius-md); margin-bottom: 25px; box-shadow: var(--box-shadow); border: 1px solid var(--border); }
+        .time-header { font-size: 1.8rem; margin-bottom: 30px; color: var(--primary); font-weight: 700; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+        
+        textarea, input[type="date"], select, .auth-form input, .settings-item input { width: 100%; padding: 15px; border-radius: var(--border-radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; }
+        textarea:focus, input[type="date"]:focus, select:focus, .auth-form input:focus, .settings-item input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+        textarea { min-height: 120px; resize: vertical; }
+        label.question { display: block; font-weight: 600; margin-bottom: 10px; }
+        .question-group { margin-bottom: 30px; }
+
+        .summary-block { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border); }
+        .summary-title { font-weight: 700; font-size: 1.3rem; margin-bottom: 25px; color: var(--primary); }
+        
+        .sentiment-star { font-size: 2rem; cursor: pointer; color: var(--border); transition: color 0.2s, transform 0.2s; }
+        .sentiment-star:hover { transform: scale(1.2); }
+        .sentiment-star.active { color: var(--accent); }
+        .habit-tracker input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: color-mix(in srgb, var(--bg) 50%, transparent); backdrop-filter: blur(5px); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { max-width: 600px; width: 90%; margin: auto; padding: 25px; border-radius: var(--border-radius-md); animation: fadeIn 0.3s; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 1.5rem; }
+        .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+
+        .modal-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .modal-tab { padding: 10px 15px; cursor: pointer; border-bottom: 3px solid transparent; }
+        .modal-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+        html.dark-mode .modal-tab.active, html[data-theme='ocean'] .modal-tab.active, html[data-theme='fokus'] .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .modal-tab-panel { display: none; }
+        .modal-tab-panel.active { display: block; }
+
+        .modal-tab-panel h4 { margin-bottom: 20px; font-weight: 600; color: var(--primary); }
+        html.dark-mode .modal-tab-panel h4 { color: var(--accent); }
+        .settings-list { display: flex; flex-direction: column; gap: 15px; }
+        .settings-item { display: flex; gap: 10px; align-items: center; }
+        .settings-item input { flex-grow: 1; padding: 12px; font-size: 1rem; }
+        .settings-item button { padding: 8px 12px; background-color: #dc3545; color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+        
+        .theme-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; }
+        .theme-option { padding: 15px; border: 2px solid var(--border); border-radius: var(--border-radius-sm); cursor: pointer; text-align: center; }
+        .theme-option.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+        .theme-option span { font-size: 2rem; display: block; }
+
+        .auth-container { border: none; text-align: center; }
+        .auth-toggle button { color: var(--primary); }
+        .auth-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+
+        @media (max-width: 768px) {
+            .controls { flex-direction: column; align-items: stretch; gap: 20px; }
+            .actions, .date-controls { justify-content: center; width: 100%; display: flex; gap: 10px; }
+            .time-section, .auth-container, .modal-content { padding: 25px 20px; }
+            header { padding: 30px 20px; }
+            .btn { min-height: 48px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-page">
+        <div class="auth-container">
+            <h1>🌱 Daily Growth</h1>
+            <div class="auth-toggle">
+                <span id="toggleText">Nie masz konta?</span>
+                <button id="toggleAuthBtn" type="button">Zarejestruj się</button>
+            </div>
+            <form id="authForm" class="auth-form">
+                <div class="auth-error" id="authError"></div>
+                <input type="text" id="authLogin" placeholder="Login" autocomplete="username" required>
+                <input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required>
+                <button class="btn btn-primary" id="authSubmitBtn" type="submit" style="width: 100%;">Zaloguj się</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <div class="container">
+            <header>
+                <h1>🌱 Daily Growth 2.0</h1>
+                <p class="quote" id="dailyQuote"></p>
+            </header>
+            <div class="controls">
+                <div class="date-controls">
+                    <button class="btn btn-primary" id="prev-day-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
+                    </button>
+                    <input type="date" id="currentDate">
+                    <button class="btn btn-primary" id="next-day-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                    </button>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="pdf-btn">PDF</button>
+                    <button class="btn btn-primary" id="dark-mode-btn">Tryb</button>
+                    <button class="btn btn-secondary" id="settings-btn">Ustawienia</button>
+                    <button class="btn btn-primary" id="logout-btn">Wyloguj</button>
+                </div>
+            </div>
+            <div class="tabs-container">
+                <div class="tabs" role="tablist">
+                    <div class="tab active" data-section="morning">🌅 Poranek</div>
+                    <div class="tab" data-section="afternoon">☀️ Południe</div>
+                    <div class="tab" data-section="evening">🌙 Wieczór</div>
+                    <div class="tab" data-section="stats">📊 Analiza trendów</div>
+                </div>
+            </div>
+            <section id="morning-panel" class="section active"></section>
+            <section id="afternoon-panel" class="section"></section>
+            <section id="evening-panel" class="section"></section>
+            <section id="stats-panel" class="section"></section>
+        </div>
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header"><h3>⚙️ Ustawienia</h3><button class="close-modal-btn">✖</button></div>
+                <div class="modal-tabs">
+                    <div class="modal-tab active" data-section="appearance">🎨 Wygląd</div>
+                    <div class="modal-tab" data-section="morning">🌅 Poranek</div>
+                    <div class="modal-tab" data-section="afternoon">☀️ Południe</div>
+                    <div class="modal-tab" data-section="evening">🌙 Wieczór</div>
+                    <div class="modal-tab" data-section="habits">✅ Nawyki</div>
+                </div>
+                <div id="s-appearance-panel" class="modal-tab-panel active"></div>
+                <div id="s-morning-panel" class="modal-tab-panel"></div>
+                <div id="s-afternoon-panel" class="modal-tab-panel"></div>
+                <div id="s-evening-panel" class="modal-tab-panel"></div>
+                <div id="s-habits-panel" class="modal-tab-panel"></div>
+                <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 20px; width: 100%;">Zapisz i zamknij</button>
+            </div>
+        </div>
+        <div class="notification" id="notification"></div>
+    </div>
+<script>
+    'use strict';
+    const Auth = {
+        mode: "login",
+        init() { this.cacheDOM(); this.bindEvents(); },
+        cacheDOM() { this.authPage = document.getElementById('auth-page'); this.mainApp = document.getElementById('main-app'); this.authForm = document.getElementById('authForm'); this.authLogin = document.getElementById('authLogin'); this.authPassword = document.getElementById('authPassword'); this.authError = document.getElementById('authError'); this.authSubmitBtn = document.getElementById('authSubmitBtn'); this.toggleAuthBtn = document.getElementById('toggleAuthBtn'); this.toggleText = document.getElementById('toggleText'); },
+        bindEvents() {
+            this.authForm.addEventListener('submit', (e) => { e.preventDefault(); if (this.mode === "login") this.login(); else this.register(); });
+            this.toggleAuthBtn.addEventListener('click', () => { if (this.mode === "login") this.showRegister(); else this.showLogin(); });
+        },
+        showLogin() { this.mode = "login"; this.authSubmitBtn.textContent = "Zaloguj się"; this.toggleText.textContent = "Nie masz konta?"; this.toggleAuthBtn.textContent = "Zarejestruj się"; this.authError.textContent = ""; this.authLogin.value = ""; this.authPassword.value = ""; },
+        showRegister() { this.mode = "register"; this.authSubmitBtn.textContent = "Zarejestruj się"; this.toggleText.textContent = "Masz już konto?"; this.toggleAuthBtn.textContent = "Zaloguj się"; this.authError.textContent = ""; this.authLogin.value = ""; this.authPassword.value = ""; },
+        async login() {
+            const login = this.authLogin.value.trim();
+            const password = this.authPassword.value;
+            if (!login || !password) { this.authError.textContent = "Podaj login i hasło."; return; }
+            try {
+                const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, password }) });
+                if (res.ok) { sessionStorage.setItem('isLoggedIn', 'true'); sessionStorage.setItem('dg_user', login); this.showMainApp(); } else { const data = await res.json(); this.authError.textContent = data.message || "Błąd logowania."; }
+            } catch (e) { this.authError.textContent = "Błąd połączenia z serwerem."; }
+        },
+        async register() {
+            const login = this.authLogin.value.trim();
+            const password = this.authPassword.value;
+            if (!login || !password) { this.authError.textContent = "Podaj login i hasło."; return; }
+            try {
+                const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, password }) });
+                if (res.ok) { this.authError.textContent = "Rejestracja udana! Możesz się zalogować."; setTimeout(() => this.showLogin(), 1500); } else { const data = await res.json(); this.authError.textContent = data.message || "Błąd rejestracji."; }
+            } catch (e) { this.authError.textContent = "Błąd połączenia z serwerem."; }
+        },
+        showMainApp() { this.authPage.classList.add('hidden'); this.mainApp.classList.remove('hidden'); initializeAppLogic(); },
+        logout() { sessionStorage.removeItem('isLoggedIn'); sessionStorage.removeItem('dg_user'); window.location.reload(); },
+        checkLoginStatus() { 
+            applyTheme();
+            if (sessionStorage.getItem('isLoggedIn')) { this.showMainApp(); } else { this.authPage.classList.remove('hidden'); this.mainApp.classList.add('hidden'); } 
+        }
+    };
+
+    const initialQuestions = {
+        morning: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}, {id:"m3", text:"Jaką pozytywną afirmację wybieram na dziś?"} ],
+        afternoon: [ {id:"a1", text:"Co udało mi się do tej pory osiągnąć?"}, {id:"a2", text:"Co sprawiło mi dzisiaj radość?"}, {id:"a3", text:"Jak mogę lepiej wykorzystać resztę dnia?"} ],
+        evening: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3", text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
+    };
+    const initialHabits = ["Medytacja", "Ćwiczenia fizyczne", "Czytanie książki", "Nauka czegoś nowego"];
+    const sentimentQuestions = [ { id: 'health', question: '💪 Jak oceniasz swoje samopoczucie fizyczne?' }, { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' } ];
+    const affirmations = [ "Jestem spokojny/a i skoncentrowany/a.", "Każdy dzień przynosi nowe możliwości.", "Mam w sobie siłę, by sprostać każdemu wyzwaniu." ];
+    const quotes = [ "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨" ];
+    let currentQuestions, currentHabits, currentDate, notificationTimeout, isAppInitialized = false;
+
+    class DateHelpers {
+        static subDays(date, amount) { const d = new Date(date); d.setDate(d.getDate() - amount); return d; }
+        static formatDateISO(date) { return date.toISOString().split('T')[0]; }
+    }
+
+    class AppStorage {
+        static getDayEntry(date) { const user = sessionStorage.getItem('dg_user'); try { return JSON.parse(localStorage.getItem(`dg_entry_${user}_${date}`)) || {}; } catch (e) { return {}; } }
+        static saveDayEntry(date, entry) { const user = sessionStorage.getItem('dg_user'); try { localStorage.setItem(`dg_entry_${user}_${date}`, JSON.stringify(entry)); showNotification("Auto-zapisano ✅"); } catch (e) { showNotification("Błąd zapisu."); } }
+        static getSetting(key) { const user = sessionStorage.getItem('dg_user'); try { const settings = JSON.parse(localStorage.getItem(`dg_settings_${user}`)); return settings ? settings[key] : null; } catch (e) { return null; } }
+        static setSetting(key, value) { const user = sessionStorage.getItem('dg_user'); let s = {}; try { s = JSON.parse(localStorage.getItem(`dg_settings_${user}`)) || {}; } catch (e) {} s[key] = value; localStorage.setItem(`dg_settings_${user}`, JSON.stringify(s)); }
+        static getQuestions() { let q = JSON.parse(localStorage.getItem(`dg_questions_${sessionStorage.getItem('dg_user')}`)); return q && q.morning ? q : initialQuestions; }
+        static saveQuestions(q) { localStorage.setItem(`dg_questions_${sessionStorage.getItem('dg_user')}`, JSON.stringify(q)); }
+        static getHabits() { return JSON.parse(localStorage.getItem(`dg_habits_${sessionStorage.getItem('dg_user')}`)) || initialHabits; }
+        static saveHabits(h) { localStorage.setItem(`dg_habits_${sessionStorage.getItem('dg_user')}`, JSON.stringify(h)); }
+    }
+
+    class UI {
+        static buildSection(sectionId, title, emoji, containerSelector) {
+            const panel = document.querySelector(containerSelector);
+            if (!panel) return;
+            const questions = currentQuestions[sectionId] || [];
+            let html = `<div class="time-section"><h2 class="time-header">${emoji} ${title}</h2><div id="${sectionId}-content-container">`;
+            questions.forEach(q => {
+                const isAffirmation = sectionId === 'morning' && q.text.toLowerCase().includes('afirmacj');
+                html += `<div class="question-group"><label class="question">${q.text}</label>`;
+                if (isAffirmation) {
+                    html += `<div class="affirmation-wrapper"><select data-id="${q.id}" class="affirmation-select"><option value="">Wybierz...</option>${affirmations.map(aff => `<option value="${aff}">${aff.substring(0, 60)}...</option>`).join('')}<option value="custom">Inna...</option></select><div class="hidden-textarea hidden"><textarea data-id="${q.id}"></textarea></div></div>`;
+                } else { html += `<textarea data-id="${q.id}"></textarea>`; }
+                html += `</div>`;
+            });
+            if (sectionId === 'evening') {
+                html += `<div class="summary-block"><div class="summary-title">Podsumowanie dnia:</div>${sentimentQuestions.map(sq => `<div class="question-group"><label class="question">${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('')}</div>`;
+                if (currentHabits.length > 0) { html += `<div class="summary-block habit-tracker"><div class="summary-title">Nawyki:</div>${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div>`; }
+            }
+            html += `</div></div>`;
+            panel.innerHTML = html;
+            panel.querySelectorAll('textarea, select').forEach(el => { el.addEventListener('input', (e) => UI.saveInput(sectionId, e.target)); if (el.tagName === 'SELECT') { el.addEventListener('change', (e) => UI.handleAffirmationChange(e.target)); } });
+            panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', (e) => UI.saveHabitStatus(e.target)));
+            panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', (e) => UI.setSentiment(e.currentTarget)));
+        }
+        static buildStatsSection(containerSelector) { const el = document.querySelector(containerSelector); if (el) el.innerHTML = `<div class="statistics"><div class="stats-header"><h2>📊 Analiza</h2><select id="statsPeriod"><option value="7">7 dni</option><option value="30" selected>30 dni</option><option value="90">90 dni</option></select></div><h3>Oceny</h3><div class="chart-container"><canvas id="sentimentChart"></canvas></div><h3>Sentyment tekstu</h3><div class="chart-container"><canvas id="textSentimentChart"></canvas></div></div>`; }
+        static loadSectionData(sectionId, date) { const entry = AppStorage.getDayEntry(date); const data = entry[sectionId] || {}; document.querySelectorAll(`#${sectionId}-panel textarea, #${sectionId}-panel select`).forEach(el => { const id = el.dataset.id; if (!id) return; el.value = data[id] || ''; }); if (sectionId === 'evening') { const habits = entry.evening?.habits || {}; currentHabits.forEach(h => { const cb = document.querySelector(`#evening-panel [data-habit-name="${h}"]`); if (cb) cb.checked = habits[h] || false; }); sentimentQuestions.forEach(sq => { const val = entry.evening?.[sq.id + 'Sent']; if (val) UI.updateStars(document.querySelector(`#evening-panel .sentiment-buttons[data-id="${sq.id}"]`), val); }); } }
+        static saveInput(sectionId, target) { const id = target.dataset.id, entry = AppStorage.getDayEntry(currentDate); if (!entry[sectionId]) entry[sectionId] = {}; entry[sectionId][id] = target.value; AppStorage.saveDayEntry(currentDate, entry); }
+        static saveHabitStatus(checkbox) { const name = checkbox.dataset.habitName, entry = AppStorage.getDayEntry(currentDate); if (!entry.evening) entry.evening = {}; if (!entry.evening.habits) entry.evening.habits = {}; entry.evening.habits[name] = checkbox.checked; AppStorage.saveDayEntry(currentDate, entry); }
+        static handleAffirmationChange(select) { const textarea = select.parentElement.querySelector('.hidden-textarea'); if (select.value === 'custom') textarea.classList.remove('hidden'); else textarea.classList.add('hidden'); }
+        static setSentiment(starEl) { const value = starEl.dataset.value; const container = starEl.parentElement; const catId = container.dataset.id; UI.updateStars(container, value); const entry = AppStorage.getDayEntry(currentDate); if (!entry.evening) entry.evening = {}; entry.evening[catId + 'Sent'] = value; AppStorage.saveDayEntry(currentDate, entry); }
+        static updateStars(container, value) { if (!container) return; const stars = container.querySelectorAll('.sentiment-star'); stars.forEach(star => { star.classList.remove('active'); star.textContent = '☆'; if (parseInt(star.dataset.value) <= parseInt(value)) { star.classList.add('active'); star.textContent = '★'; } }); }
+    }
+
+    class Stats { /* ... Implementacja Stats ... */ }
+    
+    class Settings {
+        static tempQuestions;
+        static tempHabits;
+        
+        static init() {
+            document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
+            document.querySelectorAll('#settingsModal .modal-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchTab(e.target)));
+            
+            const modal = document.getElementById('settingsModal');
+
+            modal.addEventListener('click', (e) => {
+                const target = e.target;
+                const themeOption = target.closest('.theme-option');
+
+                if (themeOption) {
+                    this.handleThemeChange(themeOption);
+                } else if (target.matches('.delete-question-btn')) {
+                    this.deleteQuestion(target.dataset.section, target.dataset.index);
+                } else if (target.matches('.add-question-btn')) {
+                    this.addQuestion(target.dataset.section);
+                } else if (target.matches('.delete-habit-btn')) {
+                    this.deleteHabit(target.dataset.index);
+                } else if (target.matches('.add-habit-btn')) {
+                    this.addHabit();
+                }
+            });
+
+            modal.addEventListener('input', (e) => {
+                const target = e.target;
+                if (target.matches('.question-input')) {
+                    this.updateQuestionText(target.dataset.section, target.dataset.index, target.value);
+                } else if (target.matches('.habit-input')) {
+                    this.updateHabitText(target.dataset.index, target.value);
+                }
+            });
+        }
+    
+        static open() {
+            this.tempQuestions = JSON.parse(JSON.stringify(AppStorage.getQuestions()));
+            this.tempHabits = [...AppStorage.getHabits()];
+            this.switchTab(document.querySelector('#settingsModal .modal-tab'));
+            openModal('settingsModal');
+        }
+    
+        static switchTab(tabEl) {
+            document.querySelectorAll('#settingsModal .modal-tab, #settingsModal .modal-tab-panel').forEach(el => el.classList.remove('active'));
+            tabEl.classList.add('active');
+            const sectionId = tabEl.dataset.section;
+            document.getElementById(`s-${sectionId}-panel`).classList.add('active');
+            this.render(sectionId);
+        }
+
+        static handleThemeChange(optionElement) {
+            const themeName = optionElement.dataset.theme;
+            applyTheme(themeName);
+            AppStorage.setSetting('theme', themeName);
+            document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+            optionElement.classList.add('active');
+        }
+    
+        static render(sectionId) {
+            const container = document.getElementById(`s-${sectionId}-panel`);
+            let html = '';
+
+            if (sectionId === 'appearance') {
+                const currentTheme = AppStorage.getSetting('theme') || 'las';
+                html = `
+                    <h4>Wybierz motyw wizualny</h4>
+                    <div class="theme-selector">
+                        <div class="theme-option ${currentTheme === 'las' ? 'active' : ''}" data-theme="las">
+                            <span>🌱</span> Las
+                        </div>
+                        <div class="theme-option ${currentTheme === 'ocean' ? 'active' : ''}" data-theme="ocean">
+                            <span>🌊</span> Ocean
+                        </div>
+                        <div class="theme-option ${currentTheme === 'fokus' ? 'active' : ''}" data-theme="fokus">
+                            <span>⚡</span> Fokus
+                        </div>
+                    </div>`;
+            } else if (sectionId === 'habits') {
+                html += `<h4>Edytuj swoje nawyki</h4><div class="settings-list">`;
+                this.tempHabits.forEach((habit, index) => {
+                    html += `
+                        <div class="settings-item">
+                            <input type="text" class="habit-input" data-index="${index}" value="${habit}" placeholder="Treść nawyku">
+                            <button class="delete-habit-btn btn" data-index="${index}">Usuń</button>
+                        </div>`;
+                });
+                html += `</div><button class="btn btn-secondary add-habit-btn" style="margin-top: 15px;">+ Dodaj nawyk</button>`;
+            } else if (this.tempQuestions[sectionId]) {
+                html += `<h4>Edytuj pytania dla sekcji "${sectionId}"</h4><div class="settings-list">`;
+                this.tempQuestions[sectionId].forEach((question, index) => {
+                    html += `
+                        <div class="settings-item">
+                            <input type="text" class="question-input" data-section="${sectionId}" data-index="${index}" value="${question.text}" placeholder="Treść pytania">
+                            <button class="delete-question-btn btn" data-section="${sectionId}" data-index="${index}">Usuń</button>
+                        </div>`;
+                });
+                html += `</div><button class="btn btn-secondary add-question-btn" data-section="${sectionId}" style="margin-top: 15px;">+ Dodaj pytanie</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        static updateQuestionText(section, index, newText) { this.tempQuestions[section][index].text = newText; }
+        static deleteQuestion(section, index) { this.tempQuestions[section].splice(index, 1); this.render(section); }
+        static addQuestion(section) { const newId = section.charAt(0) + Date.now(); this.tempQuestions[section].push({ id: newId, text: '' }); this.render(section); }
+        static updateHabitText(index, newText) { this.tempHabits[index] = newText; }
+        static deleteHabit(index) { this.tempHabits.splice(index, 1); this.render('habits'); }
+        static addHabit() { this.tempHabits.push(''); this.render('habits'); }
+
+        static saveAndClose() {
+            Object.keys(this.tempQuestions).forEach(section => {
+                this.tempQuestions[section] = this.tempQuestions[section].filter(q => q.text.trim() !== '');
+            });
+            this.tempHabits = this.tempHabits.filter(h => h.trim() !== '');
+
+            AppStorage.saveQuestions(this.tempQuestions);
+            AppStorage.saveHabits(this.tempHabits);
+
+            currentQuestions = AppStorage.getQuestions();
+            currentHabits = AppStorage.getHabits();
+            rebuildAllSections();
+            loadDate(currentDate); 
+
+            closeModal('settingsModal');
+            showNotification("Ustawienia zapisane! ✅");
+        }
+    }
+
+    function initializeAppLogic() {
+        if (isAppInitialized) return;
+        
+        const isDarkMode = AppStorage.getSetting('darkMode') || false;
+        document.documentElement.classList.toggle('dark-mode', isDarkMode);
+        
+        currentQuestions = AppStorage.getQuestions();
+        currentHabits = AppStorage.getHabits();
+        currentDate = DateHelpers.formatDateISO(new Date());
+        
+        document.getElementById('dailyQuote').textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+        bindAppEventListeners();
+        rebuildAllSections();
+        UI.buildStatsSection('#stats-panel');
+        loadDate(currentDate);
+        isAppInitialized = true;
+    }
+
+    function bindAppEventListeners() {
+        document.getElementById('prev-day-btn').addEventListener('click', () => changeDate(-1));
+        document.getElementById('next-day-btn').addEventListener('click', () => changeDate(1));
+        document.getElementById('currentDate').addEventListener('input', (e) => loadDate(e.target.value));
+        document.getElementById('pdf-btn').addEventListener('click', exportPDF);
+        document.getElementById('dark-mode-btn').addEventListener('click', toggleDarkMode);
+        document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
+        document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+        
+        document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', (e) => {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            const sId = e.currentTarget.dataset.section;
+            document.getElementById(`${sId}-panel`).classList.add('active');
+        }));
+        
+        document.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', (e) => closeModal(e.target.closest('.modal').id)));
+        Settings.init();
+    }
+    
+    function rebuildAllSections() { UI.buildSection('morning', 'Poranek', '🌅', '#morning-panel'); UI.buildSection('afternoon', 'Południe', '☀️', '#afternoon-panel'); UI.buildSection('evening', 'Wieczór', '🌙', '#evening-panel'); }
+    function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['morning', 'afternoon', 'evening'].forEach(s => UI.loadSectionData(s, currentDate)); }
+    function changeDate(d) { const dt = new Date(currentDate); dt.setDate(dt.getDate() + d); loadDate(DateHelpers.formatDateISO(dt)); }
+    
+    function applyTheme(themeName = null) {
+        const themeToApply = themeName || AppStorage.getSetting('theme') || 'las';
+        document.documentElement.dataset.theme = themeToApply;
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if(metaThemeColor) {
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+            metaThemeColor.setAttribute('content', primaryColor.trim());
+        }
+    }
+
+    function toggleDarkMode() {
+        const isDarkMode = document.documentElement.classList.toggle('dark-mode');
+        AppStorage.setSetting('darkMode', isDarkMode);
+        applyTheme();
+    }
+    
+    function showNotification(m, d = 3000) { const el = document.getElementById('notification'); if(el) { el.textContent = m; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), d - 100); } }
+    function openModal(id) { document.getElementById(id)?.classList.add('active'); }
+    function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+    async function exportPDF() { showNotification("Funkcja PDF w budowie."); }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        Auth.init();
+        Auth.checkLoginStatus();
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(err => console.error('Service worker registration failed:', err));
+            });
+        }
+    });
+</script>
+</body>
+</html>
