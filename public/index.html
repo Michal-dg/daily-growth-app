@@ -24,79 +24,45 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
 
     <style>
-        /* === NOWY, PROFESJONALNY STYL DLA DAILY GROWTH 2.0 === */
+        /* === FINALNY, PROFESJONALNY STYL V3 === */
         :root {
-            --bg-light: #f8f9fa;
-            --card-light: #ffffff;
-            --text-light: #212529;
-            --text-muted: #6c757d;
-            --primary: #2c6e49; /* Głęboka, spokojna zieleń */
-            --accent: #f9a620;  /* Ciepłe, motywujące złoto */
+            --bg-light: #f8f9fa; --card-light: #ffffff;
+            --text-light: #212529; --text-muted: #6c757d;
+            --primary: #2c6e49; --accent: #f9a620;
             --border-color-light: #dee2e6;
             
-            --bg-dark: #12181b;
-            --card-dark: #1a2226;
-            --text-dark: #e8e8e8;
-            --text-muted-dark: #adb5bd;
+            --bg-dark: #12181b; --card-dark: #1a2226;
+            --text-dark: #e8e8e8; --text-muted-dark: #adb5bd;
             --border-color-dark: #495057;
 
-            --border-radius-sm: 8px;
-            --border-radius-md: 16px;
+            --border-radius-sm: 8px; --border-radius-md: 16px;
             --box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
             --transition-speed: 0.2s ease-in-out;
         }
 
-        html.dark-mode {
-            --bg-light: var(--bg-dark);
-            --card-light: var(--card-dark);
-            --text-light: var(--text-dark);
-            --text-muted: var(--text-muted-dark);
-            --border-color-light: var(--border-color-dark);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
-        }
-
-        body {
-            background: var(--bg-light);
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
+        html.dark-mode { --bg-light: var(--bg-dark); --card-light: var(--card-dark); --text-light: var(--text-dark); --text-muted: var(--text-muted-dark); --border-color-light: var(--border-color-dark); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+        body { background: var(--bg-light); color: var(--text-light); line-height: 1.6; }
         .hidden { display: none !important; }
 
         .container { max-width: 900px; margin: 0 auto; padding: 20px 15px; }
-
-        header {
-            background: var(--primary);
-            color: white;
-            border-radius: var(--border-radius-md);
-            padding: 40px 30px;
-            margin: 20px 0 40px 0;
-            box-shadow: var(--box-shadow);
-        }
+        header { background: var(--primary); color: white; border-radius: var(--border-radius-md); padding: 40px 30px; margin: 20px 0 40px 0; box-shadow: var(--box-shadow); text-align: center; }
         header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 15px; }
-        .quote { font-style: italic; font-size: 1.1rem; opacity: 0.8; max-width: 600px; margin: 15px auto 0 auto; background: transparent; padding: 0; }
+        .quote { font-style: italic; font-size: 1.1rem; opacity: 0.8; max-width: 600px; margin: 15px auto 0 auto; }
 
         .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; margin: 25px 0; }
-
-        .btn { padding: 12px 24px; border-radius: var(--border-radius-sm); border: none; cursor: pointer; font-size: 1rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed); }
+        .btn { padding: 12px 24px; border-radius: var(--border-radius-sm); border: none; cursor: pointer; font-size: 1rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: all var(--transition-speed); }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: #3a8d5f; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(44, 110, 73, 0.2); }
         .btn-secondary { background: var(--accent); color: #12181b; }
         .btn-secondary:hover { background: #ffb947; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(249, 166, 32, 0.2); }
 
-        .tabs-container { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* Firefox */ }
-        .tabs-container::-webkit-scrollbar { display: none; /* Chrome, Safari */ }
+        .tabs-container { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .tabs-container::-webkit-scrollbar { display: none; }
         .tabs { display: flex; gap: 12px; justify-content: flex-start; margin: 40px 0; padding-bottom: 10px; min-width: max-content; }
         .tab { padding: 10px 24px; border-radius: var(--border-radius-sm); background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 600; border: 2px solid transparent; flex-shrink: 0; }
         .tab.active { background: var(--card-light); color: var(--primary); border: 2px solid var(--primary); box-shadow: 0 2px 8px rgba(44, 110, 73, 0.1); }
-        html.dark-mode .tab.active { color: var(--accent); border-color: var(--accent); box-shadow: 0 2px 8px rgba(249, 166, 32, 0.1); }
+        html.dark-mode .tab.active { color: var(--accent); border-color: var(--accent); }
 
         .section { display: none; }
         .section.active { display: block; animation: fadeIn 0.5s ease; }
@@ -109,23 +75,28 @@
         textarea:focus, input[type="date"]:focus, select:focus, .auth-form input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 110, 73, 0.15); }
         html.dark-mode textarea:focus, html.dark-mode input[type="date"]:focus, html.dark-mode select:focus, html.dark-mode .auth-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249, 166, 32, 0.2); }
         textarea { min-height: 120px; resize: vertical; }
-        label.question { display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-light); }
-        .question-group { margin-bottom: 25px; }
+        label.question { display: block; font-weight: 600; margin-bottom: 10px; }
+        .question-group { margin-bottom: 30px; }
 
-        .summary-block { margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border-color-light); }
-        .summary-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 20px; color: var(--primary); }
-        .chart-container { height: 350px; margin-top: 20px; }
+        .summary-block { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border-color-light); }
+        .summary-title { font-weight: 700; font-size: 1.3rem; margin-bottom: 25px; color: var(--primary); }
+        
+        .sentiment-buttons { display: flex; gap: 8px; margin-top: 10px; }
+        .sentiment-star { font-size: 2rem; cursor: pointer; color: var(--border-color-light); transition: color 0.2s, transform 0.2s; }
+        .sentiment-star:hover { transform: scale(1.2); }
+        .sentiment-star.active { color: var(--accent); }
+        .habit-tracker .habit-item { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .habit-tracker input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); }
+
         .modal { backdrop-filter: blur(5px); }
-        .notification { background: var(--primary); box-shadow: var(--box-shadow); }
-        .auth-container { border: none; }
+        .auth-container { border: none; text-align: center; }
         .auth-toggle button { color: var(--primary); }
-        .close-modal-btn { color: var(--text-muted); }
 
         @media (max-width: 768px) {
             body { font-size: 16px; }
             .container { padding: 15px 10px; }
-            .controls { flex-direction: column; align-items: stretch; }
-            .actions { justify-content: center; }
+            .controls { flex-direction: column; align-items: stretch; gap: 20px; }
+            .actions, .date-controls { justify-content: center; width: 100%; }
             .time-section, .auth-container { padding: 25px 20px; }
             header { padding: 30px 20px; }
             .btn { min-height: 48px; }
@@ -204,8 +175,7 @@
         </div>
         <div class="notification" id="notification"></div>
     </div>
-
-    <script>
+<script>
     'use strict';
     const Auth = {
         mode: "login",
@@ -246,10 +216,8 @@
         evening: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3", text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
     };
     const initialHabits = ["Medytacja", "Ćwiczenia fizyczne", "Czytanie książki", "Nauka czegoś nowego"];
-    const sentimentQuestions = [ { id: 'health', question: '💪 Jak oceniam swoje samopoczucie fizyczne?' }, { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' } ];
+    const sentimentQuestions = [ { id: 'health', question: '💪 Jak oceniasz swoje samopoczucie fizyczne?' }, { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' } ];
     const affirmations = [ "Jestem spokojny/a i skoncentrowany/a.", "Każdy dzień przynosi nowe możliwości.", "Mam w sobie siłę, by sprostać każdemu wyzwaniu." ];
-    const positiveKeywords = ['dobrze', 'super', 'świetnie', 'cudownie', 'wspaniale', 'radość', 'szczęście', 'dumny', 'dziękuję', 'wdzięczny', 'udało', 'sukces'];
-    const negativeKeywords = ['źle', 'fatalnie', 'smutek', 'złość', 'problem', 'trudność', 'porażka', 'nie udało', 'zmęczony', 'stres', 'martwię', 'gorzej'];
     const quotes = [ "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨" ];
     let currentQuestions, currentHabits, currentDate, notificationTimeout, isAppInitialized = false;
 
@@ -268,53 +236,47 @@
         static getHabits() { return JSON.parse(localStorage.getItem(`dg_habits_${sessionStorage.getItem('dg_user')}`)) || initialHabits; }
         static saveHabits(h) { localStorage.setItem(`dg_habits_${sessionStorage.getItem('dg_user')}`, JSON.stringify(h)); }
     }
-
     class UI {
         static buildSection(sectionId, title, emoji, containerSelector) {
             const panel = document.querySelector(containerSelector);
             if (!panel) return;
-            let questions = currentQuestions[sectionId] || [];
+            const questions = currentQuestions[sectionId] || [];
             let html = `<div class="time-section"><h2 class="time-header">${emoji} ${title}</h2><div id="${sectionId}-content-container">`;
             questions.forEach(q => {
                 const isAffirmation = sectionId === 'morning' && q.text.toLowerCase().includes('afirmacj');
                 html += `<div class="question-group"><label class="question">${q.text}</label>`;
                 if (isAffirmation) {
-                    html += `<div class="affirmation-wrapper"><select data-id="${q.id}" class="affirmation-select"><option value="">Wybierz...</option>${affirmations.map(aff => `<option value="${aff}">${aff.substring(0, 60)}...</option>`).join('')}<option value="custom">Inna...</option></select><div class="hidden-textarea"><textarea data-id="${q.id}"></textarea></div></div>`;
-                } else {
-                    html += `<textarea data-id="${q.id}"></textarea>`;
-                }
+                    html += `<div class="affirmation-wrapper"><select data-id="${q.id}" class="affirmation-select"><option value="">Wybierz...</option>${affirmations.map(aff => `<option value="${aff}">${aff.substring(0, 60)}...</option>`).join('')}<option value="custom">Inna...</option></select><div class="hidden-textarea hidden"><textarea data-id="${q.id}"></textarea></div></div>`;
+                } else { html += `<textarea data-id="${q.id}"></textarea>`; }
                 html += `</div>`;
             });
             if (sectionId === 'evening') {
-                html += `<div class="summary-block"><div class="summary-title">Podsumowanie dnia:</div>${sentimentQuestions.map(sq => `<div class="question-group"><label class="question">${sq.question}</label><textarea data-id="${sq.id}"></textarea></div>`).join('')}</div>`;
-                if (currentHabits.length > 0) {
-                    html += `<div class="summary-block habit-tracker"><div class="summary-title">Nawyki:</div>${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div>`;
-                }
+                html += `<div class="summary-block"><div class="summary-title">Podsumowanie dnia:</div>${sentimentQuestions.map(sq => `<div class="question-group"><label class="question">${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('')}</div>`;
+                if (currentHabits.length > 0) { html += `<div class="summary-block habit-tracker"><div class="summary-title">Nawyki:</div>${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div>`; }
             }
             html += `</div></div>`;
             panel.innerHTML = html;
-
-            panel.querySelectorAll('textarea, select').forEach(el => {
-                el.addEventListener('input', (e) => UI.saveInput(sectionId, e.target));
-                if (el.tagName === 'SELECT') { el.addEventListener('change', (e) => UI.handleAffirmationChange(e.target)); }
-            });
+            panel.querySelectorAll('textarea, select').forEach(el => { el.addEventListener('input', (e) => UI.saveInput(sectionId, e.target)); if (el.tagName === 'SELECT') { el.addEventListener('change', (e) => UI.handleAffirmationChange(e.target)); } });
             panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', (e) => UI.saveHabitStatus(e.target)));
+            panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', (e) => UI.setSentiment(e.currentTarget)));
         }
-        static buildStatsSection(containerSelector) { const el = document.querySelector(containerSelector); if (el) el.innerHTML = `<div class="statistics"><div class="stats-header"><h2>📊 Analiza</h2><select id="statsPeriod"><option value="7">7 dni</option><option value="30" selected>30 dni</option><option value="90">90 dni</option></select></div><h3>Sentyment tekstu</h3><div class="chart-container"><canvas id="textSentimentChart"></canvas></div></div>`; }
-        static loadSectionData(date, sectionId) { /* ... implementacja z poprzednich, działających wersji ... */ }
-        static saveInput(sectionId, target) { /* ... implementacja z poprzednich, działających wersji ... */ }
-        static saveHabitStatus(checkbox) { /* ... implementacja z poprzednich, działających wersji ... */ }
-        static handleAffirmationChange(select) { /* ... implementacja z poprzednich, działających wersji ... */ }
+        static buildStatsSection(containerSelector) { const el = document.querySelector(containerSelector); if (el) el.innerHTML = `<div class="statistics"><div class="stats-header"><h2>📊 Analiza</h2><select id="statsPeriod"><option value="7">7 dni</option><option value="30" selected>30 dni</option><option value="90">90 dni</option></select></div><h3>Oceny</h3><div class="chart-container"><canvas id="sentimentChart"></canvas></div><h3>Sentyment tekstu</h3><div class="chart-container"><canvas id="textSentimentChart"></canvas></div></div>`; }
+        static loadSectionData(date, sectionId) { const entry = AppStorage.getDayEntry(date), data = entry[sectionId] || {}; document.querySelectorAll(`#${sectionId}-panel textarea, #${sectionId}-panel select`).forEach(el => { const id = el.dataset.id; if (!id) return; el.value = data[id] || ''; }); if (sectionId === 'evening') { const habits = data.habits || {}; currentHabits.forEach(h => { const cb = document.querySelector(`[data-habit-name="${h}"]`); if (cb) cb.checked = habits[h] || false; }); sentimentQuestions.forEach(sq => { const val = data[sq.id + 'Sent']; if (val) UI.updateStars(document.querySelector(`.sentiment-buttons[data-id="${sq.id}"]`), val); }); } }
+        static saveInput(sectionId, target) { const id = target.dataset.id, entry = AppStorage.getDayEntry(currentDate); if (!entry[sectionId]) entry[sectionId] = {}; entry[sectionId][id] = target.value; AppStorage.saveDayEntry(currentDate, entry); }
+        static saveHabitStatus(checkbox) { const name = checkbox.dataset.habitName, entry = AppStorage.getDayEntry(currentDate); if (!entry.evening) entry.evening = {}; if (!entry.evening.habits) entry.evening.habits = {}; entry.evening.habits[name] = checkbox.checked; AppStorage.saveDayEntry(currentDate, entry); }
+        static handleAffirmationChange(select) { const textarea = select.parentElement.querySelector('.hidden-textarea'); if (select.value === 'custom') textarea.classList.remove('hidden'); else textarea.classList.add('hidden'); }
+        static setSentiment(starEl) { const value = starEl.dataset.value; const container = starEl.parentElement; const catId = container.dataset.id; UI.updateStars(container, value); const entry = AppStorage.getDayEntry(currentDate); if (!entry.evening) entry.evening = {}; entry.evening[catId + 'Sent'] = value; AppStorage.saveDayEntry(currentDate, entry); }
+        static updateStars(container, value) { const stars = container.querySelectorAll('.sentiment-star'); stars.forEach(star => { star.classList.remove('active'); star.textContent = '☆'; if (parseInt(star.dataset.value) <= parseInt(value)) { star.classList.add('active'); star.textContent = '★'; } }); }
     }
 
-    class Stats { /* ... implementacja z poprzednich, działających wersji ... */ }
+    class Stats { /* ... Implementacja Stats ... */ }
     
     class Settings {
         static tempQuestions; static tempHabits;
         static init() { document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose()); document.querySelectorAll('#settingsModal .modal-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchTab(e.target))); }
         static open() { this.originalQuestions = AppStorage.getQuestions(); this.originalHabits = AppStorage.getHabits(); this.tempQuestions = JSON.parse(JSON.stringify(this.originalQuestions)); this.tempHabits = [...this.originalHabits]; this.switchTab(document.querySelector('#settingsModal .modal-tab.active')); openModal('settingsModal'); }
         static switchTab(tabEl) { document.querySelectorAll('#settingsModal .modal-tab, #settingsModal .modal-tab-panel').forEach(el => el.classList.remove('active')); tabEl.classList.add('active'); const sectionId = tabEl.dataset.section; document.getElementById(`s-${sectionId}-panel`).classList.add('active'); this.render(sectionId); }
-        static render(sectionId) { /* ... implementacja z poprzednich, działających wersji ... */ }
+        static render(sectionId) { const container = document.getElementById(`s-${sectionId}-panel`); container.innerHTML = "Tu będzie edycja pytań i nawyków."; }
         static saveAndClose() { AppStorage.saveQuestions(this.tempQuestions); AppStorage.saveHabits(this.tempHabits); currentQuestions = AppStorage.getQuestions(); currentHabits = AppStorage.getHabits(); rebuildAllSections(); loadDate(); closeModal('settingsModal'); showNotification("Ustawienia zapisane! ✅"); }
     }
 
@@ -342,8 +304,8 @@
         document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', (e) => {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-            e.target.classList.add('active');
-            const sId = e.target.dataset.section;
+            e.currentTarget.classList.add('active');
+            const sId = e.currentTarget.dataset.section;
             document.getElementById(`${sId}-panel`).classList.add('active');
         }));
         document.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', (e) => closeModal(e.target.closest('.modal').id)));
@@ -351,25 +313,25 @@
     }
     
     function rebuildAllSections() { UI.buildSection('morning', 'Poranek', '🌅', '#morning-panel'); UI.buildSection('afternoon', 'Południe', '☀️', '#afternoon-panel'); UI.buildSection('evening', 'Wieczór', '🌙', '#evening-panel'); }
-    function loadDate() { document.getElementById('currentDate').value = currentDate; ['morning', 'afternoon', 'evening'].forEach(s => UI.loadSectionData(currentDate, s)); }
+    function loadDate() { document.getElementById('currentDate').value = currentDate; ['morning', 'afternoon', 'evening'].forEach(s => UI.loadSectionData(s, currentDate)); }
     function changeDate(d) { const dt = new Date(currentDate); dt.setDate(dt.getDate() + d); currentDate = DateHelpers.formatDateISO(dt); loadDate(); }
     function toggleDarkMode() { document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', document.documentElement.classList.contains('dark-mode')); }
     function showNotification(m, d = 3000) { const el = document.getElementById('notification'); el.textContent = m; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), d - 100); }
     function openModal(id) { document.getElementById(id)?.classList.add('active'); }
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
-    async function exportPDF() { /* ... implementacja z poprzedniej odpowiedzi ... */ }
+    async function exportPDF() { showNotification("Funkcja PDF w budowie."); }
 
     document.addEventListener('DOMContentLoaded', () => {
         Auth.init();
         Auth.checkLoginStatus();
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('Service worker registered.', reg))
-                    .catch(err => console.error('Service worker not registered.', err));
+                navigator.serviceWorker.register('/service-worker.js').catch(err => console.error('Service worker registration failed:', err));
             });
         }
     });
-    </script>
+</script>
 </body>
 </html>
+
+
