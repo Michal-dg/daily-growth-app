@@ -486,16 +486,13 @@
     rebuildAllSections();
     loadDate(currentDate);
 
-    // NOWA LOGIKA REJESTRACJI I AKTUALIZACJI SERVICE WORKERA
+    // LOGIKA REJESTRACJI I AKTUALIZACJI SERVICE WORKERA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js').then(reg => {
             reg.addEventListener('updatefound', () => {
-                // Wykryto nową wersję Service Workera w tle.
                 const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
-                    // Czekaj, aż nowy Service Worker zakończy instalację.
                     if (newWorker.state === 'installed') {
-                        // Jeśli jest już aktywny Service Worker, to jest to aktualizacja.
                         if (navigator.serviceWorker.controller) {
                             showNotification('Dostępna jest nowa wersja aplikacji!', true);
                         }
@@ -507,7 +504,6 @@
         });
     }
 }
-    }
     function loadAppData() {
         currentQuestions = AppStorage.getQuestions();
         currentHabits = AppStorage.getHabits();
