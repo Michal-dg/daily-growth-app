@@ -472,18 +472,41 @@
 
     // --- LOGIKA GŁÓWNA I OBSŁUGA ZDARZEŃ ---
     function initializeApp() {
-        if(isAppInitialized) return;
-        document.querySelector('#main-app').classList.remove('hidden');
-        document.querySelector('#auth-page').classList.remove('active');
-        applyTheme(AppStorage.getSetting('theme'));
-        document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
-        loadAppData();
-        currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
-        document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
-        bindAppEventListeners();
-        rebuildAllSections();
-        loadDate(currentDate);
-        isAppInitialized = true;
+    if (isAppInitialized) return;
+    isAppInitialized = true;
+
+    document.querySelector('#main-app').classList.remove('hidden');
+    document.querySelector('#auth-page').classList.remove('active');
+    applyTheme(AppStorage.getSetting('theme'));
+    document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
+    loadAppData();
+    currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
+    document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+    bindAppEventListeners();
+    rebuildAllSections();
+    loadDate(currentDate);
+
+    // NOWA LOGIKA REJESTRACJI I AKTUALIZACJI SERVICE WORKERA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                // Wykryto nową wersję Service Workera w tle.
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    // Czekaj, aż nowy Service Worker zakończy instalację.
+                    if (newWorker.state === 'installed') {
+                        // Jeśli jest już aktywny Service Worker, to jest to aktualizacja.
+                        if (navigator.serviceWorker.controller) {
+                            showNotification('Dostępna jest nowa wersja aplikacji!', true);
+                        }
+                    }
+                });
+            });
+        }).catch(error => {
+            console.error('Rejestracja Service Workera nie powiodła się:', error);
+        });
+    }
+}
     }
     function loadAppData() {
         currentQuestions = AppStorage.getQuestions();
@@ -509,7 +532,25 @@
     function changeDate(d) { const dt = dateFns.addDays(new Date(currentDate), d); loadDate(dateFns.formatISO(dt, { representation: 'date' })); }
     function applyTheme(themeName) { document.documentElement.dataset.theme = themeName; AppStorage.setSetting('theme', themeName); const metaThemeColor = document.querySelector('meta[name="theme-color"]'); if(metaThemeColor) metaThemeColor.content = getComputedStyle(document.documentElement).getPropertyValue('--card').trim(); }
     function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', isDark); applyTheme(AppStorage.getSetting('theme')); if(document.getElementById('dark-mode-btn')) document.getElementById('dark-mode-btn').textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;}
-    function showNotification(msg) { const el = document.getElementById('notification'); if(el){ el.textContent = msg; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), 2800);} }
+    function showNotification(msg, withReloadButton = false) {
+    const el = document.getElementById('notification');
+    if (el) {
+        el.innerHTML = msg; // Użyj innerHTML, aby móc wstawić przycisk
+        if (withReloadButton) {
+            const reloadBtn = document.createElement('button');
+            reloadBtn.textContent = 'Odśwież';
+            reloadBtn.className = 'btn btn-primary';
+            reloadBtn.style.marginLeft = '15px';
+            reloadBtn.onclick = () => window.location.reload();
+            el.appendChild(reloadBtn);
+        }
+        el.classList.add('active');
+        // Powiadomienie nie zniknie automatycznie, jeśli ma przycisk
+        if (!withReloadButton) {
+            setTimeout(() => el.classList.remove('active'), 2800);
+        }
+    }
+}
     function openModal(id) { document.getElementById(id)?.classList.add('active'); }
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
     async function exportPDF() {
