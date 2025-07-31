@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Daily Growth 4.1 🌱 – Wersja Finalna</title>
+    <title>Daily Growth 4.0 🌱 – Wersja Finalna</title>
     <meta name="description" content="Finalna wersja Daily Growth. Uproszczony interfejs, działająca analiza trendów, eksport PDF i pełna personalizacja.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,13 +27,12 @@
 
 
     <style>
-        /* === SYSTEM DESIGNU v4.1 === */
+        /* === SYSTEM DESIGNU v4.0 === */
         :root {
             --primary: #2c6e49; --accent: #f9a620;
             --bg: #f7f9f9; --card: #ffffff;
             --text-main: #1f292e; --text-muted: #6a7881;
             --border: #e8ecef;
-            --header-overlay: rgba(30, 41, 46, 0.4);
             
             --border-radius-sm: 8px; --border-radius-md: 12px; --border-radius-lg: 16px;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -44,12 +43,10 @@
         html[data-theme='las'].dark-mode {
             --primary: #4ab779; --accent: #ffb84d; --bg: #12181b; --card: #1c2328;
             --text-main: #e8e8e8; --text-muted: #8e9a9f; --border: #2d373c;
-            --header-overlay: rgba(0, 0, 0, 0.5);
         }
         html[data-theme='ocean'] {
             --primary: #006f8a; --accent: #ee9b00; --bg: #f0f8ff; --card: #ffffff;
             --text-main: #023047; --text-muted: #5e7c8b; --border: #e0f2f8;
-            --header-overlay: rgba(1, 42, 64, 0.5);
         }
         html[data-theme='ocean'].dark-mode {
             --primary: #219ebc; --accent: #ffc254; --bg: #012a40; --card: #013754;
@@ -58,12 +55,10 @@
         html[data-theme='fokus'] {
             --primary: #1a1a1a; --accent: #007aff; --bg: #f6f6f6; --card: #ffffff;
             --text-main: #1a1a1a; --text-muted: #6b6b6b; --border: #e5e5e5;
-            --header-overlay: rgba(255, 255, 255, 0.3);
         }
         html[data-theme='fokus'].dark-mode {
             --primary: #f0f0f0; --accent: #0a84ff; --bg: #000000; --card: #1c1c1e;
             --text-main: #f0f0f0; --text-muted: #a0a0a0; --border: #38383a;
-            --header-overlay: rgba(0, 0, 0, 0.6);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,32 +66,9 @@
         .hidden { display: none !important; }
 
         .container { max-width: 900px; margin: 0 auto; padding: 20px 15px; }
-        header { 
-            position: relative;
-            color: white; 
-            border-radius: var(--border-radius-lg); 
-            padding: 60px 40px; 
-            margin-bottom: 40px; 
-            text-align: center; 
-            overflow: hidden;
-            background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-        }
-        header::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-color: var(--header-overlay);
-            z-index: 1;
-            transition: background-color var(--transition);
-        }
-        header > * {
-            position: relative;
-            z-index: 2;
-        }
-        header h1 { color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
-        .quote { font-style: normal; font-size: 1.2rem; max-width: 600px; margin: 15px auto 0; opacity: 0.95; }
+        header { background: var(--card); color: var(--text-main); border-radius: var(--border-radius-lg); padding: 40px; margin-bottom: 40px; box-shadow: var(--shadow-md); text-align: center; border: 1px solid var(--border); transition: all var(--transition); }
+        header h1 { color: var(--primary); font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
+        .quote { font-style: normal; font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 15px auto 0; }
 
         .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .btn { padding: 10px 20px; border-radius: var(--border-radius-md); border: 1px solid transparent; cursor: pointer; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: all var(--transition); user-select: none; }
@@ -129,9 +101,10 @@
 
         .sentiment-buttons { display: flex; gap: 8px; margin-top: 10px; }
         .sentiment-star { font-size: 2.2rem; cursor: pointer; color: var(--border); transition: all 0.15s ease-in-out; }
+        .sentiment-star:hover { transform: scale(1.2); color: color-mix(in srgb, var(--accent) 50%, transparent); }
+        .sentiment-star.active { color: var(--accent); } .sentiment-star.active ~ .sentiment-star { color: var(--border); }
         .sentiment-buttons:hover .sentiment-star { color: color-mix(in srgb, var(--accent) 50%, transparent); }
         .sentiment-buttons .sentiment-star:hover ~ .sentiment-star { color: var(--border); }
-        .sentiment-star.active { color: var(--accent); }
         
         .habit-item { display: flex; align-items: center; gap: 12px; }
         .habit-item label { display: flex; align-items: center; gap: 12px; font-weight: normal; width: 100%; padding: 8px 0; }
@@ -154,7 +127,7 @@
         #notification.active { bottom: 20px; opacity: 1; }
 
         @media (max-width: 768px) {
-            header, .content-card, .modal-content { padding: 40px 20px; }
+            header, .content-card, .modal-content { padding: 25px 20px; }
             .controls { flex-direction: column; align-items: stretch; gap: 10px; }
             .actions, .date-controls { justify-content: space-between; width: 100%; }
             input[type="date"] { text-align: center; }
@@ -248,15 +221,7 @@
         { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, 
         { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' }
     ];
-    const quotes = [ 
-        "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨",
-        "Każdy dzień to nowa szansa, aby stać się lepszą wersją siebie.", "Małe kroki w dobrym kierunku mogą okazać się największym krokiem w Twoim życiu.", "Tajemnica postępu polega na tym, by zacząć.",
-        "Nie licz dni, spraw, by dni się liczyły.", "Sukces to suma małych wysiłków, powtarzanych dzień po dniu.", "Wzrost i komfort nie mogą współistnieć.",
-        "Dyscyplina to most między celami a osiągnięciami.", "Umysł jest wszystkim. Stajesz się tym, o czym myślisz.", "Jesteś silniejszy, niż myślisz. Bardziej zdolny, niż sobie wyobrażasz.",
-        "Zacznij tam, gdzie jesteś. Użyj tego, co masz. Zrób, co możesz.", "Cierpliwość, wytrwałość i pot tworzą niezwyciężoną kombinację sukcesu.", "Nigdy nie jest za późno, by być tym, kim mogłeś być.",
-        "W samym środku trudności kryją się możliwości.", "Charakteru nie można rozwinąć w spokoju i ciszy. Tylko przez doświadczenie prób i cierpienia można wzmocnić duszę.",
-        "Natura nie spieszy się, a jednak wszystko jest osiągnięte.", "Spójrz głęboko w naturę, a wtedy wszystko zrozumiesz lepiej.", "Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz."
-    ];
+    const quotes = [ "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨" ];
     let currentQuestions, currentHabits, currentSentimentQuestions, currentDate, isAppInitialized = false;
 
     // --- KLASA ZARZĄDZANIA DANYMI ---
@@ -308,15 +273,7 @@
         static saveInput(sectionId, target) { const id = target.dataset.id, entry = AppStorage.getDayEntry(currentDate); if(!entry[sectionId]) entry[sectionId] = {}; entry[sectionId][id] = target.value; AppStorage.saveDayEntry(currentDate, entry); }
         static saveHabitStatus(checkbox) { const name = checkbox.dataset.habitName, entry = AppStorage.getDayEntry(currentDate); if(!entry.evening) entry.evening = {}; if(!entry.evening.habits) entry.evening.habits = {}; entry.evening.habits[name] = checkbox.checked; AppStorage.saveDayEntry(currentDate, entry); }
         static setSentiment(starEl) { const value = starEl.dataset.value, container = starEl.parentElement, catId = container.dataset.id; UI.updateStars(container, value); const entry = AppStorage.getDayEntry(currentDate); if(!entry.evening) entry.evening = {}; entry.evening[catId + 'Sent'] = value; AppStorage.saveDayEntry(currentDate, entry); }
-        static updateStars(container, value) {
-            if (!container) return;
-            const stars = container.querySelectorAll('.sentiment-star');
-            const numericValue = parseInt(value, 10);
-            stars.forEach(star => {
-                const starValue = parseInt(star.dataset.value, 10);
-                star.classList.toggle('active', numericValue >= starValue);
-            });
-        }
+        static updateStars(container, value) { if (!container || !value) return; const stars = container.querySelectorAll('.sentiment-star'); stars.forEach(star => star.classList.toggle('active', parseInt(star.dataset.value) <= parseInt(value))); }
     }
 
     // --- KLASA STATYSTYK ---
@@ -430,7 +387,7 @@
             
             switch(sectionId) {
                 case 'appearance': const theme = AppStorage.getSetting('theme') || 'las'; html = `<h4>Wybierz motyw</h4><div class="theme-selector" style="display:flex; gap:10px;">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option" data-theme="${t}" style="flex:1; text-align:center; padding:10px; border:2px solid ${theme === t ? 'var(--accent)' : 'var(--border)'}; border-radius:var(--border-radius-md); cursor:pointer;"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div><h4 style="margin-top:20px;">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`; break;
-                case 'morning': case 'evening': html = renderList(`Pytania - ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
+                case 'morning': case 'evening': html = renderList(`Pytania - ${sectionId}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
                 case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
                 case 'habits': html = renderList('Twoje Nawyki', this.tempHabits, 'habits', 'Nazwa nawyku'); break;
             }
@@ -510,13 +467,13 @@
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
     async function exportPDF() {
         showNotification('Generowanie PDF...');
+        const { jsPDF } = window.jspdf;
         const morningEl = document.getElementById('pdf-content-morning');
         const eveningEl = document.getElementById('pdf-content-evening');
 
         const morningCanvas = await html2canvas(morningEl, { scale: 2, backgroundColor: getComputedStyle(document.body).getPropertyValue('--card') });
         const eveningCanvas = await html2canvas(eveningEl, { scale: 2, backgroundColor: getComputedStyle(document.body).getPropertyValue('--card') });
         
-        const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
@@ -530,7 +487,8 @@
             return imgHeight;
         };
         
-        doc.setFontSize(10); doc.setTextColor(150);
+        doc.setFontSize(10);
+        doc.setTextColor(150);
         doc.text(`Daily Growth - ${currentDate}`, pageWidth / 2, margin, { align: 'center' });
 
         let currentY = margin + 5;
@@ -569,7 +527,10 @@
             authForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const login = document.getElementById('authLogin').value;
-                if (!login) { document.getElementById('authError').textContent = 'Login nie może być pusty.'; return; }
+                if (!login) {
+                    document.getElementById('authError').textContent = 'Login nie może być pusty.';
+                    return;
+                }
                 document.getElementById('authError').textContent = '';
                 // Symulacja logowania/rejestracji bez backendu
                 sessionStorage.setItem('isLoggedIn', 'true');
