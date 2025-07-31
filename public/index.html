@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Daily Growth 3.0 🌱 – Wersja Kompletna</title>
-    <meta name="description" content="Kompletna wersja Daily Growth. Twój osobisty dziennik rozwoju z działającą analizą trendów, eksportem PDF i pełną personalizacją.">
+    <title>Daily Growth 4.0 🌱 – Wersja Finalna</title>
+    <meta name="description" content="Finalna wersja Daily Growth. Uproszczony interfejs, działająca analiza trendów, eksport PDF i pełna personalizacja.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#2c6e49">
+    <meta name="theme-color" content="#ffffff">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,9 +23,11 @@
     <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
 
     <style>
-        /* === SYSTEM DESIGNU v3.0 === */
+        /* === SYSTEM DESIGNU v4.0 === */
         :root {
             --primary: #2c6e49; --accent: #f9a620;
             --bg: #f7f9f9; --card: #ffffff;
@@ -114,11 +116,15 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
         .auth-container { max-width: 400px; } .auth-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
-        .settings-item button { background-color: #e53e3e; color: white; } .settings-item button:hover { background-color: #c53030; }
+        .settings-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .settings-item input { flex-grow: 1; }
+        .settings-item button { background-color: #e53e3e; color: white; flex-shrink: 0; } .settings-item button:hover { background-color: #c53030; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
         .chart-container { position: relative; min-height: 350px; }
         #stats-placeholder { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        #notification { position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text-main); padding:12px 24px; border-radius:var(--border-radius-md); box-shadow:var(--shadow-md); z-index:2000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity:0; }
+        #notification.active { bottom: 20px; opacity: 1; }
 
         @media (max-width: 768px) {
             header, .content-card, .modal-content { padding: 25px 20px; }
@@ -136,21 +142,15 @@
             <div id="auth-form-container">
                 <form id="authForm" class="auth-form">
                     <h2 id="authTitle" class="content-header" style="margin-bottom: 15px; text-align: center; border: none;">Logowanie</h2>
-                    <div class="auth-error" id="authError" style="color: #e53e3e; text-align:center;"></div>
-                    <div>
-                        <label for="authLogin" class="hidden">Login</label>
-                        <input type="text" id="authLogin" placeholder="Login" autocomplete="username" required>
-                    </div>
-                    <div>
-                        <label for="authPassword" class="hidden">Hasło</label>
-                        <input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required>
-                    </div>
+                    <div id="authError" style="color: #e53e3e; text-align:center; min-height: 1.2em;"></div>
+                    <div><input type="text" id="authLogin" placeholder="Login" autocomplete="username" required></div>
+                    <div><input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required></div>
                     <button class="btn btn-primary" id="authSubmitBtn" type="submit">Zaloguj się</button>
                 </form>
             </div>
-            <div class="auth-toggle" style="text-align: center; margin-top: 20px;">
+            <div style="text-align: center; margin-top: 20px;">
                 <span id="toggleText">Nie masz konta?</span>
-                <button id="toggleAuthBtn" type="button" class="btn-tertiary" style="all:unset; cursor:pointer; font-weight:bold; color:var(--primary); text-decoration:underline;">Zarejestruj się</button>
+                <button id="toggleAuthBtn" type="button" style="all:unset; cursor:pointer; font-weight:bold; color:var(--primary); text-decoration:underline; margin-left: 5px;">Zarejestruj się</button>
             </div>
         </div>
     </div>
@@ -178,14 +178,12 @@
             <div class="tabs-container">
                 <div class="tabs" role="tablist">
                     <div class="tab active" data-section="morning">🌅 Poranek</div>
-                    <div class="tab" data-section="afternoon">☀️ Południe</div>
                     <div class="tab" data-section="evening">🌙 Wieczór</div>
                     <div class="tab" data-section="stats"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 13.3333H4V8H2V13.3333ZM6.66667 13.3333H8.66667V2.66667H6.66667V13.3333ZM11.3333 13.3333H13.3333V5.33333H11.3333V13.3333Z" fill="currentColor"/></svg>Analiza</div>
                 </div>
             </div>
 
             <section id="morning-panel" class="section active"></section>
-            <section id="afternoon-panel" class="section"></section>
             <section id="evening-panel" class="section"></section>
             <section id="stats-panel" class="section"></section>
         </div>
@@ -196,29 +194,26 @@
                 <div class="modal-tabs" style="border-bottom: 1px solid var(--border); margin-bottom: 20px;">
                     <div class="modal-tab active" data-section="appearance">🎨 Wygląd</div>
                     <div class="modal-tab" data-section="morning">🌅 Poranek</div>
-                    <div class="modal-tab" data-section="afternoon">☀️ Południe</div>
                     <div class="modal-tab" data-section="evening">🌙 Wieczór</div>
                     <div class="modal-tab" data-section="summary">📊 Podsumowanie</div>
                     <div class="modal-tab" data-section="habits">✅ Nawyki</div>
                 </div>
                 <div id="s-appearance-panel" class="modal-tab-panel active"></div>
                 <div id="s-morning-panel" class="modal-tab-panel"></div>
-                <div id="s-afternoon-panel" class="modal-tab-panel"></div>
                 <div id="s-evening-panel" class="modal-tab-panel"></div>
                 <div id="s-summary-panel" class="modal-tab-panel"></div>
                 <div id="s-habits-panel" class="modal-tab-panel"></div>
                 <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 20px; width: 100%;">Zapisz i zamknij</button>
             </div>
         </div>
-        <div id="notification" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text-main); padding:12px 24px; border-radius:var(--border-radius-md); box-shadow:var(--shadow-md); z-index:2000; transition: all 0.5s; opacity:0; visibility:hidden;"></div>
+        <div id="notification"></div>
     </div>
 <script>
     'use strict';
     // --- GLOBALNE STAŁE ---
     const initialQuestions = {
         morning: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}, {id:"m3", text:"Jaką pozytywną afirmację wybieram na dziś?"} ],
-        afternoon: [ {id:"a1", text:"Co udało mi się do tej pory osiągnąć?"}, {id:"a2", text:"Co sprawiło mi dzisiaj radość?"}, {id:"a3", text:"Jak mogę lepiej wykorzystać resztę dnia?"} ],
-        evening: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3", text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
+        evening: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3",text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
     };
     const initialHabits = ["Medytacja", "Ćwiczenia fizyczne", "Czytanie książki", "Nauka czegoś nowego"];
     const initialSentimentQuestions = [
@@ -252,7 +247,7 @@
             const panel = document.querySelector(containerSelector);
             if (!panel) return;
             const questions = currentQuestions[sectionId] || [];
-            let html = `<div class="content-card"><h2 class="content-header">${emoji} ${title}</h2><div>`;
+            let html = `<div class="content-card" id="pdf-content-${sectionId}"><h2 class="content-header">${emoji} ${title}</h2><div>`;
             questions.forEach(q => html += `<div class="question-group"><label for="q-${q.id}">${q.text}</label><textarea id="q-${q.id}" data-id="${q.id}"></textarea></div>`);
             if (sectionId === 'evening') {
                 html += currentSentimentQuestions.map(sq => `<div class="question-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
@@ -270,9 +265,9 @@
             document.querySelectorAll(`#${sectionId}-panel textarea`).forEach(el => el.value = data[el.dataset.id] || '');
             if (sectionId === 'evening') {
                 const eveningData = entry.evening || {};
-                currentSentimentQuestions.forEach(sq => UI.updateStars(document.querySelector(`.sentiment-buttons[data-id="${sq.id}"]`), eveningData[sq.id + 'Sent']));
+                currentSentimentQuestions.forEach(sq => UI.updateStars(document.querySelector(`#evening-panel .sentiment-buttons[data-id="${sq.id}"]`), eveningData[sq.id + 'Sent']));
                 const habits = eveningData.habits || {};
-                currentHabits.forEach(h => { const cb = document.querySelector(`[data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
+                currentHabits.forEach(h => { const cb = document.querySelector(`#evening-panel [data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
             }
         }
         static saveInput(sectionId, target) { const id = target.dataset.id, entry = AppStorage.getDayEntry(currentDate); if(!entry[sectionId]) entry[sectionId] = {}; entry[sectionId][id] = target.value; AppStorage.saveDayEntry(currentDate, entry); }
@@ -288,7 +283,7 @@
         static render(containerSelector) {
             const panel = document.querySelector(containerSelector);
             if (!panel) return;
-            panel.innerHTML = `<div class="content-card"><div class="stats-grid"><div class="chart-container"><canvas id="sentimentChart"></canvas></div><div class="chart-container"><canvas id="habitsChart"></canvas></div></div><div id="stats-placeholder" class="hidden">Brak wystarczających danych do analizy.</div></div>`;
+            panel.innerHTML = `<div class="content-card"><div class="stats-grid"><div class="chart-container"><canvas id="sentimentChart"></canvas></div><div class="chart-container"><canvas id="habitsChart"></canvas></div></div><div id="stats-placeholder" class="hidden">Brak wystarczających danych do analizy. Wprowadź dane z co najmniej dwóch dni.</div></div>`;
             this.renderCharts();
         }
         static gatherData(days = 30) {
@@ -332,7 +327,7 @@
                         label: sq.question.split(' ').slice(1).join(' '),
                         data: data.sentiments[sq.id],
                         borderColor: [style.getPropertyValue('--primary'), style.getPropertyValue('--accent'), '#00bcd4'][i],
-                        tension: 0.4, spanGaps: true, pointRadius: 3, pointHoverRadius: 6
+                        tension: 0.4, spanGaps: true, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2
                     }))
                 },
                 options: chartOptions({ x: { type: 'time', time: { unit: 'day' }, grid: { display: false } }, y: { beginAtZero: true, max: 5 } }),
@@ -364,10 +359,10 @@
                 }
             });
             modal.addEventListener('input', e => {
-                const { id, section, index } = e.target.dataset;
+                const { section, index, id } = e.target.dataset;
                 if(section === 'summary') this.tempSentimentQuestions[index].question = e.target.value;
-                else if (id) this.tempQuestions[section][index].text = e.target.value;
-                else this.tempHabits[index] = e.target.value;
+                else if (section === 'habits') this.tempHabits[index] = e.target.value;
+                else this.tempQuestions[section].find(q => q.id === id).text = e.target.value;
             });
         }
         static open() {
@@ -391,8 +386,8 @@
             const renderList = (title, items, section, placeholder, textKey) => `<h4>${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div><button class="btn btn-tertiary action-btn" data-action="addItem" data-section="${section}">+ Dodaj</button>`;
             
             switch(sectionId) {
-                case 'appearance': const theme = AppStorage.getSetting('theme') || 'las'; html = `<h4>Wybierz motyw</h4><div class="theme-selector">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option ${theme === t ? 'active' : ''}" data-theme="${t}"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div><h4>Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`; break;
-                case 'morning': case 'afternoon': case 'evening': html = renderList(`Pytania - ${sectionId}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
+                case 'appearance': const theme = AppStorage.getSetting('theme') || 'las'; html = `<h4>Wybierz motyw</h4><div class="theme-selector" style="display:flex; gap:10px;">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option" data-theme="${t}" style="flex:1; text-align:center; padding:10px; border:2px solid ${theme === t ? 'var(--accent)' : 'var(--border)'}; border-radius:var(--border-radius-md); cursor:pointer;"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div><h4 style="margin-top:20px;">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`; break;
+                case 'morning': case 'evening': html = renderList(`Pytania - ${sectionId}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
                 case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
                 case 'habits': html = renderList('Twoje Nawyki', this.tempHabits, 'habits', 'Nazwa nawyku'); break;
             }
@@ -400,7 +395,7 @@
             const darkModeBtn = document.getElementById('dark-mode-btn');
             if(darkModeBtn) darkModeBtn.addEventListener('click', toggleDarkMode);
         }
-        static handleThemeChange(option) { applyTheme(option.dataset.theme); AppStorage.setSetting('theme', option.dataset.theme); this.render('appearance'); }
+        static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
         static addItem(section) {
             if(section === 'habits') this.tempHabits.push('');
             else if (section === 'summary') this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: ''});
@@ -432,10 +427,9 @@
     function initializeApp() {
         if(isAppInitialized) return;
         document.querySelector('#main-app').classList.remove('hidden');
-        document.querySelector('#auth-page').classList.add('hidden');
+        document.querySelector('#auth-page').classList.remove('active');
         applyTheme(AppStorage.getSetting('theme'));
-        const isDarkMode = AppStorage.getSetting('darkMode');
-        document.documentElement.classList.toggle('dark-mode', isDarkMode);
+        document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
         loadAppData();
         currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
         document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
@@ -463,50 +457,50 @@
             if (sectionId === 'stats') Stats.render('#stats-panel');
         }));
     }
-    function rebuildAllSections() { ['morning', 'afternoon', 'evening'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase()+s.slice(1), {'morning':'🌅','afternoon':'☀️','evening':'🌙'}[s], `#${s}-panel`)); }
-    function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['morning', 'afternoon', 'evening'].forEach(s => UI.loadSectionData(s, currentDate)); }
+    function rebuildAllSections() { ['morning', 'evening'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase()+s.slice(1), {'morning':'🌅','evening':'🌙'}[s], `#${s}-panel`)); }
+    function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['morning', 'evening'].forEach(s => UI.loadSectionData(s, currentDate)); }
     function changeDate(d) { const dt = dateFns.addDays(new Date(currentDate), d); loadDate(dateFns.formatISO(dt, { representation: 'date' })); }
     function applyTheme(themeName) { document.documentElement.dataset.theme = themeName; AppStorage.setSetting('theme', themeName); const metaThemeColor = document.querySelector('meta[name="theme-color"]'); if(metaThemeColor) metaThemeColor.content = getComputedStyle(document.documentElement).getPropertyValue('--card').trim(); }
     function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', isDark); applyTheme(AppStorage.getSetting('theme')); if(document.getElementById('dark-mode-btn')) document.getElementById('dark-mode-btn').textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;}
-    function showNotification(msg) { const el = document.getElementById('notification'); if(el){ el.textContent = msg; el.style.opacity = 1; el.style.visibility = 'visible'; setTimeout(() => {el.style.opacity = 0; el.style.visibility = 'hidden'}, 3000);} }
+    function showNotification(msg) { const el = document.getElementById('notification'); if(el){ el.textContent = msg; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), 2800);} }
     function openModal(id) { document.getElementById(id)?.classList.add('active'); }
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
     async function exportPDF() {
         showNotification('Generowanie PDF...');
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const entry = AppStorage.getDayEntry(currentDate);
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(22);
-        doc.text('Daily Growth - Dziennik', 105, 20, { align: 'center' });
-        doc.setFontSize(14);
-        doc.text(`Data: ${currentDate}`, 105, 30, { align: 'center' });
-        let y = 50;
-        const addSection = (title, data) => {
-            if (!data || Object.keys(data).length === 0) return;
-            doc.setFontSize(16);
-            doc.text(title, 14, y);
-            y += 8;
-            doc.setLineWidth(0.5);
-            doc.line(14, y, 196, y);
-            y += 10;
-            doc.setFontSize(12);
-            for (const [key, value] of Object.entries(data)) {
-                const question = currentQuestions[title.toLowerCase().split(' ')[1]]?.find(q => q.id === key)?.text;
-                if(question && value) {
-                    doc.setFont('Helvetica', 'bold');
-                    doc.text(question, 14, y);
-                    y += 7;
-                    doc.setFont('Helvetica', 'normal');
-                    const splitText = doc.splitTextToSize(String(value), 182);
-                    doc.text(splitText, 14, y);
-                    y += splitText.length * 5 + 10;
-                }
-            }
+        const morningEl = document.getElementById('pdf-content-morning');
+        const eveningEl = document.getElementById('pdf-content-evening');
+
+        const morningCanvas = await html2canvas(morningEl, { scale: 2, backgroundColor: getComputedStyle(document.body).getPropertyValue('--card') });
+        const eveningCanvas = await html2canvas(eveningEl, { scale: 2, backgroundColor: getComputedStyle(document.body).getPropertyValue('--card') });
+        
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 10;
+        
+        const addImageToPdf = (canvas, yOffset) => {
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = pageWidth - 2 * margin;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            doc.addImage(imgData, 'PNG', margin, yOffset, imgWidth, imgHeight);
+            return imgHeight;
         };
-        addSection('🌅 Poranek', entry.morning);
-        addSection('☀️ Południe', entry.afternoon);
-        addSection('🌙 Wieczór', entry.evening);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(150);
+        doc.text(`Daily Growth - ${currentDate}`, pageWidth / 2, margin, { align: 'center' });
+
+        let currentY = margin + 5;
+        currentY += addImageToPdf(morningCanvas, currentY);
+        currentY += 10;
+        
+        if (currentY + eveningCanvas.height * (pageWidth - 2 * margin) / eveningCanvas.width > pageHeight - margin) {
+            doc.addPage();
+            currentY = margin;
+        }
+        
+        addImageToPdf(eveningCanvas, currentY);
         doc.save(`Daily-Growth-${currentDate}.pdf`);
     }
 
@@ -533,9 +527,12 @@
             authForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const login = document.getElementById('authLogin').value;
-                const endpoint = isLogin ? '/api/login' : '/api/register';
+                if (!login) {
+                    document.getElementById('authError').textContent = 'Login nie może być pusty.';
+                    return;
+                }
+                document.getElementById('authError').textContent = '';
                 // Symulacja logowania/rejestracji bez backendu
-                console.log(`Wysłano do ${endpoint}`, { login });
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('dg_user', login);
                 initializeApp();
