@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Daily Growth 5.1 🌱 – Interfejs Pro</title>
-    <meta name="description" content="Nowa wersja Daily Growth z przeprojektowanym interfejsem ustawień, rozbudowanymi sugestiami i poprawkami w działaniu.">
+    <title>Daily Growth 5.2 🌱 – Wersja Stabilna</title>
+    <meta name="description" content="Stabilna wersja Daily Growth z poprawkami w interfejsie ustawień i logice działania aplikacji.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
 
     <style>
-        /* === SYSTEM DESIGNU v5.1 === */
+        /* === SYSTEM DESIGNU v5.2 === */
         :root {
             --primary: #2c6e49; --accent: #f9a620;
             --bg: #f7f9f9; --card: #ffffff;
@@ -124,12 +124,14 @@
         .modal-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
         .modal-footer { padding: 15px 25px; border-top: 1px solid var(--border); }
 
-        .modal-tabs-horizontal { display: flex; gap: 5px; margin-bottom: 25px; flex-wrap: wrap; }
-        .modal-tab { flex-shrink: 0; }
+        .modal-tabs-horizontal { display: flex; gap: 5px; margin-bottom: 25px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         
         .suggestion-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: var(--border-radius-sm); transition: background-color var(--transition); }
         .suggestion-item:hover { background-color: var(--bg); }
         .suggestion-item button { font-size: 0.8rem; padding: 4px 10px; }
+        .settings-item { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+        .settings-item input { flex-grow: 1; }
+        .settings-item button { background-color: #e53e3e; color: white; flex-shrink: 0; } .settings-item button:hover { background-color: #c53030; }
 
         @media (max-width: 768px) {
             .content-card, .auth-container { padding: 25px 20px; }
@@ -203,11 +205,11 @@
                         <div class="tab" data-section="summary">📊 Podsumowanie</div>
                         <div class="tab" data-section="habits">✅ Nawyki</div>
                     </div>
-                    <div id="s-appearance-panel" class="modal-tab-panel active"></div>
-                    <div id="s-poranek-panel" class="modal-tab-panel"></div>
-                    <div id="s-wieczor-panel" class="modal-tab-panel"></div>
-                    <div id="s-summary-panel" class="modal-tab-panel"></div>
-                    <div id="s-habits-panel" class="modal-tab-panel"></div>
+                    <div class="modal-tab-panel active" id="s-appearance-panel"></div>
+                    <div class="modal-tab-panel" id="s-poranek-panel"></div>
+                    <div class="modal-tab-panel" id="s-wieczor-panel"></div>
+                    <div class="modal-tab-panel" id="s-summary-panel"></div>
+                    <div class="modal-tab-panel" id="s-habits-panel"></div>
                 </div>
                 <div class="modal-footer">
                      <button class="btn btn-primary" id="save-settings-btn" style="width: 100%;">Zapisz i zamknij</button>
@@ -230,15 +232,11 @@
 <script>
     'use strict';
     const initialQuestions = {
-        poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}, {id:"m3", text:"Jaką pozytywną afirmację wybieram na dziś?"} ],
-        wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3",text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
+        poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}],
+        wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}]
     };
     const initialHabits = ["Medytacja", "Ćwiczenia fizyczne", "Czytanie książki", "Nauka czegoś nowego"];
-    const initialSentimentQuestions = [
-        { id: 'health', question: '💪 Jak oceniasz swoje samopoczucie fizyczne?' }, 
-        { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, 
-        { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' }
-    ];
+    const initialSentimentQuestions = [ { id: 'health', question: '💪 Jak oceniasz swoje samopoczucie fizyczne?' }, { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' }];
     const quotes = [ "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨", "Każdy dzień to nowa szansa, aby stać się lepszą wersją siebie.", "Małe kroki w dobrym kierunku mogą okazać się największym krokiem w Twoim życiu.", "Tajemnica postępu polega na tym, by zacząć.", "Nie licz dni, spraw, by dni się liczyły.", "Sukces to suma małych wysiłków, powtarzanych dzień po dniu.", "Wzrost i komfort nie mogą współistnieć.", "Dyscyplina to most między celami a osiągnięciami.", "Umysł jest wszystkim. Stajesz się tym, o czym myślisz.", "Jesteś silniejszy, niż myślisz. Bardziej zdolny, niż sobie wyobrażasz.", "Zacznij tam, gdzie jesteś. Użyj tego, co masz. Zrób, co możesz.", "Cierpliwość, wytrwałość i pot tworzą niezwyciężoną kombinację sukcesu.", "Nigdy nie jest za późno, by być tym, kim mogłeś być.", "W samym środku trudności kryją się możliwości.", "Charakteru nie można rozwinąć w spokoju i ciszy. Tylko przez doświadczenie prób i cierpienia można wzmocnić duszę.", "Natura nie spieszy się, a jednak wszystko jest osiągnięte.", "Spójrz głęboko w naturę, a wtedy wszystko zrozumiesz lepiej.", "Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz."];
     const suggestedMorningQuestions = ["Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"];
     const suggestedEveningQuestions = ["Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"];
@@ -384,7 +382,7 @@
             });
 
             settingsModal.addEventListener('click', e => {
-                const tab = e.target.closest('.modal-tab');
+                const tab = e.target.closest('.modal-tabs-horizontal .tab');
                 if (tab) this.switchTab(tab);
 
                 const themeOption = e.target.closest('.theme-option');
@@ -413,7 +411,10 @@
                 const { section, index, id } = e.target.dataset;
                 if(section === 'summary') this.tempSentimentQuestions[index].question = e.target.value;
                 else if (section === 'habits') this.tempHabits[index] = e.target.value;
-                else this.tempQuestions[section].find(q => q.id === id).text = e.target.value;
+                else if (this.tempQuestions[section]) {
+                    const question = this.tempQuestions[section].find(q => q.id === id);
+                    if (question) question.text = e.target.value;
+                }
             });
         }
         static open() {
@@ -434,7 +435,7 @@
             const container = document.getElementById(`s-${sectionId}-panel`);
             if(!container) return;
             let html = '';
-            const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${value.replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
+            const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${String(value || '').replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
             const renderList = (title, items, section, placeholder, textKey) => {
                 let listHtml = `<h4>${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>
                 <div style="margin-top: 15px; display: flex; gap: 10px;">
@@ -589,9 +590,11 @@
 
         if (sessionStorage.getItem('isLoggedIn')) {
             mainApp.classList.remove('hidden');
+            authPage.classList.add('hidden');
             initializeApp();
         } else {
             authPage.classList.remove('hidden');
+            mainApp.classList.add('hidden');
             const authForm = document.getElementById('authForm');
             const toggleBtn = document.getElementById('toggleAuthBtn');
             let isLogin = true;
