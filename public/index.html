@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Daily Growth 5.0 🌱 – Nowy Horyzont</title>
-    <meta name="description" content="Nowa wersja Daily Growth z personalizacją czcionek, sugestiami pytań i jeszcze bardziej dopracowanym interfejsem.">
+    <title>Daily Growth 5.1 🌱 – Interfejs Pro</title>
+    <meta name="description" content="Nowa wersja Daily Growth z przeprojektowanym interfejsem ustawień, rozbudowanymi sugestiami i poprawkami w działaniu.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
 
     <style>
-        /* === SYSTEM DESIGNU v5.0 === */
+        /* === SYSTEM DESIGNU v5.1 === */
         :root {
             --primary: #2c6e49; --accent: #f9a620;
             --bg: #f7f9f9; --card: #ffffff;
@@ -114,49 +114,35 @@
         textarea { min-height: 120px; resize: vertical; }
         .question-group { margin-bottom: 30px; }
         label { display: block; font-weight: 600; margin-bottom: 10px; }
-
-        .sentiment-buttons { display: flex; gap: 8px; margin-top: 10px; }
-        .sentiment-star { font-size: 2.2rem; cursor: pointer; color: var(--border); transition: all 0.15s ease-in-out; }
-        .sentiment-buttons:hover .sentiment-star { color: color-mix(in srgb, var(--accent) 50%, transparent); }
-        .sentiment-buttons .sentiment-star:hover ~ .sentiment-star { color: var(--border); }
-        .sentiment-star.active { color: var(--accent); }
         
-        .habit-item { display: flex; align-items: center; gap: 12px; }
-        .habit-item label { display: flex; align-items: center; gap: 12px; font-weight: normal; width: 100%; padding: 8px 0; }
-        .habit-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); flex-shrink: 0; }
-
         .modal { display: none; position: fixed; z-index: 1000; inset: 0; align-items: center; justify-content: center; background-color: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(8px); }
         .modal.active { display: flex; animation: fadeIn 0.3s forwards; }
-        .modal-content { max-width: 600px; width: 90%; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-content-wrapper { background: var(--card); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); max-width: 600px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header .content-header { border: none; padding: 0; margin: 0; }
         .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-        
-        .modal-tabs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        .modal-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
+        .modal-footer { padding: 15px 25px; border-top: 1px solid var(--border); }
 
-        .auth-container { max-width: 400px; } .auth-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
-        .settings-item { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
-        .settings-item input { flex-grow: 1; }
-        .settings-item button { background-color: #e53e3e; color: white; flex-shrink: 0; } .settings-item button:hover { background-color: #c53030; }
+        .modal-tabs-horizontal { display: flex; gap: 5px; margin-bottom: 25px; flex-wrap: wrap; }
+        .modal-tab { flex-shrink: 0; }
         
         .suggestion-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: var(--border-radius-sm); transition: background-color var(--transition); }
         .suggestion-item:hover { background-color: var(--bg); }
         .suggestion-item button { font-size: 0.8rem; padding: 4px 10px; }
 
-        #notification { position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text-main); padding:12px 24px; border-radius:var(--border-radius-md); box-shadow:var(--shadow-md); z-index:2000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity:0; }
-        #notification.active { bottom: 20px; opacity: 1; }
-
         @media (max-width: 768px) {
-            header, .content-card, .modal-content { padding: 40px 20px; }
+            .content-card, .auth-container { padding: 25px 20px; }
+            .modal-content-wrapper { max-height: 90vh; }
             .controls { flex-direction: column; align-items: stretch; gap: 10px; }
             .actions, .date-controls { justify-content: space-between; width: 100%; }
-            input[type="date"] { text-align: center; }
         }
     </style>
 </head>
-<body>
+<body class="font-sans-serif">
 
-    <div id="auth-page">
-        <div class="auth-container content-card">
+    <div id="auth-page" class="hidden">
+        <div class="auth-container">
             <h1 style="text-align:center;">🌱 Witaj</h1>
             <div id="auth-form-container">
                 <form id="authForm" class="auth-form">
@@ -180,7 +166,6 @@
                 <h1>Daily Growth</h1>
                 <p class="quote" id="dailyQuote"></p>
             </header>
-
             <div class="controls">
                 <div class="date-controls">
                     <button class="btn btn-tertiary" id="prev-day-btn" aria-label="Poprzedni dzień"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.3333 13.666L4.66667 7.99935L10.3333 2.33268" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -192,7 +177,6 @@
                     <button class="btn btn-primary" id="logout-btn">Wyloguj</button>
                 </div>
             </div>
-
             <div class="tabs-container">
                 <div class="tabs" role="tablist">
                     <div class="tab active" data-section="poranek">🌅 Poranek</div>
@@ -200,38 +184,44 @@
                     <div class="tab" data-section="stats"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 13.3333H4V8H2V13.3333ZM6.66667 13.3333H8.66667V2.66667H6.66667V13.3333ZM11.3333 13.3333H13.3333V5.33333H11.3333V13.3333Z" fill="currentColor"/></svg>Analiza</div>
                 </div>
             </div>
-
             <section id="poranek-panel" class="section active"></section>
             <section id="wieczor-panel" class="section"></section>
             <section id="stats-panel" class="section"></section>
         </div>
         
         <div class="modal" id="settingsModal">
-            <div class="content-card modal-content">
-                <div class="modal-header"><h2 class="content-header" style="border:none; margin:0; padding:0;">Ustawienia</h2><button class="close-modal-btn" data-modal-id="settingsModal">✖</button></div>
-                <div class="modal-tabs">
-                    <div class="modal-tab active" data-section="appearance">🎨 Wygląd</div>
-                    <div class="modal-tab" data-section="poranek">🌅 Poranek</div>
-                    <div class="modal-tab" data-section="wieczor">🌙 Wieczór</div>
-                    <div class="modal-tab" data-section="summary">📊 Podsumowanie</div>
-                    <div class="modal-tab" data-section="habits">✅ Nawyki</div>
+            <div class="modal-content-wrapper">
+                <div class="modal-header">
+                    <h2 class="content-header">Ustawienia</h2>
+                    <button class="close-modal-btn" data-modal-id="settingsModal">✖</button>
                 </div>
-                <div id="s-appearance-panel" class="modal-tab-panel active"></div>
-                <div id="s-poranek-panel" class="modal-tab-panel"></div>
-                <div id="s-wieczor-panel" class="modal-tab-panel"></div>
-                <div id="s-summary-panel" class="modal-tab-panel"></div>
-                <div id="s-habits-panel" class="modal-tab-panel"></div>
-                <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 20px; width: 100%;">Zapisz i zamknij</button>
+                <div class="modal-body">
+                    <div class="modal-tabs-horizontal">
+                        <div class="tab active" data-section="appearance">🎨 Wygląd</div>
+                        <div class="tab" data-section="poranek">🌅 Poranek</div>
+                        <div class="tab" data-section="wieczor">🌙 Wieczór</div>
+                        <div class="tab" data-section="summary">📊 Podsumowanie</div>
+                        <div class="tab" data-section="habits">✅ Nawyki</div>
+                    </div>
+                    <div id="s-appearance-panel" class="modal-tab-panel active"></div>
+                    <div id="s-poranek-panel" class="modal-tab-panel"></div>
+                    <div id="s-wieczor-panel" class="modal-tab-panel"></div>
+                    <div id="s-summary-panel" class="modal-tab-panel"></div>
+                    <div id="s-habits-panel" class="modal-tab-panel"></div>
+                </div>
+                <div class="modal-footer">
+                     <button class="btn btn-primary" id="save-settings-btn" style="width: 100%;">Zapisz i zamknij</button>
+                </div>
             </div>
         </div>
 
         <div class="modal" id="suggestionsModal">
-             <div class="content-card modal-content">
+             <div class="modal-content-wrapper">
                 <div class="modal-header">
-                    <h2 id="suggestionsTitle" class="content-header" style="border:none; margin:0; padding:0;">Sugerowane Pytania</h2>
+                    <h2 id="suggestionsTitle" class="content-header">Sugerowane Pytania</h2>
                     <button class="close-modal-btn" data-modal-id="suggestionsModal">✖</button>
                 </div>
-                <div id="suggestionsList" style="max-height: 400px; overflow-y: auto;"></div>
+                <div id="suggestionsList" class="modal-body"></div>
             </div>
         </div>
 
@@ -239,7 +229,6 @@
     </div>
 <script>
     'use strict';
-    // --- GLOBALNE STAŁE ---
     const initialQuestions = {
         poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}, {id:"m3", text:"Jaką pozytywną afirmację wybieram na dziś?"} ],
         wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3",text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
@@ -250,21 +239,11 @@
         { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, 
         { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' }
     ];
-    const quotes = [ 
-        "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨",
-        "Każdy dzień to nowa szansa, aby stać się lepszą wersją siebie.", "Małe kroki w dobrym kierunku mogą okazać się największym krokiem w Twoim życiu.", "Tajemnica postępu polega na tym, by zacząć.",
-        "Nie licz dni, spraw, by dni się liczyły.", "Sukces to suma małych wysiłków, powtarzanych dzień po dniu.", "Wzrost i komfort nie mogą współistnieć.",
-        "Dyscyplina to most między celami a osiągnięciami.", "Umysł jest wszystkim. Stajesz się tym, o czym myślisz.", "Jesteś silniejszy, niż myślisz. Bardziej zdolny, niż sobie wyobrażasz.",
-        "Zacznij tam, gdzie jesteś. Użyj tego, co masz. Zrób, co możesz.", "Cierpliwość, wytrwałość i pot tworzą niezwyciężoną kombinację sukcesu.", "Nigdy nie jest za późno, by być tym, kim mogłeś być.",
-        "W samym środku trudności kryją się możliwości.", "Charakteru nie można rozwinąć w spokoju i ciszy. Tylko przez doświadczenie prób i cierpienia można wzmocnić duszę.",
-        "Natura nie spieszy się, a jednak wszystko jest osiągnięte.", "Spójrz głęboko w naturę, a wtedy wszystko zrozumiesz lepiej.", "Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz."
-    ];
-    const suggestedMorningQuestions = [
-        "Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"
-    ];
-    const suggestedEveningQuestions = [
-        "Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"
-    ];
+    const quotes = [ "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨", "Każdy dzień to nowa szansa, aby stać się lepszą wersją siebie.", "Małe kroki w dobrym kierunku mogą okazać się największym krokiem w Twoim życiu.", "Tajemnica postępu polega na tym, by zacząć.", "Nie licz dni, spraw, by dni się liczyły.", "Sukces to suma małych wysiłków, powtarzanych dzień po dniu.", "Wzrost i komfort nie mogą współistnieć.", "Dyscyplina to most między celami a osiągnięciami.", "Umysł jest wszystkim. Stajesz się tym, o czym myślisz.", "Jesteś silniejszy, niż myślisz. Bardziej zdolny, niż sobie wyobrażasz.", "Zacznij tam, gdzie jesteś. Użyj tego, co masz. Zrób, co możesz.", "Cierpliwość, wytrwałość i pot tworzą niezwyciężoną kombinację sukcesu.", "Nigdy nie jest za późno, by być tym, kim mogłeś być.", "W samym środku trudności kryją się możliwości.", "Charakteru nie można rozwinąć w spokoju i ciszy. Tylko przez doświadczenie prób i cierpienia można wzmocnić duszę.", "Natura nie spieszy się, a jednak wszystko jest osiągnięte.", "Spójrz głęboko w naturę, a wtedy wszystko zrozumiesz lepiej.", "Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz."];
+    const suggestedMorningQuestions = ["Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"];
+    const suggestedEveningQuestions = ["Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"];
+    const suggestedSummaryQuestions = ["Jaką jedną emocję najczęściej dziś odczuwałem/am?", "Co było największym wyzwaniem, z którym się zmierzyłem/am?", "Gdybym miał/a opisać ten dzień jednym słowem, jakie by to było?", "Co dzisiaj zabrało mi najwięcej energii?", "Co dzisiaj dało mi najwięcej energii?", "Czy zrobiłem/am dziś coś tylko dla siebie?", "Jaki był najbardziej pamiętny moment dnia?", "Czy moje dzisiejsze działania były zgodne z moimi wartościami?", "Jaką jedną rzecz chciałbym/chciałabym zapamiętać z tego dnia?", "Czy jestem zadowolony/a z tego, jak spędziłem/am dziś czas?"];
+    const suggestedHabits = ["Picie 2l wody", "Spacer 30 minut", "Bez social mediów rano", "Joga lub rozciąganie", "Nauka 5 nowych słówek", "Pisanie dziennika", "Planowanie następnego dnia", "Zdrowy posiłek", "Kontakt z naturą", "Poświęcenie czasu na hobby", "Słuchanie podcastu rozwojowego", "Praktyka uważności (mindfulness)"];
 
     let currentQuestions, currentHabits, currentSentimentQuestions, currentDate, isAppInitialized = false;
 
@@ -306,7 +285,7 @@
             const data = entry[sectionId] || {};
             document.querySelectorAll(`#${sectionId}-panel textarea`).forEach(el => el.value = data[el.dataset.id] || '');
             if (sectionId === 'wieczor') {
-                const eveningData = entry.evening || {};
+                const eveningData = entry.wieczor || {};
                 currentSentimentQuestions.forEach(sq => UI.updateStars(document.querySelector(`#wieczor-panel .sentiment-buttons[data-id="${sq.id}"]`), eveningData[sq.id + 'Sent']));
                 const habits = eveningData.habits || {};
                 currentHabits.forEach(h => { const cb = document.querySelector(`#wieczor-panel [data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
@@ -399,9 +378,8 @@
 
             [settingsModal, suggestionsModal].forEach(modal => {
                 modal.addEventListener('click', e => {
-                    if (e.target.closest('.close-modal-btn')) {
-                        closeModal(e.target.closest('.modal').id);
-                    }
+                    const btn = e.target.closest('.close-modal-btn');
+                    if (btn) closeModal(btn.dataset.modalId);
                 });
             });
 
@@ -458,11 +436,11 @@
             let html = '';
             const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${value.replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
             const renderList = (title, items, section, placeholder, textKey) => {
-                let listHtml = `<h4>${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>`;
-                if(section === 'poranek' || section === 'wieczor') {
-                    listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}" style="margin-top: 10px;">Zainspiruj mnie</button>`;
-                }
-                listHtml += `<button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}" style="margin-left: 10px; margin-top: 10px;">+ Dodaj</button>`;
+                let listHtml = `<h4>${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}">Zainspiruj mnie</button>
+                    <button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}">+ Dodaj</button>
+                </div>`;
                 return listHtml;
             };
             
@@ -485,16 +463,20 @@
         static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
         static handleFontChange(btn) { applyFont(btn.dataset.font); this.render('appearance'); }
         static showSuggestions(section) {
-            const suggestions = section === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
+            const suggestionsMap = { poranek: suggestedMorningQuestions, wieczor: suggestedEveningQuestions, summary: suggestedSummaryQuestions, habits: suggestedHabits };
+            const titleMap = { poranek: 'Poranek', wieczor: 'Wieczór', summary: 'Podsumowanie', habits: 'Nawyki' };
+            const suggestions = suggestionsMap[section];
             const suggestionsList = document.getElementById('suggestionsList');
             suggestionsList.innerHTML = suggestions.map((q, index) => `<div class="suggestion-item"><span>${q}</span><button class="btn btn-secondary add-suggestion-btn" data-section="${section}" data-index="${index}">Dodaj</button></div>`).join('');
-            document.getElementById('suggestionsTitle').textContent = `Sugestie - ${section.charAt(0).toUpperCase() + section.slice(1)}`;
+            document.getElementById('suggestionsTitle').textContent = `Sugestie - ${titleMap[section]}`;
             openModal('suggestionsModal');
         }
         static addSuggestion(section, index) {
-            const suggestions = section === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
-            const questionText = suggestions[index];
-            this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: questionText});
+            const suggestionsMap = { poranek: suggestedMorningQuestions, wieczor: suggestedEveningQuestions, summary: suggestedSummaryQuestions, habits: suggestedHabits };
+            const suggestionText = suggestionsMap[section][index];
+            if (section === 'habits') { this.tempHabits.push(suggestionText); }
+            else if (section === 'summary') { this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: suggestionText}); }
+            else { this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: suggestionText}); }
             this.render(section);
         }
         static addItem(section) {
@@ -523,13 +505,12 @@
             showNotification("Ustawienia zapisane! ✅");
         }
     }
-
-    // --- LOGIKA GŁÓWNA I OBSŁUGA ZDARZEŃ ---
+    
     function initializeApp() {
         if (isAppInitialized) return;
         isAppInitialized = true;
-        document.querySelector('#main-app').classList.remove('hidden');
-        document.querySelector('#auth-page').classList.remove('active');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('auth-page').classList.add('hidden');
         applyTheme(AppStorage.getSetting('theme'));
         applyFont(AppStorage.getSetting('font'));
         document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
@@ -603,25 +584,25 @@
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
 
     document.addEventListener('DOMContentLoaded', () => {
+        const authPage = document.getElementById('auth-page');
+        const mainApp = document.getElementById('main-app');
+
         if (sessionStorage.getItem('isLoggedIn')) {
+            mainApp.classList.remove('hidden');
             initializeApp();
         } else {
-            const authPage = document.querySelector('#auth-page');
-            authPage.classList.add('active');
+            authPage.classList.remove('hidden');
             const authForm = document.getElementById('authForm');
             const toggleBtn = document.getElementById('toggleAuthBtn');
-            const authTitle = document.getElementById('authTitle');
-            const authSubmitBtn = document.getElementById('authSubmitBtn');
-            const toggleText = document.getElementById('toggleText');
             let isLogin = true;
             toggleBtn.addEventListener('click', () => {
                 isLogin = !isLogin;
-                authTitle.textContent = isLogin ? 'Logowanie' : 'Rejestracja';
-                authSubmitBtn.textContent = isLogin ? 'Zaloguj się' : 'Zarejestruj się';
-                toggleText.textContent = isLogin ? 'Nie masz konta?' : 'Masz już konto?';
+                document.getElementById('authTitle').textContent = isLogin ? 'Logowanie' : 'Rejestracja';
+                document.getElementById('authSubmitBtn').textContent = isLogin ? 'Zaloguj się' : 'Zarejestruj się';
+                document.getElementById('toggleText').textContent = isLogin ? 'Nie masz konta?' : 'Masz już konto?';
                 toggleBtn.textContent = isLogin ? 'Zarejestruj się' : 'Zaloguj się';
             });
-            authForm.addEventListener('submit', async (e) => {
+            authForm.addEventListener('submit', e => {
                 e.preventDefault();
                 const login = document.getElementById('authLogin').value;
                 if (!login) { document.getElementById('authError').textContent = 'Login nie może być pusty.'; return; }
@@ -633,7 +614,6 @@
         }
         Settings.init();
     });
-
 </script>
 </body>
 </html>
