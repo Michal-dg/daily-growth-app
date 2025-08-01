@@ -24,68 +24,36 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
 
     <style>
-        /* === SYSTEM DESIGNU v5.2 === */
         :root {
             --primary: #2c6e49; --accent: #f9a620;
             --bg: #f7f9f9; --card: #ffffff;
             --text-main: #1f292e; --text-muted: #6a7881;
             --border: #e8ecef;
             --header-overlay: rgba(30, 41, 46, 0.4);
-            
             --font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-serif: 'Lora', serif;
             --font-rounded: 'Nunito', sans-serif;
-
             --border-radius-sm: 8px; --border-radius-md: 12px; --border-radius-lg: 16px;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        html[data-theme='las'].dark-mode {
-            --primary: #4ab779; --accent: #ffb84d; --bg: #12181b; --card: #1c2328;
-            --text-main: #e8e8e8; --text-muted: #8e9a9f; --border: #2d373c;
-            --header-overlay: rgba(0, 0, 0, 0.5);
-        }
-        html[data-theme='ocean'] {
-            --primary: #006f8a; --accent: #ee9b00; --bg: #f0f8ff; --card: #ffffff;
-            --text-main: #023047; --text-muted: #5e7c8b; --border: #e0f2f8;
-            --header-overlay: rgba(1, 42, 64, 0.5);
-        }
-        html[data-theme='ocean'].dark-mode {
-            --primary: #219ebc; --accent: #ffc254; --bg: #012a40; --card: #013754;
-            --text-main: #e0f2f8; --text-muted: #a6bfcc; --border: #025078;
-        }
-        html[data-theme='fokus'] {
-            --primary: #1a1a1a; --accent: #007aff; --bg: #f6f6f6; --card: #ffffff;
-            --text-main: #1a1a1a; --text-muted: #6b6b6b; --border: #e5e5e5;
-            --header-overlay: rgba(255, 255, 255, 0.3);
-        }
-        html[data-theme='fokus'].dark-mode {
-            --primary: #f0f0f0; --accent: #0a84ff; --bg: #000000; --card: #1c1c1e;
-            --text-main: #f0f0f0; --text-muted: #a0a0a0; --border: #38383a;
-            --header-overlay: rgba(0, 0, 0, 0.6);
-        }
-
+        html[data-theme='las'].dark-mode { --primary: #4ab779; --accent: #ffb84d; --bg: #12181b; --card: #1c2328; --text-main: #e8e8e8; --text-muted: #8e9a9f; --border: #2d373c; --header-overlay: rgba(0, 0, 0, 0.5); }
+        html[data-theme='ocean'] { --primary: #006f8a; --accent: #ee9b00; --bg: #f0f8ff; --card: #ffffff; --text-main: #023047; --text-muted: #5e7c8b; --border: #e0f2f8; --header-overlay: rgba(1, 42, 64, 0.5); }
+        html[data-theme='ocean'].dark-mode { --primary: #219ebc; --accent: #ffc254; --bg: #012a40; --card: #013754; --text-main: #e0f2f8; --text-muted: #a6bfcc; --border: #025078; }
+        html[data-theme='fokus'] { --primary: #1a1a1a; --accent: #007aff; --bg: #f6f6f6; --card: #ffffff; --text-main: #1a1a1a; --text-muted: #6b6b6b; --border: #e5e5e5; --header-overlay: rgba(255, 255, 255, 0.3); }
+        html[data-theme='fokus'].dark-mode { --primary: #f0f0f0; --accent: #0a84ff; --bg: #000000; --card: #1c1c1e; --text-main: #f0f0f0; --text-muted: #a0a0a0; --border: #38383a; --header-overlay: rgba(0, 0, 0, 0.6); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-sans-serif); background: var(--bg); color: var(--text-main); line-height: 1.6; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; transition: background-color var(--transition), color var(--transition); }
         body.font-serif { font-family: var(--font-serif); }
         body.font-rounded { font-family: var(--font-rounded); }
-
         .hidden { display: none !important; }
-
         .container { max-width: 900px; margin: 0 auto; padding: 20px 15px; }
-        header { 
-            position: relative; color: white; border-radius: var(--border-radius-lg); 
-            padding: 60px 40px; margin-bottom: 40px; text-align: center; overflow: hidden;
-            background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover; background-position: center;
-        }
+        header { position: relative; color: white; border-radius: var(--border-radius-lg); padding: 60px 40px; margin-bottom: 40px; text-align: center; overflow: hidden; background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; }
         header::before { content: ''; position: absolute; inset: 0; background-color: var(--header-overlay); z-index: 1; transition: background-color var(--transition); }
         header > * { position: relative; z-index: 2; }
         header h1 { color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
         .quote { font-style: normal; font-size: 1.2rem; max-width: 600px; margin: 15px auto 0; opacity: 0.95; }
-
         .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .btn { padding: 10px 20px; border-radius: var(--border-radius-md); border: 1px solid transparent; cursor: pointer; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: all var(--transition); user-select: none; }
         .btn:active { transform: scale(0.97); }
@@ -94,27 +62,22 @@
         .btn-secondary { background: var(--accent); color: var(--text-main); }
         .btn-tertiary { background: var(--card); color: var(--text-main); border-color: var(--border); box-shadow: var(--shadow-sm); }
         .btn-tertiary:hover { background-color: var(--bg); border-color: color-mix(in srgb, var(--border) 80%, var(--text-muted)); }
-
         .tabs-container { border-bottom: 1px solid var(--border); }
         .tabs { display: flex; gap: 12px; justify-content: flex-start; margin-bottom: -1px; min-width: max-content; overflow-x: auto; scrollbar-width: none;}
         .tabs::-webkit-scrollbar { display: none; }
         .tab { padding: 10px 16px; border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 600; border: 1px solid transparent; white-space: nowrap; }
         .tab.active { background: var(--card); color: var(--primary); border-color: var(--border); border-bottom-color: var(--card); }
         .tab svg { margin-right: 8px; width: 16px; height: 16px; }
-
         .section { display: none; }
         .section.active { display: block; animation: fadeIn 0.5s var(--transition); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
         .content-card, .auth-container { background: var(--card); padding: 40px; border-radius: var(--border-radius-lg); margin-top: 25px; box-shadow: var(--shadow-md); border: 1px solid var(--border); transition: all var(--transition); }
         .content-header { font-size: 1.8rem; margin-bottom: 30px; color: var(--primary); font-weight: 700; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
-        
         textarea, input, select { width: 100%; padding: 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; font-family: inherit; transition: all var(--transition); }
         textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
         textarea { min-height: 120px; resize: vertical; }
         .question-group { margin-bottom: 30px; }
         label { display: block; font-weight: 600; margin-bottom: 10px; }
-        
         .modal { display: none; position: fixed; z-index: 1000; inset: 0; align-items: center; justify-content: center; background-color: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(8px); }
         .modal.active { display: flex; animation: fadeIn 0.3s forwards; }
         .modal-content-wrapper { background: var(--card); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); max-width: 600px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
@@ -123,16 +86,15 @@
         .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
         .modal-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
         .modal-footer { padding: 15px 25px; border-top: 1px solid var(--border); }
-
         .modal-tabs-horizontal { display: flex; gap: 5px; margin-bottom: 25px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        
         .suggestion-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: var(--border-radius-sm); transition: background-color var(--transition); }
         .suggestion-item:hover { background-color: var(--bg); }
         .suggestion-item button { font-size: 0.8rem; padding: 4px 10px; }
         .settings-item { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
         .settings-item input { flex-grow: 1; }
         .settings-item button { background-color: #e53e3e; color: white; flex-shrink: 0; } .settings-item button:hover { background-color: #c53030; }
-
+        #notification { position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text-main); padding:12px 24px; border-radius:var(--border-radius-md); box-shadow:var(--shadow-md); z-index:2000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity:0; }
+        #notification.active { bottom: 20px; opacity: 1; }
         @media (max-width: 768px) {
             .content-card, .auth-container { padding: 25px 20px; }
             .modal-content-wrapper { max-height: 90vh; }
@@ -371,26 +333,19 @@
         static init() {
             document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
             document.getElementById('settings-btn').addEventListener('click', () => this.open());
+            document.querySelectorAll('.close-modal-btn').forEach(btn => {
+                btn.addEventListener('click', e => closeModal(e.currentTarget.dataset.modalId));
+            });
             const settingsModal = document.getElementById('settingsModal');
             const suggestionsModal = document.getElementById('suggestionsModal');
-
-            [settingsModal, suggestionsModal].forEach(modal => {
-                modal.addEventListener('click', e => {
-                    const btn = e.target.closest('.close-modal-btn');
-                    if (btn) closeModal(btn.dataset.modalId);
-                });
-            });
-
+            
             settingsModal.addEventListener('click', e => {
                 const tab = e.target.closest('.modal-tabs-horizontal .tab');
                 if (tab) this.switchTab(tab);
-
                 const themeOption = e.target.closest('.theme-option');
                 if (themeOption) this.handleThemeChange(themeOption);
-
                 const fontBtn = e.target.closest('.font-selector button');
                 if (fontBtn) this.handleFontChange(fontBtn);
-
                 const actionBtn = e.target.closest('.action-btn');
                 if(actionBtn) {
                     const { action, section, index } = actionBtn.dataset;
@@ -510,8 +465,6 @@
     function initializeApp() {
         if (isAppInitialized) return;
         isAppInitialized = true;
-        document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('auth-page').classList.add('hidden');
         applyTheme(AppStorage.getSetting('theme'));
         applyFont(AppStorage.getSetting('font'));
         document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
@@ -585,16 +538,18 @@
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
 
     document.addEventListener('DOMContentLoaded', () => {
+        Settings.init();
         const authPage = document.getElementById('auth-page');
         const mainApp = document.getElementById('main-app');
 
         if (sessionStorage.getItem('isLoggedIn')) {
-            mainApp.classList.remove('hidden');
             authPage.classList.add('hidden');
+            mainApp.classList.remove('hidden');
             initializeApp();
         } else {
-            authPage.classList.remove('hidden');
             mainApp.classList.add('hidden');
+            authPage.classList.remove('hidden');
+            
             const authForm = document.getElementById('authForm');
             const toggleBtn = document.getElementById('toggleAuthBtn');
             let isLogin = true;
@@ -615,7 +570,6 @@
                 initializeApp();
             });
         }
-        Settings.init();
     });
 </script>
 </body>
