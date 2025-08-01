@@ -81,11 +81,11 @@
         .modal { display: none; position: fixed; z-index: 1000; inset: 0; align-items: center; justify-content: center; background-color: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(8px); }
         .modal.active { display: flex; animation: fadeIn 0.3s forwards; }
         .modal-content-wrapper { background: var(--card); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); max-width: 600px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
-        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .modal-header .content-header { border: none; padding: 0; margin: 0; }
         .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
         .modal-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
-        .modal-footer { padding: 15px 25px; border-top: 1px solid var(--border); }
+        .modal-footer { padding: 15px 25px; border-top: 1px solid var(--border); flex-shrink: 0; }
         .modal-tabs-horizontal { display: flex; gap: 5px; margin-bottom: 25px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .suggestion-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: var(--border-radius-sm); transition: background-color var(--transition); }
         .suggestion-item:hover { background-color: var(--bg); }
@@ -108,15 +108,13 @@
     <div id="auth-page" class="hidden">
         <div class="auth-container">
             <h1 style="text-align:center;">🌱 Witaj</h1>
-            <div id="auth-form-container">
-                <form id="authForm" class="auth-form">
-                    <h2 id="authTitle" class="content-header" style="margin-bottom: 15px; text-align: center; border: none;">Logowanie</h2>
-                    <div id="authError" style="color: #e53e3e; text-align:center; min-height: 1.2em;"></div>
-                    <div><input type="text" id="authLogin" placeholder="Login" autocomplete="username" required></div>
-                    <div><input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required></div>
-                    <button class="btn btn-primary" id="authSubmitBtn" type="submit">Zaloguj się</button>
-                </form>
-            </div>
+            <form id="authForm" class="auth-form">
+                <h2 id="authTitle" class="content-header" style="margin-bottom: 15px; text-align: center; border: none;">Logowanie</h2>
+                <div id="authError" style="color: #e53e3e; text-align:center; min-height: 1.2em;"></div>
+                <div><input type="text" id="authLogin" placeholder="Login" autocomplete="username" required></div>
+                <div><input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required></div>
+                <button class="btn btn-primary" id="authSubmitBtn" type="submit">Zaloguj się</button>
+            </form>
             <div style="text-align: center; margin-top: 20px;">
                 <span id="toggleText">Nie masz konta?</span>
                 <button id="toggleAuthBtn" type="button" style="all:unset; cursor:pointer; font-weight:bold; color:var(--primary); text-decoration:underline; margin-left: 5px;">Zarejestruj się</button>
@@ -438,13 +436,13 @@
         static addItem(section) {
             if(section === 'habits') this.tempHabits.push('');
             else if (section === 'summary') this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: ''});
-            else this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: ''});
+            else { this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: ''}); }
             this.render(section);
         }
         static deleteItem(section, index) {
             if(section === 'habits') this.tempHabits.splice(index, 1);
             else if (section === 'summary') this.tempSentimentQuestions.splice(index, 1);
-            else this.tempQuestions[section].splice(index, 1);
+            else { this.tempQuestions[section].splice(index, 1); }
             this.render(section);
         }
         static saveAndClose() {
@@ -567,6 +565,8 @@
                 document.getElementById('authError').textContent = '';
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('dg_user', login);
+                authPage.classList.add('hidden');
+                mainApp.classList.remove('hidden');
                 initializeApp();
             });
         }
