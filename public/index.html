@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Daily Growth 6.0 🌱 – Wersja Ostateczna</title>
-    <meta name="description" content="Ostateczna, stabilna wersja Daily Growth. Dopracowany interfejs, pełna funkcjonalność i niezawodne działanie.">
+    <title>Daily Growth 5.2 🌱 – Wersja Stabilna</title>
+    <meta name="description" content="Stabilna wersja Daily Growth z poprawkami w interfejsie ustawień i logice działania aplikacji.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -330,6 +330,7 @@
     class Settings {
         static init() {
             document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
+            document.getElementById('settings-btn').addEventListener('click', () => this.open());
             document.querySelectorAll('.close-modal-btn').forEach(btn => {
                 btn.addEventListener('click', e => closeModal(e.currentTarget.dataset.modalId));
             });
@@ -462,21 +463,15 @@
     function initializeApp() {
         if (isAppInitialized) return;
         isAppInitialized = true;
-        
         applyTheme(AppStorage.getSetting('theme'));
         applyFont(AppStorage.getSetting('font'));
         document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
-        
         loadAppData();
-        
+        currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
         document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
-        
         bindAppEventListeners();
         rebuildAllSections();
-        
-        currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
         loadDate(currentDate);
-
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js').then(reg => {
                 reg.addEventListener('updatefound', () => {
@@ -496,7 +491,6 @@
         currentSentimentQuestions = AppStorage.getSentimentQuestions();
     }
     function bindAppEventListeners() {
-        document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
         document.getElementById('prev-day-btn').addEventListener('click', () => changeDate(-1));
         document.getElementById('next-day-btn').addEventListener('click', () => changeDate(1));
         document.getElementById('currentDate').addEventListener('input', e => loadDate(e.target.value));
@@ -575,7 +569,6 @@
             initializeApp();
         } else {
             authPage.classList.remove('hidden');
-            mainApp.classList.add('hidden');
             setupAuthListeners();
         }
         Settings.init();
