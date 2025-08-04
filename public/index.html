@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Daily Growth 6.0 🌱 – Wersja Stabilna</title>
-    <meta name="description" content="Stabilna wersja Daily Growth. Dopracowany interfejs, pełna funkcjonalność i niezawodne działanie.">
+    <title>Daily Growth 5.0 🌱 – Nowy Horyzont</title>
+    <meta name="description" content="Nowa wersja Daily Growth z personalizacją czcionek, sugestiami pytań i jeszcze bardziej dopracowanym interfejsem.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,36 +24,68 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
 
     <style>
+        /* === SYSTEM DESIGNU v5.0 === */
         :root {
             --primary: #2c6e49; --accent: #f9a620;
             --bg: #f7f9f9; --card: #ffffff;
             --text-main: #1f292e; --text-muted: #6a7881;
             --border: #e8ecef;
             --header-overlay: rgba(30, 41, 46, 0.4);
+            
             --font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-serif: 'Lora', serif;
             --font-rounded: 'Nunito', sans-serif;
+
             --border-radius-sm: 8px; --border-radius-md: 12px; --border-radius-lg: 16px;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        html[data-theme='las'].dark-mode { --primary: #4ab779; --accent: #ffb84d; --bg: #12181b; --card: #1c2328; --text-main: #e8e8e8; --text-muted: #8e9a9f; --border: #2d373c; --header-overlay: rgba(0, 0, 0, 0.5); }
-        html[data-theme='ocean'] { --primary: #006f8a; --accent: #ee9b00; --bg: #f0f8ff; --card: #ffffff; --text-main: #023047; --text-muted: #5e7c8b; --border: #e0f2f8; --header-overlay: rgba(1, 42, 64, 0.5); }
-        html[data-theme='ocean'].dark-mode { --primary: #219ebc; --accent: #ffc254; --bg: #012a40; --card: #013754; --text-main: #e0f2f8; --text-muted: #a6bfcc; --border: #025078; }
-        html[data-theme='fokus'] { --primary: #1a1a1a; --accent: #007aff; --bg: #f6f6f6; --card: #ffffff; --text-main: #1a1a1a; --text-muted: #6b6b6b; --border: #e5e5e5; --header-overlay: rgba(255, 255, 255, 0.3); }
-        html[data-theme='fokus'].dark-mode { --primary: #f0f0f0; --accent: #0a84ff; --bg: #000000; --card: #1c1c1e; --text-main: #f0f0f0; --text-muted: #a0a0a0; --border: #38383a; --header-overlay: rgba(0, 0, 0, 0.6); }
+
+        html[data-theme='las'].dark-mode {
+            --primary: #4ab779; --accent: #ffb84d; --bg: #12181b; --card: #1c2328;
+            --text-main: #e8e8e8; --text-muted: #8e9a9f; --border: #2d373c;
+            --header-overlay: rgba(0, 0, 0, 0.5);
+        }
+        html[data-theme='ocean'] {
+            --primary: #006f8a; --accent: #ee9b00; --bg: #f0f8ff; --card: #ffffff;
+            --text-main: #023047; --text-muted: #5e7c8b; --border: #e0f2f8;
+            --header-overlay: rgba(1, 42, 64, 0.5);
+        }
+        html[data-theme='ocean'].dark-mode {
+            --primary: #219ebc; --accent: #ffc254; --bg: #012a40; --card: #013754;
+            --text-main: #e0f2f8; --text-muted: #a6bfcc; --border: #025078;
+        }
+        html[data-theme='fokus'] {
+            --primary: #1a1a1a; --accent: #007aff; --bg: #f6f6f6; --card: #ffffff;
+            --text-main: #1a1a1a; --text-muted: #6b6b6b; --border: #e5e5e5;
+            --header-overlay: rgba(255, 255, 255, 0.3);
+        }
+        html[data-theme='fokus'].dark-mode {
+            --primary: #f0f0f0; --accent: #0a84ff; --bg: #000000; --card: #1c1c1e;
+            --text-main: #f0f0f0; --text-muted: #a0a0a0; --border: #38383a;
+            --header-overlay: rgba(0, 0, 0, 0.6);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-sans-serif); background: var(--bg); color: var(--text-main); line-height: 1.6; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; transition: background-color var(--transition), color var(--transition); }
         body.font-serif { font-family: var(--font-serif); }
         body.font-rounded { font-family: var(--font-rounded); }
+
         .hidden { display: none !important; }
+
         .container { max-width: 900px; margin: 0 auto; padding: 20px 15px; }
-        header { position: relative; color: white; border-radius: var(--border-radius-lg); padding: 60px 40px; margin-bottom: 40px; text-align: center; overflow: hidden; background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; }
+        header { 
+            position: relative; color: white; border-radius: var(--border-radius-lg); 
+            padding: 60px 40px; margin-bottom: 40px; text-align: center; overflow: hidden;
+            background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center;
+        }
         header::before { content: ''; position: absolute; inset: 0; background-color: var(--header-overlay); z-index: 1; transition: background-color var(--transition); }
         header > * { position: relative; z-index: 2; }
         header h1 { color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
         .quote { font-style: normal; font-size: 1.2rem; max-width: 600px; margin: 15px auto 0; opacity: 0.95; }
+
         .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .btn { padding: 10px 20px; border-radius: var(--border-radius-md); border: 1px solid transparent; cursor: pointer; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: all var(--transition); user-select: none; }
         .btn:active { transform: scale(0.97); }
@@ -62,59 +94,79 @@
         .btn-secondary { background: var(--accent); color: var(--text-main); }
         .btn-tertiary { background: var(--card); color: var(--text-main); border-color: var(--border); box-shadow: var(--shadow-sm); }
         .btn-tertiary:hover { background-color: var(--bg); border-color: color-mix(in srgb, var(--border) 80%, var(--text-muted)); }
+
         .tabs-container { border-bottom: 1px solid var(--border); }
         .tabs { display: flex; gap: 12px; justify-content: flex-start; margin-bottom: -1px; min-width: max-content; overflow-x: auto; scrollbar-width: none;}
         .tabs::-webkit-scrollbar { display: none; }
         .tab { padding: 10px 16px; border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 600; border: 1px solid transparent; white-space: nowrap; }
         .tab.active { background: var(--card); color: var(--primary); border-color: var(--border); border-bottom-color: var(--card); }
         .tab svg { margin-right: 8px; width: 16px; height: 16px; }
+
         .section { display: none; }
         .section.active { display: block; animation: fadeIn 0.5s var(--transition); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
         .content-card, .auth-container { background: var(--card); padding: 40px; border-radius: var(--border-radius-lg); margin-top: 25px; box-shadow: var(--shadow-md); border: 1px solid var(--border); transition: all var(--transition); }
         .content-header { font-size: 1.8rem; margin-bottom: 30px; color: var(--primary); font-weight: 700; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        
         textarea, input, select { width: 100%; padding: 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; font-family: inherit; transition: all var(--transition); }
         textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
         textarea { min-height: 120px; resize: vertical; }
         .question-group { margin-bottom: 30px; }
         label { display: block; font-weight: 600; margin-bottom: 10px; }
+
+        .sentiment-buttons { display: flex; gap: 8px; margin-top: 10px; }
+        .sentiment-star { font-size: 2.2rem; cursor: pointer; color: var(--border); transition: all 0.15s ease-in-out; }
+        .sentiment-buttons:hover .sentiment-star { color: color-mix(in srgb, var(--accent) 50%, transparent); }
+        .sentiment-buttons .sentiment-star:hover ~ .sentiment-star { color: var(--border); }
+        .sentiment-star.active { color: var(--accent); }
+        
+        .habit-item { display: flex; align-items: center; gap: 12px; }
+        .habit-item label { display: flex; align-items: center; gap: 12px; font-weight: normal; width: 100%; padding: 8px 0; }
+        .habit-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); flex-shrink: 0; }
+
         .modal { display: none; position: fixed; z-index: 1000; inset: 0; align-items: center; justify-content: center; background-color: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(8px); }
         .modal.active { display: flex; animation: fadeIn 0.3s forwards; }
-        .modal-content-wrapper { background: var(--card); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); max-width: 600px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
-        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .modal-header .content-header { border: none; padding: 0; margin: 0; }
+        .modal-content { max-width: 600px; width: 90%; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-        .modal-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
-        .modal-footer { padding: 15px 25px; border-top: 1px solid var(--border); flex-shrink: 0; }
-        .modal-tabs-horizontal { display: flex; gap: 5px; margin-bottom: 25px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .suggestion-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: var(--border-radius-sm); transition: background-color var(--transition); }
-        .suggestion-item:hover { background-color: var(--bg); }
-        .suggestion-item button { font-size: 0.8rem; padding: 4px 10px; }
+        
+        .modal-tabs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+
+        .auth-container { max-width: 400px; } .auth-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
         .settings-item { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
         .settings-item input { flex-grow: 1; }
         .settings-item button { background-color: #e53e3e; color: white; flex-shrink: 0; } .settings-item button:hover { background-color: #c53030; }
+        
+        .suggestion-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: var(--border-radius-sm); transition: background-color var(--transition); }
+        .suggestion-item:hover { background-color: var(--bg); }
+        .suggestion-item button { font-size: 0.8rem; padding: 4px 10px; }
+
         #notification { position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--card); color:var(--text-main); padding:12px 24px; border-radius:var(--border-radius-md); box-shadow:var(--shadow-md); z-index:2000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity:0; }
         #notification.active { bottom: 20px; opacity: 1; }
+
         @media (max-width: 768px) {
-            .content-card, .auth-container { padding: 25px 20px; }
-            .modal-content-wrapper { max-height: 90vh; }
+            header, .content-card, .modal-content { padding: 40px 20px; }
             .controls { flex-direction: column; align-items: stretch; gap: 10px; }
             .actions, .date-controls { justify-content: space-between; width: 100%; }
+            input[type="date"] { text-align: center; }
         }
     </style>
 </head>
-<body class="font-sans-serif">
+<body>
 
-    <div id="auth-page" class="hidden">
-        <div class="auth-container">
+    <div id="auth-page">
+        <div class="auth-container content-card">
             <h1 style="text-align:center;">🌱 Witaj</h1>
-            <form id="authForm" class="auth-form">
-                <h2 id="authTitle" class="content-header" style="margin-bottom: 15px; text-align: center; border: none;">Logowanie</h2>
-                <div id="authError" style="color: #e53e3e; text-align:center; min-height: 1.2em;"></div>
-                <div><input type="text" id="authLogin" placeholder="Login" autocomplete="username" required></div>
-                <div><input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required></div>
-                <button class="btn btn-primary" id="authSubmitBtn" type="submit">Zaloguj się</button>
-            </form>
+            <div id="auth-form-container">
+                <form id="authForm" class="auth-form">
+                    <h2 id="authTitle" class="content-header" style="margin-bottom: 15px; text-align: center; border: none;">Logowanie</h2>
+                    <div id="authError" style="color: #e53e3e; text-align:center; min-height: 1.2em;"></div>
+                    <div><input type="text" id="authLogin" placeholder="Login" autocomplete="username" required></div>
+                    <div><input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required></div>
+                    <button class="btn btn-primary" id="authSubmitBtn" type="submit">Zaloguj się</button>
+                </form>
+            </div>
             <div style="text-align: center; margin-top: 20px;">
                 <span id="toggleText">Nie masz konta?</span>
                 <button id="toggleAuthBtn" type="button" style="all:unset; cursor:pointer; font-weight:bold; color:var(--primary); text-decoration:underline; margin-left: 5px;">Zarejestruj się</button>
@@ -128,6 +180,7 @@
                 <h1>Daily Growth</h1>
                 <p class="quote" id="dailyQuote"></p>
             </header>
+
             <div class="controls">
                 <div class="date-controls">
                     <button class="btn btn-tertiary" id="prev-day-btn" aria-label="Poprzedni dzień"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.3333 13.666L4.66667 7.99935L10.3333 2.33268" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -139,6 +192,7 @@
                     <button class="btn btn-primary" id="logout-btn">Wyloguj</button>
                 </div>
             </div>
+
             <div class="tabs-container">
                 <div class="tabs" role="tablist">
                     <div class="tab active" data-section="poranek">🌅 Poranek</div>
@@ -146,44 +200,38 @@
                     <div class="tab" data-section="stats"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 13.3333H4V8H2V13.3333ZM6.66667 13.3333H8.66667V2.66667H6.66667V13.3333ZM11.3333 13.3333H13.3333V5.33333H11.3333V13.3333Z" fill="currentColor"/></svg>Analiza</div>
                 </div>
             </div>
+
             <section id="poranek-panel" class="section active"></section>
             <section id="wieczor-panel" class="section"></section>
             <section id="stats-panel" class="section"></section>
         </div>
         
         <div class="modal" id="settingsModal">
-            <div class="modal-content-wrapper">
-                <div class="modal-header">
-                    <h2 class="content-header">Ustawienia</h2>
-                    <button class="close-modal-btn" data-modal-id="settingsModal">✖</button>
+            <div class="content-card modal-content">
+                <div class="modal-header"><h2 class="content-header" style="border:none; margin:0; padding:0;">Ustawienia</h2><button class="close-modal-btn" data-modal-id="settingsModal">✖</button></div>
+                <div class="modal-tabs">
+                    <div class="modal-tab active" data-section="appearance">🎨 Wygląd</div>
+                    <div class="modal-tab" data-section="poranek">🌅 Poranek</div>
+                    <div class="modal-tab" data-section="wieczor">🌙 Wieczór</div>
+                    <div class="modal-tab" data-section="summary">📊 Podsumowanie</div>
+                    <div class="modal-tab" data-section="habits">✅ Nawyki</div>
                 </div>
-                <div class="modal-body">
-                    <div class="modal-tabs-horizontal">
-                        <div class="tab active" data-section="appearance">🎨 Wygląd</div>
-                        <div class="tab" data-section="poranek">🌅 Poranek</div>
-                        <div class="tab" data-section="wieczor">🌙 Wieczór</div>
-                        <div class="tab" data-section="summary">📊 Podsumowanie</div>
-                        <div class="tab" data-section="habits">✅ Nawyki</div>
-                    </div>
-                    <div class="modal-tab-panel active" id="s-appearance-panel"></div>
-                    <div class="modal-tab-panel" id="s-poranek-panel"></div>
-                    <div class="modal-tab-panel" id="s-wieczor-panel"></div>
-                    <div class="modal-tab-panel" id="s-summary-panel"></div>
-                    <div class="modal-tab-panel" id="s-habits-panel"></div>
-                </div>
-                <div class="modal-footer">
-                     <button class="btn btn-primary" id="save-settings-btn" style="width: 100%;">Zapisz i zamknij</button>
-                </div>
+                <div id="s-appearance-panel" class="modal-tab-panel active"></div>
+                <div id="s-poranek-panel" class="modal-tab-panel"></div>
+                <div id="s-wieczor-panel" class="modal-tab-panel"></div>
+                <div id="s-summary-panel" class="modal-tab-panel"></div>
+                <div id="s-habits-panel" class="modal-tab-panel"></div>
+                <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 20px; width: 100%;">Zapisz i zamknij</button>
             </div>
         </div>
 
         <div class="modal" id="suggestionsModal">
-             <div class="modal-content-wrapper">
+             <div class="content-card modal-content">
                 <div class="modal-header">
-                    <h2 id="suggestionsTitle" class="content-header">Sugerowane Pytania</h2>
+                    <h2 id="suggestionsTitle" class="content-header" style="border:none; margin:0; padding:0;">Sugerowane Pytania</h2>
                     <button class="close-modal-btn" data-modal-id="suggestionsModal">✖</button>
                 </div>
-                <div id="suggestionsList" class="modal-body"></div>
+                <div id="suggestionsList" style="max-height: 400px; overflow-y: auto;"></div>
             </div>
         </div>
 
@@ -191,17 +239,32 @@
     </div>
 <script>
     'use strict';
+    // --- GLOBALNE STAŁE ---
     const initialQuestions = {
-        poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}],
-        wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}]
+        poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}, {id:"m3", text:"Jaką pozytywną afirmację wybieram na dziś?"} ],
+        wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3",text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
     };
     const initialHabits = ["Medytacja", "Ćwiczenia fizyczne", "Czytanie książki", "Nauka czegoś nowego"];
-    const initialSentimentQuestions = [ { id: 'health', question: '💪 Jak oceniasz swoje samopoczucie fizyczne?' }, { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' }];
-    const quotes = [ "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨", "Każdy dzień to nowa szansa, aby stać się lepszą wersją siebie.", "Małe kroki w dobrym kierunku mogą okazać się największym krokiem w Twoim życiu.", "Tajemnica postępu polega na tym, by zacząć.", "Nie licz dni, spraw, by dni się liczyły.", "Sukces to suma małych wysiłków, powtarzanych dzień po dniu.", "Wzrost i komfort nie mogą współistnieć.", "Dyscyplina to most między celami a osiągnięciami.", "Umysł jest wszystkim. Stajesz się tym, o czym myślisz.", "Jesteś silniejszy, niż myślisz. Bardziej zdolny, niż sobie wyobrażasz.", "Zacznij tam, gdzie jesteś. Użyj tego, co masz. Zrób, co możesz.", "Cierpliwość, wytrwałość i pot tworzą niezwyciężoną kombinację sukcesu.", "Nigdy nie jest za późno, by być tym, kim mogłeś być.", "W samym środku trudności kryją się możliwości.", "Charakteru nie można rozwinąć w spokoju i ciszy. Tylko przez doświadczenie prób i cierpienia można wzmocnić duszę.", "Natura nie spieszy się, a jednak wszystko jest osiągnięte.", "Spójrz głęboko w naturę, a wtedy wszystko zrozumiesz lepiej.", "Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz."];
-    const suggestedMorningQuestions = ["Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"];
-    const suggestedEveningQuestions = ["Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"];
-    const suggestedSummaryQuestions = ["Jaką jedną emocję najczęściej dziś odczuwałem/am?", "Co było największym wyzwaniem, z którym się zmierzyłem/am?", "Gdybym miał/a opisać ten dzień jednym słowem, jakie by to było?", "Co dzisiaj zabrało mi najwięcej energii?", "Co dzisiaj dało mi najwięcej energii?", "Czy zrobiłem/am dziś coś tylko dla siebie?", "Jaki był najbardziej pamiętny moment dnia?", "Czy moje dzisiejsze działania były zgodne z moimi wartościami?", "Jaką jedną rzecz chciałbym/chciałabym zapamiętać z tego dnia?", "Czy jestem zadowolony/a z tego, jak spędziłem/am dziś czas?"];
-    const suggestedHabits = ["Picie 2l wody", "Spacer 30 minut", "Bez social mediów rano", "Joga lub rozciąganie", "Nauka 5 nowych słówek", "Pisanie dziennika", "Planowanie następnego dnia", "Zdrowy posiłek", "Kontakt z naturą", "Poświęcenie czasu na hobby", "Słuchanie podcastu rozwojowego", "Praktyka uważności (mindfulness)"];
+    const initialSentimentQuestions = [
+        { id: 'health', question: '💪 Jak oceniasz swoje samopoczucie fizyczne?' }, 
+        { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, 
+        { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' }
+    ];
+    const quotes = [ 
+        "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨",
+        "Każdy dzień to nowa szansa, aby stać się lepszą wersją siebie.", "Małe kroki w dobrym kierunku mogą okazać się największym krokiem w Twoim życiu.", "Tajemnica postępu polega na tym, by zacząć.",
+        "Nie licz dni, spraw, by dni się liczyły.", "Sukces to suma małych wysiłków, powtarzanych dzień po dniu.", "Wzrost i komfort nie mogą współistnieć.",
+        "Dyscyplina to most między celami a osiągnięciami.", "Umysł jest wszystkim. Stajesz się tym, o czym myślisz.", "Jesteś silniejszy, niż myślisz. Bardziej zdolny, niż sobie wyobrażasz.",
+        "Zacznij tam, gdzie jesteś. Użyj tego, co masz. Zrób, co możesz.", "Cierpliwość, wytrwałość i pot tworzą niezwyciężoną kombinację sukcesu.", "Nigdy nie jest za późno, by być tym, kim mogłeś być.",
+        "W samym środku trudności kryją się możliwości.", "Charakteru nie można rozwinąć w spokoju i ciszy. Tylko przez doświadczenie prób i cierpienia można wzmocnić duszę.",
+        "Natura nie spieszy się, a jednak wszystko jest osiągnięte.", "Spójrz głęboko w naturę, a wtedy wszystko zrozumiesz lepiej.", "Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz."
+    ];
+    const suggestedMorningQuestions = [
+        "Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"
+    ];
+    const suggestedEveningQuestions = [
+        "Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"
+    ];
 
     let currentQuestions, currentHabits, currentSentimentQuestions, currentDate, isAppInitialized = false;
 
@@ -243,7 +306,7 @@
             const data = entry[sectionId] || {};
             document.querySelectorAll(`#${sectionId}-panel textarea`).forEach(el => el.value = data[el.dataset.id] || '');
             if (sectionId === 'wieczor') {
-                const eveningData = entry.wieczor || {};
+                const eveningData = entry.evening || {};
                 currentSentimentQuestions.forEach(sq => UI.updateStars(document.querySelector(`#wieczor-panel .sentiment-buttons[data-id="${sq.id}"]`), eveningData[sq.id + 'Sent']));
                 const habits = eveningData.habits || {};
                 currentHabits.forEach(h => { const cb = document.querySelector(`#wieczor-panel [data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
@@ -330,19 +393,28 @@
     class Settings {
         static init() {
             document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
-            document.querySelectorAll('.close-modal-btn').forEach(btn => {
-                btn.addEventListener('click', e => closeModal(e.currentTarget.dataset.modalId));
-            });
+            document.getElementById('settings-btn').addEventListener('click', () => this.open());
             const settingsModal = document.getElementById('settingsModal');
             const suggestionsModal = document.getElementById('suggestionsModal');
-            
+
+            [settingsModal, suggestionsModal].forEach(modal => {
+                modal.addEventListener('click', e => {
+                    if (e.target.closest('.close-modal-btn')) {
+                        closeModal(e.target.closest('.modal').id);
+                    }
+                });
+            });
+
             settingsModal.addEventListener('click', e => {
-                const tab = e.target.closest('.modal-tabs-horizontal .tab');
+                const tab = e.target.closest('.modal-tab');
                 if (tab) this.switchTab(tab);
+
                 const themeOption = e.target.closest('.theme-option');
                 if (themeOption) this.handleThemeChange(themeOption);
+
                 const fontBtn = e.target.closest('.font-selector button');
                 if (fontBtn) this.handleFontChange(fontBtn);
+
                 const actionBtn = e.target.closest('.action-btn');
                 if(actionBtn) {
                     const { action, section, index } = actionBtn.dataset;
@@ -363,10 +435,7 @@
                 const { section, index, id } = e.target.dataset;
                 if(section === 'summary') this.tempSentimentQuestions[index].question = e.target.value;
                 else if (section === 'habits') this.tempHabits[index] = e.target.value;
-                else if (this.tempQuestions[section]) {
-                    const question = this.tempQuestions[section].find(q => q.id === id);
-                    if (question) question.text = e.target.value;
-                }
+                else this.tempQuestions[section].find(q => q.id === id).text = e.target.value;
             });
         }
         static open() {
@@ -387,13 +456,13 @@
             const container = document.getElementById(`s-${sectionId}-panel`);
             if(!container) return;
             let html = '';
-            const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${String(value || '').replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
+            const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${value.replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
             const renderList = (title, items, section, placeholder, textKey) => {
-                let listHtml = `<h4>${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>
-                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}">Zainspiruj mnie</button>
-                    <button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}">+ Dodaj</button>
-                </div>`;
+                let listHtml = `<h4>${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>`;
+                if(section === 'poranek' || section === 'wieczor') {
+                    listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}" style="margin-top: 10px;">Zainspiruj mnie</button>`;
+                }
+                listHtml += `<button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}" style="margin-left: 10px; margin-top: 10px;">+ Dodaj</button>`;
                 return listHtml;
             };
             
@@ -416,32 +485,28 @@
         static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
         static handleFontChange(btn) { applyFont(btn.dataset.font); this.render('appearance'); }
         static showSuggestions(section) {
-            const suggestionsMap = { poranek: suggestedMorningQuestions, wieczor: suggestedEveningQuestions, summary: suggestedSummaryQuestions, habits: suggestedHabits };
-            const titleMap = { poranek: 'Poranek', wieczor: 'Wieczór', summary: 'Podsumowanie', habits: 'Nawyki' };
-            const suggestions = suggestionsMap[section];
+            const suggestions = section === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
             const suggestionsList = document.getElementById('suggestionsList');
             suggestionsList.innerHTML = suggestions.map((q, index) => `<div class="suggestion-item"><span>${q}</span><button class="btn btn-secondary add-suggestion-btn" data-section="${section}" data-index="${index}">Dodaj</button></div>`).join('');
-            document.getElementById('suggestionsTitle').textContent = `Sugestie - ${titleMap[section]}`;
+            document.getElementById('suggestionsTitle').textContent = `Sugestie - ${section.charAt(0).toUpperCase() + section.slice(1)}`;
             openModal('suggestionsModal');
         }
         static addSuggestion(section, index) {
-            const suggestionsMap = { poranek: suggestedMorningQuestions, wieczor: suggestedEveningQuestions, summary: suggestedSummaryQuestions, habits: suggestedHabits };
-            const suggestionText = suggestionsMap[section][index];
-            if (section === 'habits') { this.tempHabits.push(suggestionText); }
-            else if (section === 'summary') { this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: suggestionText}); }
-            else { this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: suggestionText}); }
+            const suggestions = section === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
+            const questionText = suggestions[index];
+            this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: questionText});
             this.render(section);
         }
         static addItem(section) {
             if(section === 'habits') this.tempHabits.push('');
             else if (section === 'summary') this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: ''});
-            else { this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: ''}); }
+            else this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: ''});
             this.render(section);
         }
         static deleteItem(section, index) {
             if(section === 'habits') this.tempHabits.splice(index, 1);
             else if (section === 'summary') this.tempSentimentQuestions.splice(index, 1);
-            else { this.tempQuestions[section].splice(index, 1); }
+            else this.tempQuestions[section].splice(index, 1);
             this.render(section);
         }
         static saveAndClose() {
@@ -458,27 +523,24 @@
             showNotification("Ustawienia zapisane! ✅");
         }
     }
-    
+
+    // --- LOGIKA GŁÓWNA I OBSŁUGA ZDARZEŃ ---
     function initializeApp() {
         if (isAppInitialized) return;
         isAppInitialized = true;
-        
+        document.querySelector('#main-app').classList.remove('hidden');
+        document.querySelector('#auth-page').classList.remove('active');
         applyTheme(AppStorage.getSetting('theme'));
         applyFont(AppStorage.getSetting('font'));
         document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
-        
         loadAppData();
-        
+        currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
         document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
-        
         bindAppEventListeners();
         rebuildAllSections();
-        
-        currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
         loadDate(currentDate);
-
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' }).then(reg => {
+            navigator.serviceWorker.register('/service-worker.js').then(reg => {
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
                     newWorker.addEventListener('statechange', () => {
@@ -496,7 +558,6 @@
         currentSentimentQuestions = AppStorage.getSentimentQuestions();
     }
     function bindAppEventListeners() {
-        document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
         document.getElementById('prev-day-btn').addEventListener('click', () => changeDate(-1));
         document.getElementById('next-day-btn').addEventListener('click', () => changeDate(1));
         document.getElementById('currentDate').addEventListener('input', e => loadDate(e.target.value));
@@ -542,44 +603,37 @@
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const authPage = document.getElementById('auth-page');
-        const mainApp = document.getElementById('main-app');
-
-        const setupAuthListeners = () => {
+        if (sessionStorage.getItem('isLoggedIn')) {
+            initializeApp();
+        } else {
+            const authPage = document.querySelector('#auth-page');
+            authPage.classList.add('active');
             const authForm = document.getElementById('authForm');
             const toggleBtn = document.getElementById('toggleAuthBtn');
+            const authTitle = document.getElementById('authTitle');
+            const authSubmitBtn = document.getElementById('authSubmitBtn');
+            const toggleText = document.getElementById('toggleText');
             let isLogin = true;
             toggleBtn.addEventListener('click', () => {
                 isLogin = !isLogin;
-                document.getElementById('authTitle').textContent = isLogin ? 'Logowanie' : 'Rejestracja';
-                document.getElementById('authSubmitBtn').textContent = isLogin ? 'Zaloguj się' : 'Zarejestruj się';
-                document.getElementById('toggleText').textContent = isLogin ? 'Nie masz konta?' : 'Masz już konto?';
+                authTitle.textContent = isLogin ? 'Logowanie' : 'Rejestracja';
+                authSubmitBtn.textContent = isLogin ? 'Zaloguj się' : 'Zarejestruj się';
+                toggleText.textContent = isLogin ? 'Nie masz konta?' : 'Masz już konto?';
                 toggleBtn.textContent = isLogin ? 'Zarejestruj się' : 'Zaloguj się';
             });
-            authForm.addEventListener('submit', e => {
+            authForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const login = document.getElementById('authLogin').value;
                 if (!login) { document.getElementById('authError').textContent = 'Login nie może być pusty.'; return; }
                 document.getElementById('authError').textContent = '';
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('dg_user', login);
-                
-                authPage.classList.add('hidden');
-                mainApp.classList.remove('hidden');
                 initializeApp();
             });
-        };
-
-        if (sessionStorage.getItem('isLoggedIn')) {
-            mainApp.classList.remove('hidden');
-            initializeApp();
-        } else {
-            authPage.classList.remove('hidden');
-            mainApp.classList.add('hidden');
-            setupAuthListeners();
         }
         Settings.init();
     });
+
 </script>
 </body>
 </html>
