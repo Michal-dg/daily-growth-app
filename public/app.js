@@ -1,7 +1,6 @@
 'use strict';
 
 // --- GLOBALNE STAŁE ---
-console.log("Plik app.js został wczytany.");
 const initialQuestions = {
     poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}, {id:"m3", text:"Jaką pozytywną afirmację wybieram na dziś?"} ],
     wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3",text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
@@ -21,15 +20,13 @@ const suggestedMorningQuestions = [
 const suggestedEveningQuestions = [
     "Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"
 ];
-// Wklej to na początku pliku app.js, w sekcji --- GLOBALNE STAŁE ---
-
 const suggestedHabits = [
     "Codzienna medytacja (10 min)", "Pójście na siłownię/trening", "Czytanie książki (20 stron)", "Nauka nowego języka (15 min)", "Wieczorny spacer", "Planowanie następnego dnia", "Praktyka wdzięczności", "Zdrowe śniadanie", "Picca 2 litrów wody", "Joga lub rozciąganie"
 ];
-
 const suggestedSummaryQuestions = [
     "Jaka była najważniejsza lekcja tego dnia?", "Co sprawiło, że poczułem/am się dziś dumny/a?", "Jaką jedną rzecz mogę jutro zrobić lepiej?", "Co dzisiaj odpuściłem/am dla swojego spokoju?", "Kiedy czułem/am się dziś najbardziej energicznie?", "Jaki mały sukces dzisiaj odniosłem/am?", "Czego nauczyło mnie dzisiejsze wyzwanie?", "Jak oceniłbym/abym swoją cierpliwość w skali 1-5?"
 ];
+
 let currentQuestions, currentHabits, currentSentimentQuestions, currentDate, isAppInitialized = false;
 
 // --- KLASY ---
@@ -50,38 +47,14 @@ class AppStorage {
 }
 
 class UI {
-   // Wklej ten kod w miejsce starej funkcji buildSection
     static buildSection(sectionId, title, emoji, containerSelector) {
         const panel = document.querySelector(containerSelector);
         if (!panel) return;
         const questions = currentQuestions[sectionId] || [];
         let html = `<div class="content-card"><h2 class="content-header">${emoji} ${title}</h2><div>`;
         questions.forEach(q => {
-            html += `
-                <div class="question-group">
-                    <div class="label-with-inspire">
-                        <label for="q-${q.id}">${q.text}</label>
-                        <button class="btn inspire-btn" data-question-id="${q.id}" data-section="${sectionId}">Zainspiruj mnie</button>
-                    </div>
-                    <textarea id="q-${q.id}" data-id="${q.id}"></textarea>
-                </div>
-            `;
+            html += `<div class="question-group"><label for="q-${q.id}">${q.text}</label><textarea id="q-${q.id}" data-id="${q.id}"></textarea></div>`;
         });
-        if (sectionId === 'wieczor') {
-            html += currentSentimentQuestions.map(sq => `<div class="question-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
-            if (currentHabits.length > 0) html += `<div class="question-group"><label>Nawyki</label>${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div>`;
-        }
-        html += `</div></div>`;
-        panel.innerHTML = html;
-
-        // Nasz "szpieg" jest tutaj:
-        console.log("Podpinanie zdarzeń zapisu w buildSection dla sekcji:", sectionId);
-
-        panel.querySelectorAll('textarea').forEach(el => el.addEventListener('input', e => UI.saveInput(sectionId, e.target)));
-        panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
-        panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
-    }
-
         if (sectionId === 'wieczor') {
             html += currentSentimentQuestions.map(sq => `<div class="question-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
             if (currentHabits.length > 0) html += `<div class="question-group"><label>Nawyki</label>${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div>`;
@@ -104,7 +77,6 @@ class UI {
             currentHabits.forEach(h => { const cb = document.querySelector(`#wieczor-panel [data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
         }
     }
-
     static saveInput(sectionId, target) {
         const id = target.dataset.id;
         const entry = AppStorage.getDayEntry(currentDate);
@@ -201,7 +173,6 @@ class Stats {
     }
 }
 
-// ZASTĄP STARĄ KLASĘ SETTINGS TĄ NOWĄ:
 class Settings {
     static init() {
         document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
@@ -216,7 +187,6 @@ class Settings {
         suggestionsModal.addEventListener('click', e => {
             const addBtn = e.target.closest('.add-suggestion-btn');
             if (addBtn) {
-                // Ta funkcja jest teraz uniwersalna i obsługuje wszystkie sekcje
                 this.addSuggestion(addBtn.dataset.section, addBtn.dataset.index);
                 addBtn.textContent = 'Dodano ✔';
                 addBtn.disabled = true;
@@ -258,7 +228,6 @@ class Settings {
         const renderList = (title, items, section, placeholder, textKey) => {
             let listHtml = `<h4 class="settings-header-4">${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>`;
             listHtml += `<div class="settings-action-buttons">`;
-            // ZMIANA: Przycisk "Zainspiruj mnie" jest teraz dodawany do wszystkich 4 sekcji
             if (['poranek', 'wieczor', 'summary', 'habits'].includes(section)) {
                 listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}">Zainspiruj mnie</button>`;
             }
@@ -292,60 +261,30 @@ class Settings {
     }
     static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
     static handleFontChange(btn) { applyFont(btn.dataset.font); this.render('appearance'); }
-    
-    // ZMIANA: Ulepszona funkcja pokazująca sugestie dla wszystkich sekcji
     static showSuggestions(section) {
         let suggestions = [];
         let title = "Sugerowane Pytania";
         switch(section) {
-            case 'poranek': 
-                suggestions = suggestedMorningQuestions; 
-                title = "Sugestie - Poranek";
-                break;
-            case 'wieczor': 
-                suggestions = suggestedEveningQuestions; 
-                title = "Sugestie - Wieczór";
-                break;
-            case 'summary':
-                suggestions = suggestedSummaryQuestions;
-                title = "Sugerowane Pytania Podsumowujące";
-                break;
-            case 'habits':
-                suggestions = suggestedHabits;
-                title = "Sugerowane Nawyki";
-                break;
+            case 'poranek': suggestions = suggestedMorningQuestions; title = "Sugestie - Poranek"; break;
+            case 'wieczor': suggestions = suggestedEveningQuestions; title = "Sugestie - Wieczór"; break;
+            case 'summary': suggestions = suggestedSummaryQuestions; title = "Sugerowane Pytania Podsumowujące"; break;
+            case 'habits': suggestions = suggestedHabits; title = "Sugerowane Nawyki"; break;
         }
-        
         const suggestionsList = document.getElementById('suggestionsList');
         suggestionsList.innerHTML = suggestions.map((q, index) => `<div class="suggestion-item"><span>${q}</span><button class="btn btn-secondary add-suggestion-btn" data-section="${section}" data-index="${index}">Dodaj</button></div>`).join('');
         document.getElementById('suggestionsTitle').textContent = title;
         openModal('suggestionsModal');
     }
-
-    // ZMIANA: Ulepszona funkcja dodająca sugestie dla wszystkich sekcji
     static addSuggestion(section, index) {
         let textToAdd;
         switch(section) {
-            case 'poranek':
-                textToAdd = suggestedMorningQuestions[index];
-                this.tempQuestions.poranek.push({id: `m${Date.now()}`, text: textToAdd});
-                break;
-            case 'wieczor':
-                textToAdd = suggestedEveningQuestions[index];
-                this.tempQuestions.wieczor.push({id: `e${Date.now()}`, text: textToAdd});
-                break;
-            case 'summary':
-                textToAdd = suggestedSummaryQuestions[index];
-                this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: textToAdd});
-                break;
-            case 'habits':
-                textToAdd = suggestedHabits[index];
-                this.tempHabits.push(textToAdd);
-                break;
+            case 'poranek': textToAdd = suggestedMorningQuestions[index]; this.tempQuestions.poranek.push({id: `m${Date.now()}`, text: textToAdd}); break;
+            case 'wieczor': textToAdd = suggestedEveningQuestions[index]; this.tempQuestions.wieczor.push({id: `e${Date.now()}`, text: textToAdd}); break;
+            case 'summary': textToAdd = suggestedSummaryQuestions[index]; this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: textToAdd}); break;
+            case 'habits': textToAdd = suggestedHabits[index]; this.tempHabits.push(textToAdd); break;
         }
         this.render(section);
     }
-    
     static addItem(section) {
         if(section === 'habits') this.tempHabits.push('');
         else if (section === 'summary') this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: ''});
@@ -376,12 +315,6 @@ class Settings {
 // --- LOGIKA GŁÓWNA I OBSŁUGA ZDARZEŃ ---
 function initializeApp() {
     if (isAppInitialized) return;
-    function initializeApp() {
-    if (isAppInitialized) return;
-    console.log("Funkcja initializeApp() wystartowała."); // <--- DODAJ TĘ LINIĘ
-    isAppInitialized = true;
-    // ... reszta funkcji ...
-}
     isAppInitialized = true;
     document.querySelector('#main-app').classList.remove('hidden');
     applyTheme(AppStorage.getSetting('theme'));
@@ -412,8 +345,22 @@ function bindAppEventListeners() {
         document.getElementById(`${sectionId}-panel`).classList.add('active');
         if (sectionId === 'stats') Stats.render('#stats-panel');
     }));
-
+    const inspirationModal = document.getElementById('inspirationModal');
+    inspirationModal.addEventListener('click', e => {
+        const inspirationItem = e.target.closest('.inspiration-item');
+        if (inspirationItem) {
+            const targetTextareaId = inspirationModal.dataset.targetId;
+            const targetTextarea = document.getElementById(targetTextareaId);
+            if (targetTextarea) {
+                targetTextarea.value = inspirationItem.textContent.trim();
+                targetTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            closeModal('inspirationModal');
+        }
+    });
 }
+
+// Usunięto pustą funkcję openInspirationModal - była zduplikowana logika
 function rebuildAllSections() { ['poranek', 'wieczor'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase()+s.slice(1), {'poranek':'🌅','wieczor':'🌙'}[s], `#${s}-panel`)); }
 function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['poranek', 'wieczor'].forEach(s => UI.loadSectionData(s, currentDate)); }
 function changeDate(d) { const dt = dateFns.addDays(new Date(currentDate), d); loadDate(dateFns.format(dt, 'yyyy-MM-dd')); }
@@ -427,7 +374,7 @@ function applyFont(fontName = 'sans-serif') {
 function toggleDarkMode() {
     const isDark = document.documentElement.classList.toggle('dark-mode');
     AppStorage.setSetting('darkMode', isDark);
-    applyTheme(AppStorage.getSetting('theme')); // Przywrócono odświeżanie motywu
+    applyTheme(AppStorage.getSetting('theme'));
     const btn = document.getElementById('dark-mode-btn');
     if (btn) btn.textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;
 }
