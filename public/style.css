@@ -493,10 +493,6 @@ label {
 
 /* === KLASY POMOCNICZE I USUNIĘTE STYLE INLINE === */
 
-.text-center {
-    text-align: center;
-}
-
 .modal-title {
     border: none;
     margin: 0;
@@ -575,6 +571,59 @@ label {
     max-height: 1000px;
     padding: 0 15px 20px 15px;
 }
+
+/* === STYLE DLA PRZYCISKU I MODALA INSPIRACJI === */
+
+.label-with-inspire {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.inspire-btn {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    background-color: color-mix(in srgb, var(--accent) 25%, transparent);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: var(--border-radius-sm);
+}
+
+.inspire-btn:hover {
+    background-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    border-color: var(--accent);
+}
+
+.inspiration-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.inspiration-item {
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.inspiration-item:hover {
+    background-color: var(--card);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 /* === DODATKOWE KLASY POMOCNICZE DLA USTAWIEŃ === */
 
 .settings-header-4 {

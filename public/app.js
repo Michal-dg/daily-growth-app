@@ -105,7 +105,6 @@ class UI {
         entry.wieczor[catId + 'Sent'] = value;
         AppStorage.saveDayEntry(currentDate, entry);
     }
-
     static updateStars(container, value) {
         if (!container) return;
         const stars = container.querySelectorAll('.sentiment-star');
@@ -310,7 +309,6 @@ function initializeApp() {
     applyFont(AppStorage.getSetting('font'));
     document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
     loadAppData();
-    // POPRAWKA DATY #1
     currentDate = dateFns.format(new Date(), 'yyyy-MM-dd');
     document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
     bindAppEventListeners();
@@ -369,7 +367,6 @@ function openInspirationModal(sectionId, questionId) {
 
 function rebuildAllSections() { ['poranek', 'wieczor'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase()+s.slice(1), {'poranek':'🌅','wieczor':'🌙'}[s], `#${s}-panel`)); }
 function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['poranek', 'wieczor'].forEach(s => UI.loadSectionData(s, currentDate)); }
-// POPRAWKA DATY #2
 function changeDate(d) { const dt = dateFns.addDays(new Date(currentDate), d); loadDate(dateFns.format(dt, 'yyyy-MM-dd')); }
 function applyTheme(themeName = 'las') { document.documentElement.dataset.theme = themeName; AppStorage.setSetting('theme', themeName); const meta = document.querySelector('meta[name="theme-color"]'); if(meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--card').trim(); }
 function applyFont(fontName = 'sans-serif') {
@@ -378,7 +375,6 @@ function applyFont(fontName = 'sans-serif') {
     else if (fontName === 'rounded') document.body.classList.add('font-rounded');
     AppStorage.setSetting('font', fontName);
 }
-// POPRAWKA Dark Mode
 function toggleDarkMode() {
     const isDark = document.documentElement.classList.toggle('dark-mode');
     AppStorage.setSetting('darkMode', isDark);
