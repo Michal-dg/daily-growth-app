@@ -14,18 +14,6 @@ const initialSentimentQuestions = [
 const quotes = [ 
     "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨"
 ];
-const suggestedMorningQuestions = [
-    "Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"
-];
-const suggestedEveningQuestions = [
-    "Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"
-];
-const suggestedHabits = [
-    "Codzienna medytacja (10 min)", "Pójście na siłownię/trening", "Czytanie książki (20 stron)", "Nauka nowego języka (15 min)", "Wieczorny spacer", "Planowanie następnego dnia", "Praktyka wdzięczności", "Zdrowe śniadanie", "Picca 2 litrów wody", "Joga lub rozciąganie"
-];
-const suggestedSummaryQuestions = [
-    "Jaka była najważniejsza lekcja tego dnia?", "Co sprawiło, że poczułem/am się dziś dumny/a?", "Jaką jedną rzecz mogę jutro zrobić lepiej?", "Co dzisiaj odpuściłem/am dla swojego spokoju?", "Kiedy czułem/am się dziś najbardziej energicznie?", "Jaki mały sukces dzisiaj odniosłem/am?", "Czego nauczyło mnie dzisiejsze wyzwanie?", "Jak oceniłbym/abym swoją cierpliwość w skali 1-5?"
-];
 
 let currentQuestions, currentHabits, currentSentimentQuestions, currentDate, isAppInitialized = false;
 
@@ -61,6 +49,7 @@ class UI {
         }
         html += `</div></div>`;
         panel.innerHTML = html;
+
         panel.querySelectorAll('textarea').forEach(el => el.addEventListener('input', e => UI.saveInput(sectionId, e.target)));
         panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
         panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
@@ -178,19 +167,11 @@ class Settings {
         document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
         document.getElementById('settings-btn').addEventListener('click', () => this.open());
         const settingsModal = document.getElementById('settingsModal');
-        const suggestionsModal = document.getElementById('suggestionsModal');
-        [settingsModal, suggestionsModal].forEach(modal => { modal.addEventListener('click', e => { if (e.target.closest('.close-modal-btn')) { closeModal(e.target.closest('.modal').id); } }); });
         settingsModal.addEventListener('click', e => {
             const editBtn = e.target.closest('.settings-edit-btn');
-            if (editBtn) { this.toggleSection(editBtn); }
-        });
-        suggestionsModal.addEventListener('click', e => {
-            const addBtn = e.target.closest('.add-suggestion-btn');
-            if (addBtn) {
-                this.addSuggestion(addBtn.dataset.section, addBtn.dataset.index);
-                addBtn.textContent = 'Dodano ✔';
-                addBtn.disabled = true;
-            }
+            if (editBtn) this.toggleSection(editBtn);
+            const closeBtn = e.target.closest('.close-modal-btn');
+            if(closeBtn) closeModal(closeBtn.dataset.modalId);
         });
         settingsModal.addEventListener('input', e => {
             const { section, index, id } = e.target.dataset;
@@ -227,12 +208,7 @@ class Settings {
         const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${value.replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
         const renderList = (title, items, section, placeholder, textKey) => {
             let listHtml = `<h4 class="settings-header-4">${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>`;
-            listHtml += `<div class="settings-action-buttons">`;
-            if (['poranek', 'wieczor', 'summary', 'habits'].includes(section)) {
-                listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}">Zainspiruj mnie</button>`;
-            }
-            listHtml += `<button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}">+ Dodaj</button>`;
-            listHtml += `</div>`;
+            listHtml += `<div class="settings-action-buttons"><button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}">+ Dodaj</button></div>`;
             return listHtml;
         };
         switch (sectionId) {
@@ -261,30 +237,6 @@ class Settings {
     }
     static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
     static handleFontChange(btn) { applyFont(btn.dataset.font); this.render('appearance'); }
-    static showSuggestions(section) {
-        let suggestions = [];
-        let title = "Sugerowane Pytania";
-        switch(section) {
-            case 'poranek': suggestions = suggestedMorningQuestions; title = "Sugestie - Poranek"; break;
-            case 'wieczor': suggestions = suggestedEveningQuestions; title = "Sugestie - Wieczór"; break;
-            case 'summary': suggestions = suggestedSummaryQuestions; title = "Sugerowane Pytania Podsumowujące"; break;
-            case 'habits': suggestions = suggestedHabits; title = "Sugerowane Nawyki"; break;
-        }
-        const suggestionsList = document.getElementById('suggestionsList');
-        suggestionsList.innerHTML = suggestions.map((q, index) => `<div class="suggestion-item"><span>${q}</span><button class="btn btn-secondary add-suggestion-btn" data-section="${section}" data-index="${index}">Dodaj</button></div>`).join('');
-        document.getElementById('suggestionsTitle').textContent = title;
-        openModal('suggestionsModal');
-    }
-    static addSuggestion(section, index) {
-        let textToAdd;
-        switch(section) {
-            case 'poranek': textToAdd = suggestedMorningQuestions[index]; this.tempQuestions.poranek.push({id: `m${Date.now()}`, text: textToAdd}); break;
-            case 'wieczor': textToAdd = suggestedEveningQuestions[index]; this.tempQuestions.wieczor.push({id: `e${Date.now()}`, text: textToAdd}); break;
-            case 'summary': textToAdd = suggestedSummaryQuestions[index]; this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: textToAdd}); break;
-            case 'habits': textToAdd = suggestedHabits[index]; this.tempHabits.push(textToAdd); break;
-        }
-        this.render(section);
-    }
     static addItem(section) {
         if(section === 'habits') this.tempHabits.push('');
         else if (section === 'summary') this.tempSentimentQuestions.push({id: `s${Date.now()}`, question: ''});
@@ -345,22 +297,8 @@ function bindAppEventListeners() {
         document.getElementById(`${sectionId}-panel`).classList.add('active');
         if (sectionId === 'stats') Stats.render('#stats-panel');
     }));
-    const inspirationModal = document.getElementById('inspirationModal');
-    inspirationModal.addEventListener('click', e => {
-        const inspirationItem = e.target.closest('.inspiration-item');
-        if (inspirationItem) {
-            const targetTextareaId = inspirationModal.dataset.targetId;
-            const targetTextarea = document.getElementById(targetTextareaId);
-            if (targetTextarea) {
-                targetTextarea.value = inspirationItem.textContent.trim();
-                targetTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-            closeModal('inspirationModal');
-        }
-    });
 }
 
-// Usunięto pustą funkcję openInspirationModal - była zduplikowana logika
 function rebuildAllSections() { ['poranek', 'wieczor'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase()+s.slice(1), {'poranek':'🌅','wieczor':'🌙'}[s], `#${s}-panel`)); }
 function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['poranek', 'wieczor'].forEach(s => UI.loadSectionData(s, currentDate)); }
 function changeDate(d) { const dt = dateFns.addDays(new Date(currentDate), d); loadDate(dateFns.format(dt, 'yyyy-MM-dd')); }
