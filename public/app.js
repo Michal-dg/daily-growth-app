@@ -63,8 +63,6 @@ class UI {
         }
         html += `</div></div>`;
         panel.innerHTML = html;
-
-        // POPRAWKA: Przywracamy bezpośrednie i niezawodne podpinanie zdarzeń
         panel.querySelectorAll('textarea').forEach(el => el.addEventListener('input', e => UI.saveInput(sectionId, e.target)));
         panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
         panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
@@ -81,14 +79,11 @@ class UI {
             currentHabits.forEach(h => { const cb = document.querySelector(`#wieczor-panel [data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
         }
     }
-    
-    // POPRAWKA: Uczytelnione funkcje zapisu
+
     static saveInput(sectionId, target) {
         const id = target.dataset.id;
         const entry = AppStorage.getDayEntry(currentDate);
-        if (!entry[sectionId]) {
-            entry[sectionId] = {};
-        }
+        if (!entry[sectionId]) entry[sectionId] = {};
         entry[sectionId][id] = target.value;
         AppStorage.saveDayEntry(currentDate, entry);
     }
@@ -142,7 +137,7 @@ class Stats {
         let entriesFound = 0;
         for (let i = days - 1; i >= 0; i--) {
             const date = dateFns.subDays(today, i);
-            const dateKey = dateFns.formatISO(date, { representation: 'date' });
+            const dateKey = dateFns.format(date, 'yyyy-MM-dd');
             data.labels.push(dateKey);
             const entry = AppStorage.getDayEntry(dateKey);
             if (entry && entry.wieczor) {
@@ -227,21 +222,31 @@ class Settings {
     }
     static render(sectionId) {
         const container = document.getElementById(`s-${sectionId}-panel`);
-        if(!container) return;
+        if (!container) return;
         let html = '';
         const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${value.replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
         const renderList = (title, items, section, placeholder, textKey) => {
-            let listHtml = `<h4 style="margin-bottom: 15px;">${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>`;
-            if(section === 'poranek' || section === 'wieczor') { listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}" style="margin-top: 10px;">Zainspiruj mnie</button>`; }
-            listHtml += `<button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}" style="margin-left: 10px; margin-top: 10px;">+ Dodaj</button>`;
+            let listHtml = `<h4 class="settings-header-4">${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>`;
+            listHtml += `<div class="settings-action-buttons">`;
+            if (section === 'poranek' || section === 'wieczor') {
+                listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}">Zainspiruj mnie</button>`;
+            }
+            listHtml += `<button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}">+ Dodaj</button>`;
+            listHtml += `</div>`;
             return listHtml;
         };
-        switch(sectionId) {
-            case 'appearance': 
-                const theme = AppStorage.getSetting('theme') || 'las'; const font = AppStorage.getSetting('font') || 'sans-serif';
-                html = `<h4 style="margin-bottom: 15px;">Wybierz motyw</h4><div class="theme-selector" style="display:flex; gap:10px;">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option" data-theme="${t}" style="flex:1; text-align:center; padding:10px; border:2px solid ${theme === t ? 'var(--accent)' : 'var(--border)'}; border-radius:var(--border-radius-md); cursor:pointer;"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div>
-                <h4 style="margin-top:20px; margin-bottom: 15px;">Wybierz czcionkę</h4><div class="font-selector" style="display:flex; gap:10px;">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}" style="flex:1;">${{'sans-serif':'Nowoczesna','serif':'Klasyczna','rounded':'Swobodna'}[f]}</button>`).join('')}</div>
-                <h4 style="margin-top:20px; margin-bottom: 15px;">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`; 
+        switch (sectionId) {
+            case 'appearance':
+                const theme = AppStorage.getSetting('theme') || 'las';
+                const font = AppStorage.getSetting('font') || 'sans-serif';
+                html = `
+                    <h4 class="settings-header-4">Wybierz motyw</h4>
+                    <div class="settings-group theme-selector">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option ${theme === t ? 'is-active' : ''}" data-theme="${t}"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div>
+                    <h4 class="settings-header-4" style="margin-top:20px;">Wybierz czcionkę</h4>
+                    <div class="settings-group font-selector">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}">${{'sans-serif':'Nowoczesna','serif':'Klasyczna','rounded':'Swobodna'}[f]}</button>`).join('')}</div>
+                    <h4 class="settings-header-4" style="margin-top:20px;">Tryb Ciemny</h4>
+                    <button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>
+                `;
                 break;
             case 'poranek': case 'wieczor': html = renderList(`Pytania - ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
             case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
@@ -252,7 +257,7 @@ class Settings {
         container.querySelectorAll('.theme-option').forEach(opt => opt.addEventListener('click', e => this.handleThemeChange(e.currentTarget)));
         container.querySelectorAll('.font-selector button').forEach(btn => btn.addEventListener('click', e => this.handleFontChange(e.currentTarget)));
         const darkModeBtn = container.querySelector('#dark-mode-btn');
-        if(darkModeBtn) darkModeBtn.addEventListener('click', toggleDarkMode);
+        if (darkModeBtn) darkModeBtn.addEventListener('click', toggleDarkMode);
     }
     static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
     static handleFontChange(btn) { applyFont(btn.dataset.font); this.render('appearance'); }
@@ -305,7 +310,8 @@ function initializeApp() {
     applyFont(AppStorage.getSetting('font'));
     document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
     loadAppData();
-    currentDate = dateFns.formatISO(new Date(), { representation: 'date' });
+    // POPRAWKA DATY #1
+    currentDate = dateFns.format(new Date(), 'yyyy-MM-dd');
     document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
     bindAppEventListeners();
     rebuildAllSections();
@@ -322,7 +328,6 @@ function bindAppEventListeners() {
     document.getElementById('prev-day-btn').addEventListener('click', () => changeDate(-1));
     document.getElementById('next-day-btn').addEventListener('click', () => changeDate(1));
     document.getElementById('currentDate').addEventListener('input', e => loadDate(e.target.value));
-    
     document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', e => {
         document.querySelectorAll('.tab, .section').forEach(el => el.classList.remove('active'));
         const sectionId = e.currentTarget.dataset.section;
@@ -330,8 +335,6 @@ function bindAppEventListeners() {
         document.getElementById(`${sectionId}-panel`).classList.add('active');
         if (sectionId === 'stats') Stats.render('#stats-panel');
     }));
-
-    // POPRAWKA: Delegacja zdarzeń tylko dla przycisków dodanych dynamicznie, które nie są częścią sekcji
     document.getElementById('main-app').addEventListener('click', e => {
         const inspireBtn = e.target.closest('.inspire-btn');
         if (inspireBtn) {
@@ -340,7 +343,6 @@ function bindAppEventListeners() {
             openInspirationModal(sectionId, questionId);
         }
     });
-
     const inspirationModal = document.getElementById('inspirationModal');
     inspirationModal.addEventListener('click', e => {
         const inspirationItem = e.target.closest('.inspiration-item');
@@ -367,7 +369,8 @@ function openInspirationModal(sectionId, questionId) {
 
 function rebuildAllSections() { ['poranek', 'wieczor'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase()+s.slice(1), {'poranek':'🌅','wieczor':'🌙'}[s], `#${s}-panel`)); }
 function loadDate(newDate) { currentDate = newDate; document.getElementById('currentDate').value = currentDate; ['poranek', 'wieczor'].forEach(s => UI.loadSectionData(s, currentDate)); }
-function changeDate(d) { const dt = dateFns.addDays(new Date(currentDate), d); loadDate(dateFns.formatISO(dt, { representation: 'date' })); }
+// POPRAWKA DATY #2
+function changeDate(d) { const dt = dateFns.addDays(new Date(currentDate), d); loadDate(dateFns.format(dt, 'yyyy-MM-dd')); }
 function applyTheme(themeName = 'las') { document.documentElement.dataset.theme = themeName; AppStorage.setSetting('theme', themeName); const meta = document.querySelector('meta[name="theme-color"]'); if(meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--card').trim(); }
 function applyFont(fontName = 'sans-serif') {
     document.body.classList.remove('font-serif', 'font-rounded');
@@ -375,7 +378,14 @@ function applyFont(fontName = 'sans-serif') {
     else if (fontName === 'rounded') document.body.classList.add('font-rounded');
     AppStorage.setSetting('font', fontName);
 }
-function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', isDark); const btn = document.getElementById('dark-mode-btn'); if(btn) btn.textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;}
+// POPRAWKA Dark Mode
+function toggleDarkMode() {
+    const isDark = document.documentElement.classList.toggle('dark-mode');
+    AppStorage.setSetting('darkMode', isDark);
+    applyTheme(AppStorage.getSetting('theme')); // Przywrócono odświeżanie motywu
+    const btn = document.getElementById('dark-mode-btn');
+    if (btn) btn.textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;
+}
 function showNotification(msg, withReloadButton = false) {
     const el = document.getElementById('notification');
     if (el) {
