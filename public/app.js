@@ -1,6 +1,7 @@
 'use strict';
 
 // --- GLOBALNE STAŁE ---
+console.log("Plik app.js został wczytany.");
 const initialQuestions = {
     poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}, {id:"m3", text:"Jaką pozytywną afirmację wybieram na dziś?"} ],
     wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}, {id:"e3",text:"Za co jestem sobie dzisiaj wdzięczny/a?"} ]
@@ -49,14 +50,37 @@ class AppStorage {
 }
 
 class UI {
+   // Wklej ten kod w miejsce starej funkcji buildSection
     static buildSection(sectionId, title, emoji, containerSelector) {
         const panel = document.querySelector(containerSelector);
         if (!panel) return;
         const questions = currentQuestions[sectionId] || [];
         let html = `<div class="content-card"><h2 class="content-header">${emoji} ${title}</h2><div>`;
-      questions.forEach(q => {
-            html += `<div class="question-group"><label for="q-${q.id}">${q.text}</label><textarea id="q-${q.id}" data-id="${q.id}"></textarea></div>`;
+        questions.forEach(q => {
+            html += `
+                <div class="question-group">
+                    <div class="label-with-inspire">
+                        <label for="q-${q.id}">${q.text}</label>
+                        <button class="btn inspire-btn" data-question-id="${q.id}" data-section="${sectionId}">Zainspiruj mnie</button>
+                    </div>
+                    <textarea id="q-${q.id}" data-id="${q.id}"></textarea>
+                </div>
+            `;
         });
+        if (sectionId === 'wieczor') {
+            html += currentSentimentQuestions.map(sq => `<div class="question-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
+            if (currentHabits.length > 0) html += `<div class="question-group"><label>Nawyki</label>${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div>`;
+        }
+        html += `</div></div>`;
+        panel.innerHTML = html;
+
+        // Nasz "szpieg" jest tutaj:
+        console.log("Podpinanie zdarzeń zapisu w buildSection dla sekcji:", sectionId);
+
+        panel.querySelectorAll('textarea').forEach(el => el.addEventListener('input', e => UI.saveInput(sectionId, e.target)));
+        panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
+        panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
+    }
 
         if (sectionId === 'wieczor') {
             html += currentSentimentQuestions.map(sq => `<div class="question-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
@@ -352,6 +376,12 @@ class Settings {
 // --- LOGIKA GŁÓWNA I OBSŁUGA ZDARZEŃ ---
 function initializeApp() {
     if (isAppInitialized) return;
+    function initializeApp() {
+    if (isAppInitialized) return;
+    console.log("Funkcja initializeApp() wystartowała."); // <--- DODAJ TĘ LINIĘ
+    isAppInitialized = true;
+    // ... reszta funkcji ...
+}
     isAppInitialized = true;
     document.querySelector('#main-app').classList.remove('hidden');
     applyTheme(AppStorage.getSetting('theme'));
