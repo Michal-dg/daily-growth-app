@@ -1,3 +1,12 @@
+Oczywiście.
+
+Oto finalna, kompletna wersja pliku `index.html`, uwzględniająca wszystkie nasze dotychczasowe zmiany: podział na pliki, usunięcie logowania, nowy wygląd Ustawień (akordeon z ikonami) oraz nowe okno dla "Inspiracji".
+
+Po prostu **skopiuj całą poniższą zawartość i zastąp nią wszystko**, co masz w swoim pliku `index.html`.
+
+### Kompletny i poprawny kod dla `index.html`
+
+```html
 <!DOCTYPE html>
 <html lang="pl" data-theme="las">
 <head>
@@ -26,26 +35,7 @@
 </head>
 <body>
 
-    <div id="auth-page">
-        <div class="auth-container content-card">
-            <h1 class="text-center">🌱 Witaj</h1>
-            <div id="auth-form-container">
-                <form id="authForm" class="auth-form">
-                    <h2 id="authTitle" class="content-header auth-form-title">Logowanie</h2>
-                    <div id="authError" class="auth-error"></div>
-                    <div><input type="text" id="authLogin" placeholder="Login" autocomplete="username" required></div>
-                    <div><input type="password" id="authPassword" placeholder="Hasło" autocomplete="current-password" required></div>
-                    <button class="btn btn-primary" id="authSubmitBtn" type="submit">Zaloguj się</button>
-                </form>
-            </div>
-            <div class="auth-toggle-container">
-                <span id="toggleText">Nie masz konta?</span>
-                <button id="toggleAuthBtn" type="button" class="button-as-link">Zarejestruj się</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="main-app" class="hidden">
+    <div id="main-app">
         <div class="container">
             <header>
                 <h1>Daily Growth</h1>
@@ -60,7 +50,6 @@
                 </div>
                 <div class="actions">
                     <button class="btn btn-tertiary" id="settings-btn">Ustawienia</button>
-                    <button class="btn btn-primary" id="logout-btn">Wyloguj</button>
                 </div>
             </div>
 
@@ -83,18 +72,64 @@
                     <h2 class="content-header modal-title">Ustawienia</h2>
                     <button class="close-modal-btn" data-modal-id="settingsModal">✖</button>
                 </div>
-                <div class="modal-tabs">
-                    <div class="modal-tab active" data-section="appearance">🎨 Wygląd</div>
-                    <div class="modal-tab" data-section="poranek">🌅 Poranek</div>
-                    <div class="modal-tab" data-section="wieczor">🌙 Wieczór</div>
-                    <div class="modal-tab" data-section="summary">📊 Podsumowanie</div>
-                    <div class="modal-tab" data-section="habits">✅ Nawyki</div>
+                <div class="modal-body-content">
+                    <div class="settings-list">
+                        <div class="settings-section">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402a3.75 3.75 0 0 0-5.304-5.304L4.098 14.6c-1.455 1.455-1.455 3.847 0 5.302Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75c.621 0 1.223.24 1.697.713l2.84 2.84c.473.473.713 1.076.713 1.697v6.024a3.75 3.75 0 0 1-5.304 5.304L7.5 16.5m9-9-9 9" /></svg>
+                                </div>
+                                <h4 class="settings-section-title">Wygląd</h4>
+                                <button class="btn btn-tertiary settings-edit-btn" data-section="appearance">Edytuj</button>
+                            </div>
+                            <div class="settings-section-content" id="s-appearance-panel"></div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /></svg>
+                                </div>
+                                <h4 class="settings-section-title">Pytania - Poranek</h4>
+                                <button class="btn btn-tertiary settings-edit-btn" data-section="poranek">Edytuj</button>
+                            </div>
+                            <div class="settings-section-content" id="s-poranek-panel"></div>
+                        </div>
+        
+                        <div class="settings-section">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /></svg>
+                                </div>
+                                <h4 class="settings-section-title">Pytania - Wieczór</h4>
+                                <button class="btn btn-tertiary settings-edit-btn" data-section="wieczor">Edytuj</button>
+                            </div>
+                            <div class="settings-section-content" id="s-wieczor-panel"></div>
+                        </div>
+        
+                        <div class="settings-section">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon">
+                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h12M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-1.5m-6 0h1.5m-1.5 0h-1.5m0 0H9m1.5 0H6m3 0v3.75" /></svg>
+                                </div>
+                                <h4 class="settings-section-title">Pytania Podsumowujące</h4>
+                                <button class="btn btn-tertiary settings-edit-btn" data-section="summary">Edytuj</button>
+                            </div>
+                            <div class="settings-section-content" id="s-summary-panel"></div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon">
+                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                </div>
+                                <h4 class="settings-section-title">Twoje Nawyki</h4>
+                                <button class="btn btn-tertiary settings-edit-btn" data-section="habits">Edytuj</button>
+                            </div>
+                            <div class="settings-section-content" id="s-habits-panel"></div>
+                        </div>
+                    </div>
                 </div>
-                <div id="s-appearance-panel" class="modal-tab-panel active"></div>
-                <div id="s-poranek-panel" class="modal-tab-panel"></div>
-                <div id="s-wieczor-panel" class="modal-tab-panel"></div>
-                <div id="s-summary-panel" class="modal-tab-panel"></div>
-                <div id="s-habits-panel" class="modal-tab-panel"></div>
                 <button class="btn btn-primary btn-full-width" id="save-settings-btn">Zapisz i zamknij</button>
             </div>
         </div>
@@ -109,9 +144,21 @@
             </div>
         </div>
 
+        <div class="modal" id="inspirationModal">
+             <div class="content-card modal-content">
+                <div class="modal-header">
+                    <h2 id="inspirationTitle" class="content-header modal-title">Wybierz inspirację</h2>
+                    <button class="close-modal-btn" data-modal-id="inspirationModal">✖</button>
+                </div>
+                <div id="inspirationList" class="inspiration-list-container">
+                </div>
+            </div>
+        </div>
+
         <div id="notification"></div>
     </div>
     
 <script src="app.js" defer></script>
 </body>
 </html>
+```

@@ -269,8 +269,7 @@ html[data-theme='fokus'].dark-mode .btn-primary {
     }
 }
 
-.content-card,
-.auth-container {
+.content-card {
     background: var(--card);
     padding: 40px;
     border-radius: var(--border-radius-lg);
@@ -392,6 +391,10 @@ label {
 .modal-content {
     max-width: 600px;
     width: 90%;
+    /* Nowy layout dla modala ustawień */
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
 }
 
 .modal-header {
@@ -407,24 +410,6 @@ label {
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--text-muted);
-}
-
-.modal-tabs {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 25px;
-}
-
-.auth-container {
-    max-width: 400px;
-}
-
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 25px;
 }
 
 .settings-item {
@@ -507,36 +492,10 @@ label {
     }
 }
 
-/* === NOWE KLASY DODANE W CELU USUNIĘCIA STYLÓW INLINE === */
+/* === KLASY POMOCNICZE I USUNIĘTE STYLE INLINE === */
 
 .text-center {
     text-align: center;
-}
-
-.auth-form-title {
-    margin-bottom: 15px;
-    text-align: center;
-    border: none;
-}
-
-.auth-error {
-    color: #e53e3e;
-    text-align: center;
-    min-height: 1.2em;
-}
-
-.auth-toggle-container {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.button-as-link {
-    all: unset;
-    cursor: pointer;
-    font-weight: bold;
-    color: var(--primary);
-    text-decoration: underline;
-    margin-left: 5px;
 }
 
 .modal-title {
@@ -553,4 +512,119 @@ label {
 .suggestions-list-container {
     max-height: 400px;
     overflow-y: auto;
+}
+
+/* === STYLE DLA MODALA USTAWIEŃ (AKORDEON) === */
+
+.modal-body-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px 5px;
+}
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settings-section {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-md);
+    transition: all 0.3s ease;
+}
+
+.settings-section-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.settings-section-icon {
+    margin-right: 15px;
+    color: var(--primary);
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.settings-section-title {
+    flex-grow: 1;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.settings-edit-btn {
+    padding: 6px 16px;
+    font-size: 0.9rem;
+}
+
+.settings-section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
+    padding: 0 15px;
+}
+
+.settings-section.is-open {
+    background-color: var(--card);
+}
+
+.settings-section.is-open .settings-section-content {
+    max-height: 1000px;
+    padding: 0 15px 20px 15px;
+}
+
+/* === STYLE DLA PRZYCISKU I MODALA INSPIRACJI === */
+
+.label-with-inspire {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.inspire-btn {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    background-color: color-mix(in srgb, var(--accent) 25%, transparent);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: var(--border-radius-sm);
+}
+
+.inspire-btn:hover {
+    background-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    border-color: var(--accent);
+}
+
+.inspiration-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.inspiration-item {
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.inspiration-item:hover {
+    background-color: var(--card);
+    border-color: var(--accent);
+    color: var(--accent);
 }
