@@ -14,18 +14,11 @@ const initialSentimentQuestions = [
 const quotes = [ 
     "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨"
 ];
-// Listy sugestii do dodawania nowych pytań/nawyków
 const suggestedMorningQuestions = [
     "Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"
 ];
 const suggestedEveningQuestions = [
     "Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"
-];
-const suggestedHabits = [
-    "Wieczorne rozciąganie", "Planowanie następnego dnia", "Zero social media po 21:00", "Picie szklanki wody rano", "Spacer 15 minut", "Pisanie dziennika", "Pościelenie łóżka", "Nauka 5 nowych słówek", "Słuchanie podcastu", "Praca nad projektem pobocznym", "Kontakt z przyjacielem/rodziną", "Zdrowa przekąska", "Uporządkowanie biurka", "Trening oddechowy", "Czytanie artykułu branżowego", "Praktykowanie wdzięczności", "Zrobienie czegoś kreatywnego", "Zimny prysznic", "Uśmiechnięcie się do nieznajomego", "Rezygnacja z windy na rzecz schodów"
-];
-const suggestedSummaryQuestions = [
-    "Jak oceniam swój poziom energii?", "Jak oceniam swoją dietę?", "Jak oceniam jakość swojego snu?", "Jak oceniam relacje z bliskimi?", "Jak oceniam swoją kreatywność?", "Jak oceniam poziom stresu?", "Jak oceniam swoją cierpliwość?", "Jak oceniam swoją dyscyplinę?", "Jak oceniam swoją hojność?", "Jak oceniam swoją odwagę?"
 ];
 
 let currentQuestions, currentHabits, currentSentimentQuestions, currentDate, isAppInitialized = false;
@@ -54,7 +47,17 @@ class UI {
         let html = `<div class="content-card"><h2 class="content-header">${emoji} ${title}</h2><div>`;
         
         questions.forEach(q => {
-            html += `<div class="question-group"><label for="q-${q.id}">${q.text}</label><textarea id="q-${q.id}" data-id="${q.id}"></textarea></div>`;
+            html += `
+                <div class="question-group">
+                    <div class="label-with-inspire">
+                        <label for="q-${q.id}">${q.text}</label>
+                        <button class="btn inspire-btn" data-question-id="${q.id}" data-section="${sectionId}">
+                            Zainspiruj mnie
+                        </button>
+                    </div>
+                    <textarea id="q-${q.id}" data-id="${q.id}"></textarea>
+                </div>
+            `;
         });
 
         if (sectionId === 'wieczor') {
@@ -63,7 +66,14 @@ class UI {
         }
         html += `</div></div>`;
         panel.innerHTML = html;
+
+        // --- POPRAWKA: PRZYWRACAMY BEZPOŚREDNIE NASŁUCHIWANIE ZDARZEŃ ---
+        // To gwarantuje, że zapis będzie działał zawsze po zbudowaniu sekcji.
+        panel.querySelectorAll('textarea').forEach(el => el.addEventListener('input', e => UI.saveInput(sectionId, e.target)));
+        panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
+        panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
     }
+
     static loadSectionData(sectionId, date) {
         const entry = AppStorage.getDayEntry(date);
         const data = entry[sectionId] || {};
@@ -82,13 +92,32 @@ class UI {
         entry[sectionId][id] = target.value;
         AppStorage.saveDayEntry(currentDate, entry);
     }
-    static saveHabitStatus(checkbox) { const name = checkbox.dataset.habitName, entry = AppStorage.getDayEntry(currentDate); if(!entry.wieczor) entry.wieczor = {}; if(!entry.wieczor.habits) entry.wieczor.habits = {}; entry.wieczor.habits[name] = checkbox.checked; AppStorage.saveDayEntry(currentDate, entry); }
-    static setSentiment(starEl) { const value = starEl.dataset.value, container = starEl.parentElement, catId = container.dataset.id; UI.updateStars(container, value); const entry = AppStorage.getDayEntry(currentDate); if(!entry.wieczor) entry.wieczor = {}; entry.wieczor[catId + 'Sent'] = value; AppStorage.saveDayEntry(currentDate, entry); }
+    static saveHabitStatus(checkbox) {
+        const name = checkbox.dataset.habitName;
+        const entry = AppStorage.getDayEntry(currentDate);
+        if (!entry.wieczor) entry.wieczor = {};
+        if (!entry.wieczor.habits) entry.wieczor.habits = {};
+        entry.wieczor.habits[name] = checkbox.checked;
+        AppStorage.saveDayEntry(currentDate, entry);
+    }
+    static setSentiment(starEl) {
+        const value = starEl.dataset.value;
+        const container = starEl.parentElement;
+        const catId = container.dataset.id;
+        UI.updateStars(container, value);
+        const entry = AppStorage.getDayEntry(currentDate);
+        if (!entry.wieczor) entry.wieczor = {};
+        entry.wieczor[catId + 'Sent'] = value;
+        AppStorage.saveDayEntry(currentDate, entry);
+    }
     static updateStars(container, value) {
         if (!container) return;
         const stars = container.querySelectorAll('.sentiment-star');
         const numericValue = parseInt(value, 10);
-        if (isNaN(numericValue)) { stars.forEach(star => star.classList.remove('active')); return; };
+        if (isNaN(numericValue)) {
+            stars.forEach(star => star.classList.remove('active'));
+            return;
+        };
         stars.forEach(star => {
             const starValue = parseInt(star.dataset.value, 10);
             star.classList.toggle('active', numericValue >= starValue);
@@ -165,7 +194,7 @@ class Settings {
         });
         suggestionsModal.addEventListener('click', e => {
             const addBtn = e.target.closest('.add-suggestion-btn');
-            if (addBtn) { this.addSuggestion(addBtn.dataset.section, addBtn.dataset.text); addBtn.textContent = 'Dodano ✔'; addBtn.disabled = true; }
+            if (addBtn) { this.addSuggestion(addBtn.dataset.section, addBtn.dataset.index); addBtn.textContent = 'Dodano ✔'; addBtn.disabled = true; }
         });
         settingsModal.addEventListener('input', e => {
             const { section, index, id } = e.target.dataset;
@@ -202,7 +231,7 @@ class Settings {
         const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${value.replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
         const renderList = (title, items, section, placeholder, textKey) => {
             let listHtml = `<h4 style="margin-bottom: 15px;">${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>`;
-            listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}" style="margin-top: 10px;">Zainspiruj mnie</button>`;
+            if(section === 'poranek' || section === 'wieczor') { listHtml += `<button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}" style="margin-top: 10px;">Zainspiruj mnie</button>`; }
             listHtml += `<button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}" style="margin-left: 10px; margin-top: 10px;">+ Dodaj</button>`;
             return listHtml;
         };
@@ -213,8 +242,7 @@ class Settings {
                 <h4 style="margin-top:20px; margin-bottom: 15px;">Wybierz czcionkę</h4><div class="font-selector" style="display:flex; gap:10px;">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}" style="flex:1;">${{'sans-serif':'Nowoczesna','serif':'Klasyczna','rounded':'Swobodna'}[f]}</button>`).join('')}</div>
                 <h4 style="margin-top:20px; margin-bottom: 15px;">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`; 
                 break;
-            case 'poranek': html = renderList(`Pytania - Poranek`, this.tempQuestions.poranek, 'poranek', 'Treść pytania', 'text'); break;
-            case 'wieczor': html = renderList(`Pytania - Wieczór`, this.tempQuestions.wieczor, 'wieczor', 'Treść pytania', 'text'); break;
+            case 'poranek': case 'wieczor': html = renderList(`Pytania - ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
             case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
             case 'habits': html = renderList('Twoje Nawyki', this.tempHabits, 'habits', 'Nazwa nawyku'); break;
         }
@@ -228,27 +256,16 @@ class Settings {
     static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
     static handleFontChange(btn) { applyFont(btn.dataset.font); this.render('appearance'); }
     static showSuggestions(section) {
-        let suggestions = [];
-        let title = "Sugerowane pozycje";
-        switch(section) {
-            case 'poranek': suggestions = suggestedMorningQuestions; title = "Sugerowane pytania poranne"; break;
-            case 'wieczor': suggestions = suggestedEveningQuestions; title = "Sugerowane pytania wieczorne"; break;
-            case 'summary': suggestions = suggestedSummaryQuestions; title = "Sugerowane pytania podsumowujące"; break;
-            case 'habits': suggestions = suggestedHabits; title = "Sugerowane nawyki"; break;
-        }
+        const suggestions = section === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
         const suggestionsList = document.getElementById('suggestionsList');
-        suggestionsList.innerHTML = suggestions.map(q => `<div class="suggestion-item"><span>${q}</span><button class="btn btn-secondary add-suggestion-btn" data-section="${section}" data-text="${q.replace(/"/g, '&quot;')}">Dodaj</button></div>`).join('');
-        document.getElementById('suggestionsTitle').textContent = title;
+        suggestionsList.innerHTML = suggestions.map((q, index) => `<div class="suggestion-item"><span>${q}</span><button class="btn btn-secondary add-suggestion-btn" data-section="${section}" data-index="${index}">Dodaj</button></div>`).join('');
+        document.getElementById('suggestionsTitle').textContent = `Sugestie - ${section.charAt(0).toUpperCase() + section.slice(1)}`;
         openModal('suggestionsModal');
     }
-    static addSuggestion(section, text) {
-        if (section === 'habits') {
-            this.tempHabits.push(text);
-        } else if (section === 'summary') {
-            this.tempSentimentQuestions.push({ id: `s${Date.now()}`, question: text });
-        } else { // poranek, wieczor
-            this.tempQuestions[section].push({ id: `${section.charAt(0)}${Date.now()}`, text: text });
-        }
+    static addSuggestion(section, index) {
+        const suggestions = section === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
+        const questionText = suggestions[index];
+        this.tempQuestions[section].push({id: `${section.charAt(0)}${Date.now()}`, text: questionText});
         this.render(section);
     }
     static addItem(section) {
@@ -278,6 +295,7 @@ class Settings {
     }
 }
 
+// --- LOGIKA GŁÓWNA I OBSŁUGA ZDARZEŃ ---
 function initializeApp() {
     if (isAppInitialized) return;
     isAppInitialized = true;
@@ -303,6 +321,7 @@ function bindAppEventListeners() {
     document.getElementById('prev-day-btn').addEventListener('click', () => changeDate(-1));
     document.getElementById('next-day-btn').addEventListener('click', () => changeDate(1));
     document.getElementById('currentDate').addEventListener('input', e => loadDate(e.target.value));
+    
     document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', e => {
         document.querySelectorAll('.tab, .section').forEach(el => el.classList.remove('active'));
         const sectionId = e.currentTarget.dataset.section;
@@ -310,22 +329,43 @@ function bindAppEventListeners() {
         document.getElementById(`${sectionId}-panel`).classList.add('active');
         if (sectionId === 'stats') Stats.render('#stats-panel');
     }));
-    const mainApp = document.getElementById('main-app');
-    mainApp.addEventListener('click', e => {
-        const sentimentStar = e.target.closest('.sentiment-star');
-        if (sentimentStar) { UI.setSentiment(sentimentStar); return; }
-    });
-    mainApp.addEventListener('input', e => {
-        if (e.target.matches('textarea')) {
-            const sectionEl = e.target.closest('.section');
-            if (sectionEl) {
-                const sectionId = sectionEl.id.replace('-panel', '');
-                UI.saveInput(sectionId, e.target);
-            }
-        } else if (e.target.matches('input[type="checkbox"]')) {
-            UI.saveHabitStatus(e.target);
+
+    // Listener dla przycisków "Zainspiruj mnie"
+    document.getElementById('main-app').addEventListener('click', e => {
+        const inspireBtn = e.target.closest('.inspire-btn');
+        if (inspireBtn) {
+            const sectionId = inspireBtn.dataset.section;
+            const questionId = inspireBtn.dataset.questionId;
+            openInspirationModal(sectionId, questionId);
         }
     });
+
+    // Listener dla nowego modala inspiracji
+    const inspirationModal = document.getElementById('inspirationModal');
+    inspirationModal.addEventListener('click', e => {
+        const inspirationItem = e.target.closest('.inspiration-item');
+        if (inspirationItem) {
+            const targetTextareaId = inspirationModal.dataset.targetId;
+            const targetTextarea = document.getElementById(targetTextareaId);
+            if (targetTextarea) {
+                targetTextarea.value = inspirationItem.textContent.trim();
+                targetTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            closeModal('inspirationModal');
+        }
+    });
+}
+
+function openInspirationModal(sectionId, questionId) {
+    const suggestions = sectionId === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
+    const inspirationList = document.getElementById('inspirationList');
+    const inspirationModal = document.getElementById('inspirationModal');
+
+    inspirationList.innerHTML = suggestions.map(s => 
+        `<button class="inspiration-item">${s}</button>`
+    ).join('');
+    inspirationModal.dataset.targetId = `q-${questionId}`;
+    openModal('inspirationModal');
 }
 
 function rebuildAllSections() { ['poranek', 'wieczor'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase()+s.slice(1), {'poranek':'🌅','wieczor':'🌙'}[s], `#${s}-panel`)); }
@@ -338,7 +378,7 @@ function applyFont(fontName = 'sans-serif') {
     else if (fontName === 'rounded') document.body.classList.add('font-rounded');
     AppStorage.setSetting('font', fontName);
 }
-function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', isDark); applyTheme(AppStorage.getSetting('theme')); const btn = document.getElementById('dark-mode-btn'); if(btn) btn.textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;}
+function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark-mode'); AppStorage.setSetting('darkMode', isDark); const btn = document.getElementById('dark-mode-btn'); if(btn) btn.textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;}
 function showNotification(msg, withReloadButton = false) {
     const el = document.getElementById('notification');
     if (el) {
