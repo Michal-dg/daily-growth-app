@@ -23,6 +23,7 @@ const suggestedEveningQuestions = [
 
 let currentQuestions, currentHabits, currentSentimentQuestions, currentDate, isAppInitialized = false;
 
+// --- KLASY ---
 class AppStorage {
     static get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
     static set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) { console.error("Błąd zapisu do localStorage", e); } }
@@ -45,21 +46,17 @@ class UI {
         if (!panel) return;
         const questions = currentQuestions[sectionId] || [];
         let html = `<div class="content-card"><h2 class="content-header">${emoji} ${title}</h2><div>`;
-        
         questions.forEach(q => {
             html += `
                 <div class="question-group">
                     <div class="label-with-inspire">
                         <label for="q-${q.id}">${q.text}</label>
-                        <button class="btn inspire-btn" data-question-id="${q.id}" data-section="${sectionId}">
-                            Zainspiruj mnie
-                        </button>
+                        <button class="btn inspire-btn" data-question-id="${q.id}" data-section="${sectionId}">Zainspiruj mnie</button>
                     </div>
                     <textarea id="q-${q.id}" data-id="${q.id}"></textarea>
                 </div>
             `;
         });
-
         if (sectionId === 'wieczor') {
             html += currentSentimentQuestions.map(sq => `<div class="question-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1,2,3,4,5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
             if (currentHabits.length > 0) html += `<div class="question-group"><label>Nawyki</label>${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div>`;
@@ -67,8 +64,7 @@ class UI {
         html += `</div></div>`;
         panel.innerHTML = html;
 
-        // --- POPRAWKA: PRZYWRACAMY BEZPOŚREDNIE NASŁUCHIWANIE ZDARZEŃ ---
-        // To gwarantuje, że zapis będzie działał zawsze po zbudowaniu sekcji.
+        // POPRAWKA: Przywracamy bezpośrednie i niezawodne podpinanie zdarzeń
         panel.querySelectorAll('textarea').forEach(el => el.addEventListener('input', e => UI.saveInput(sectionId, e.target)));
         panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
         panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
@@ -85,10 +81,14 @@ class UI {
             currentHabits.forEach(h => { const cb = document.querySelector(`#wieczor-panel [data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
         }
     }
+    
+    // POPRAWKA: Uczytelnione funkcje zapisu
     static saveInput(sectionId, target) {
-        const { id } = target.dataset;
+        const id = target.dataset.id;
         const entry = AppStorage.getDayEntry(currentDate);
-        entry[sectionId] = entry[sectionId] || {};
+        if (!entry[sectionId]) {
+            entry[sectionId] = {};
+        }
         entry[sectionId][id] = target.value;
         AppStorage.saveDayEntry(currentDate, entry);
     }
@@ -110,6 +110,7 @@ class UI {
         entry.wieczor[catId + 'Sent'] = value;
         AppStorage.saveDayEntry(currentDate, entry);
     }
+
     static updateStars(container, value) {
         if (!container) return;
         const stars = container.querySelectorAll('.sentiment-star');
@@ -330,7 +331,7 @@ function bindAppEventListeners() {
         if (sectionId === 'stats') Stats.render('#stats-panel');
     }));
 
-    // Listener dla przycisków "Zainspiruj mnie"
+    // POPRAWKA: Delegacja zdarzeń tylko dla przycisków dodanych dynamicznie, które nie są częścią sekcji
     document.getElementById('main-app').addEventListener('click', e => {
         const inspireBtn = e.target.closest('.inspire-btn');
         if (inspireBtn) {
@@ -340,7 +341,6 @@ function bindAppEventListeners() {
         }
     });
 
-    // Listener dla nowego modala inspiracji
     const inspirationModal = document.getElementById('inspirationModal');
     inspirationModal.addEventListener('click', e => {
         const inspirationItem = e.target.closest('.inspiration-item');
@@ -360,10 +360,7 @@ function openInspirationModal(sectionId, questionId) {
     const suggestions = sectionId === 'poranek' ? suggestedMorningQuestions : suggestedEveningQuestions;
     const inspirationList = document.getElementById('inspirationList');
     const inspirationModal = document.getElementById('inspirationModal');
-
-    inspirationList.innerHTML = suggestions.map(s => 
-        `<button class="inspiration-item">${s}</button>`
-    ).join('');
+    inspirationList.innerHTML = suggestions.map(s => `<button class="inspiration-item">${s}</button>`).join('');
     inspirationModal.dataset.targetId = `q-${questionId}`;
     openModal('inspirationModal');
 }
