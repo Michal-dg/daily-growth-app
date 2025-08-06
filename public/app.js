@@ -51,18 +51,20 @@ class UI {
         }
         html += `</div></div>`;
         panel.innerHTML = html;
+
         panel.querySelectorAll('textarea').forEach(el => el.addEventListener('input', e => UI.saveInput(sectionId, e.target)));
         panel.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
         panel.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
     }
+
     static loadSectionData(sectionId, date) {
         const entry = AppStorage.getDayEntry(date);
         const data = entry[sectionId] || {};
         document.querySelectorAll(`#${sectionId}-panel textarea`).forEach(el => el.value = data[el.dataset.id] || '');
         if (sectionId === 'wieczor') {
-            const wieczorData = entry.wieczor || {};
-            currentSentimentQuestions.forEach(sq => UI.updateStars(document.querySelector(`#wieczor-panel .sentiment-buttons[data-id="${sq.id}"]`), wieczorData[sq.id + 'Sent']));
-            const habits = wieczorData.habits || {};
+            const eveningData = entry.evening || {};
+            currentSentimentQuestions.forEach(sq => UI.updateStars(document.querySelector(`#wieczor-panel .sentiment-buttons[data-id="${sq.id}"]`), eveningData[sq.id + 'Sent']));
+            const habits = eveningData.habits || {};
             currentHabits.forEach(h => { const cb = document.querySelector(`#wieczor-panel [data-habit-name="${h}"]`); if(cb) cb.checked = habits[h] || false; });
         }
     }
@@ -109,132 +111,56 @@ class Stats {
     static render(containerSelector) {
         const panel = document.querySelector(containerSelector);
         if (!panel) return;
-        this.renderCharts(30);
-        panel.querySelectorAll('.stats-period-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                panel.querySelectorAll('.stats-period-btn').forEach(b => b.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                const period = parseInt(e.currentTarget.dataset.period, 10);
-                this.renderCharts(period);
-            });
-        });
+        panel.innerHTML = `<div class="content-card"><div class="stats-grid"><div class="chart-container"><canvas id="sentimentChart"></canvas></div><div class="chart-container"><canvas id="habitsChart"></canvas></div></div><div id="stats-placeholder" class="hidden">Brak wystarczających danych do analizy.</div></div>`;
+        this.renderCharts();
     }
     static gatherData(days = 30) {
-        const isMonthly = days > 30;
         const data = { labels: [], sentiments: { health: [], mood: [], productivity: [] }, habits: {} };
         const today = new Date();
-        
-        if (isMonthly) {
-            const monthlyAverages = {};
-            for (let i = 364; i >= 0; i--) {
-                const date = dateFns.subDays(today, i);
-                const dateKey = dateFns.format(date, 'yyyy-MM-dd');
-                const entry = AppStorage.getDayEntry(dateKey);
-                if (entry && entry.wieczor) {
-                    const monthKey = dateFns.format(date, 'yyyy-MM');
-                    if (!monthlyAverages[monthKey]) {
-                        monthlyAverages[monthKey] = { sentiments: { health: [], mood: [], productivity: [] }, habits: {} };
-                        currentHabits.forEach(h => monthlyAverages[monthKey].habits[h] = 0);
-                    }
-                    currentSentimentQuestions.forEach(sq => {
-                        const sentValue = parseInt(entry.wieczor[sq.id + 'Sent'], 10);
-                        if (!isNaN(sentValue)) monthlyAverages[monthKey].sentiments[sq.id].push(sentValue);
-                    });
-                    currentHabits.forEach(habit => {
-                        if (entry.wieczor.habits && entry.wieczor.habits[habit]) monthlyAverages[monthKey].habits[habit]++;
-                    });
-                }
+        currentHabits.forEach(h => data.habits[h] = 0);
+        let entriesFound = 0;
+        for (let i = days - 1; i >= 0; i--) {
+            const date = dateFns.subDays(today, i);
+            const dateKey = dateFns.format(date, 'yyyy-MM-dd');
+            const entry = AppStorage.getDayEntry(dateKey);
+            if (entry && entry.wieczor) {
+                entriesFound++;
+                data.labels.push(dateKey);
+                currentSentimentQuestions.forEach(sq => { data.sentiments[sq.id].push(entry.wieczor[sq.id + 'Sent'] || null); });
+                currentHabits.forEach(habit => { if (entry.wieczor.habits && entry.wieczor.habits[habit]) data.habits[habit]++; });
             }
-            const sortedMonths = Object.keys(monthlyAverages).sort();
-            sortedMonths.forEach(monthKey => {
-                data.labels.push(monthKey);
-                currentSentimentQuestions.forEach(sq => {
-                    const monthSents = monthlyAverages[monthKey].sentiments[sq.id];
-                    const avg = monthSents.length > 0 ? monthSents.reduce((a, b) => a + b, 0) / monthSents.length : null;
-                    data.sentiments[sq.id].push(avg);
-                });
-                currentHabits.forEach(habit => {
-                    if (!data.habits[habit]) data.habits[habit] = [];
-                    data.habits[habit].push(monthlyAverages[monthKey].habits[habit]);
-                });
-            });
-            return data.labels.length > 0 ? data : null;
-        } else {
-            let entriesFound = 0;
-            currentHabits.forEach(h => data.habits[h] = 0);
-            for (let i = days - 1; i >= 0; i--) {
-                const date = dateFns.subDays(today, i);
-                const dateKey = dateFns.format(date, 'yyyy-MM-dd');
-                const entry = AppStorage.getDayEntry(dateKey);
-
-                if (entry && entry.wieczor) {
-                    entriesFound++;
-                    data.labels.push(dateKey);
-                    currentSentimentQuestions.forEach(sq => { data.sentiments[sq.id].push(entry.wieczor[sq.id + 'Sent'] || null); });
-                    currentHabits.forEach(habit => {
-                        if (entry.wieczor.habits && entry.wieczor.habits[habit]) {
-                            data.habits[habit]++;
-                        }
-                    });
-                }
-            }
-            return entriesFound > 0 ? data : null;
         }
+        return entriesFound > 1 ? data : null;
     }
-    
-    static renderCharts(period) {
+    static renderCharts() {
         this.destroyCharts();
-        const data = this.gatherData(period);
+        const data = this.gatherData();
         const placeholder = document.getElementById('stats-placeholder');
-        const grid = document.querySelector('#stats-panel .stats-grid');
-        if (!data) {
+        if (!data || data.labels.length < 2) {
             if(placeholder) placeholder.classList.remove('hidden');
-            if(grid) grid.classList.add('hidden');
+            document.querySelector('.stats-grid')?.classList.add('hidden');
             return;
         }
         if(placeholder) placeholder.classList.add('hidden');
-        if(grid) grid.classList.remove('hidden');
-        
+        document.querySelector('.stats-grid')?.classList.remove('hidden');
+
         const style = getComputedStyle(document.body);
         Chart.defaults.font.family = "inherit";
         Chart.defaults.color = style.getPropertyValue('--text-muted');
-        const chartOptions = (scales, title) => ({
-            responsive: true, maintainAspectRatio: false, scales, 
-            plugins: { legend: { position: 'bottom' }, title: { display: true, text: title, font: { size: 16 } } },
+        const chartOptions = (scales) => ({
+            responsive: true, maintainAspectRatio: false, scales, plugins: { legend: { position: 'bottom' } },
             interaction: { intersect: false, mode: 'index' }, layout: { padding: 10 }
         });
-        
-        const isMonthly = period > 30;
         this.chartInstances.sentiment = new Chart(document.getElementById('sentimentChart'), {
-            type: 'line',
-            data: {
-                labels: data.labels,
-                datasets: currentSentimentQuestions.map((sq, i) => ({
-                    label: sq.question.split(' ').slice(1).join(' '), data: data.sentiments[sq.id],
-                    borderColor: [style.getPropertyValue('--primary'), style.getPropertyValue('--accent'), '#00bcd4'][i],
-                    tension: 0.1, spanGaps: true, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2
-                }))
-            },
-            options: chartOptions({ 
-                x: { type: 'time', time: { unit: isMonthly ? 'month' : 'day' }, grid: { display: false } }, 
-                y: { beginAtZero: true, max: 5, title: { display: true, text: isMonthly ? 'Średnia ocena' : 'Ocena' } } 
-            }, 'Analiza samopoczucia'),
+            type: 'line', data: { labels: data.labels, datasets: currentSentimentQuestions.map((sq, i) => ({
+                label: sq.question.split(' ').slice(1).join(' '), data: data.sentiments[sq.id],
+                borderColor: [style.getPropertyValue('--primary'), style.getPropertyValue('--accent'), '#00bcd4'][i],
+                tension: 0.4, spanGaps: true, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2 }))
+            }, options: chartOptions({ x: { type: 'time', time: { unit: 'day' }, grid: { display: false } }, y: { beginAtZero: true, max: 5 } }),
         });
         this.chartInstances.habits = new Chart(document.getElementById('habitsChart'), {
-            type: 'bar',
-            data: {
-                labels: isMonthly ? data.labels : Object.keys(data.habits),
-                datasets: isMonthly 
-                    ? currentHabits.map((habit, i) => ({
-                        label: habit, data: data.habits[habit],
-                        backgroundColor: [style.getPropertyValue('--primary'), style.getPropertyValue('--accent'), '#00bcd4'][i % 3],
-                      }))
-                    : [{ label: `Dni zrealizowane`, data: Object.values(data.habits), backgroundColor: style.getPropertyValue('--primary') }]
-            },
-            options: chartOptions({ 
-                x: { stacked: isMonthly, type: isMonthly ? 'time' : 'category', time: { unit: 'month' }, grid: { display: false } }, 
-                y: { stacked: isMonthly, title: { display: true, text: isMonthly ? 'Liczba dni w miesiącu' : 'Liczba dni' } } 
-            }, 'Realizacja nawyków'),
+            type: 'bar', data: { labels: Object.keys(data.habits), datasets: [{ label: 'Dni zrealizowane (ostatnie 30)', data: Object.values(data.habits), backgroundColor: style.getPropertyValue('--primary'), borderRadius: 4 }] },
+            options: chartOptions({ y: { max: 30 } })
         });
     }
 }
@@ -245,7 +171,7 @@ class Settings {
         document.getElementById('settings-btn').addEventListener('click', () => this.open());
         const settingsModal = document.getElementById('settingsModal');
         const suggestionsModal = document.getElementById('suggestionsModal');
-        [settingsModal, suggestionsModal].forEach(modal => { if(modal) modal.addEventListener('click', e => { if (e.target.closest('.close-modal-btn')) { closeModal(e.target.closest('.modal').id); } }); });
+        [settingsModal, suggestionsModal].forEach(modal => { modal.addEventListener('click', e => { if (e.target.closest('.close-modal-btn')) { closeModal(e.target.closest('.modal').id); } }); });
         settingsModal.addEventListener('click', e => {
             const editBtn = e.target.closest('.settings-edit-btn');
             if (editBtn) this.toggleSection(editBtn);
@@ -304,7 +230,14 @@ class Settings {
             case 'appearance':
                 const theme = AppStorage.getSetting('theme') || 'las';
                 const font = AppStorage.getSetting('font') || 'sans-serif';
-                html = `<h4 class="settings-header-4">Wybierz motyw</h4><div class="settings-group theme-selector">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option ${theme === t ? 'is-active' : ''}" data-theme="${t}"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div><h4 class="settings-header-4">Wybierz czcionkę</h4><div class="settings-group font-selector">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}">${{'sans-serif':'Nowoczesna','serif':'Klasyczna','rounded':'Swobodna'}[f]}</button>`).join('')}</div><h4 class="settings-header-4">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`;
+                html = `
+                    <h4 class="settings-header-4">Wybierz motyw</h4>
+                    <div class="settings-group theme-selector">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option ${theme === t ? 'is-active' : ''}" data-theme="${t}"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div>
+                    <h4 class="settings-header-4">Wybierz czcionkę</h4>
+                    <div class="settings-group font-selector">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}">${{'sans-serif':'Nowoczesna','serif':'Klasyczna','rounded':'Swobodna'}[f]}</button>`).join('')}</div>
+                    <h4 class="settings-header-4">Tryb Ciemny</h4>
+                    <button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>
+                `;
                 break;
             case 'poranek': case 'wieczor': html = renderList(`Pytania - ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
             case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
@@ -440,8 +373,8 @@ function showNotification(msg, withReloadButton = false) {
         }
     }
 }
-function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('active'); }
-function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('active'); }
+function openModal(id) { document.getElementById(id)?.classList.add('active'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!sessionStorage.getItem('dg_user')) {
