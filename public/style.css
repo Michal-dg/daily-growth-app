@@ -50,7 +50,6 @@ body.font-rounded { font-family: var(--font-rounded); }
 header {
     position: relative; color: white; border-radius: var(--border-radius-lg); padding: 60px 40px;
     margin-bottom: 40px; text-align: center; overflow: hidden;
-    background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80');
     background-size: cover; background-position: center;
 }
 header::before {
@@ -172,3 +171,16 @@ label { display: block; font-weight: 600; margin-bottom: 10px; }
 .theme-option.is-active { border-color: var(--accent); }
 .settings-action-buttons { margin-top: 10px; }
 .settings-action-buttons .btn-secondary { margin-left: 10px; }
+/* === TŁA NAGŁÓWKA ZALEŻNE OD MOTYWU === */
+html[data-theme='las'] header {
+    background-image: url('images/las.jpg');
+}
+
+html[data-theme='ocean'] header {
+    background-image: url('images/ocean.jpg');
+}
+
+html[data-theme='fokus'] header {
+    background-image: url('images/fokus.jpg');
+    background-position: center;
+}

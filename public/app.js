@@ -103,9 +103,6 @@ class UI {
     }
 }
 
-// =================================================================
-// === POPRAWIONA KLASA STATS Z NOWĄ LOGIKĄ ZBIERANIA DANYCH ===
-// =================================================================
 class Stats {
     static chartInstances = {};
     static destroyCharts() { Object.values(this.chartInstances).forEach(chart => chart.destroy()); this.chartInstances = {}; }
@@ -162,31 +159,35 @@ class Stats {
                 });
             });
             return data.labels.length > 0 ? data : null;
-        } else { // Daily data
+        } else {
             let entriesFound = 0;
             currentHabits.forEach(h => data.habits[h] = 0);
             for (let i = days - 1; i >= 0; i--) {
                 const date = dateFns.subDays(today, i);
                 const dateKey = dateFns.format(date, 'yyyy-MM-dd');
                 const entry = AppStorage.getDayEntry(dateKey);
+
                 if (entry && entry.wieczor) {
                     entriesFound++;
-                    data.labels.push(dateKey); // POPRAWKA: Dodawaj datę tylko jeśli są dane
+                    data.labels.push(dateKey);
                     currentSentimentQuestions.forEach(sq => { data.sentiments[sq.id].push(entry.wieczor[sq.id + 'Sent'] || null); });
                     currentHabits.forEach(habit => {
-                        if (entry.wieczor.habits && entry.wieczor.habits[habit]) data.habits[habit]++;
+                        if (entry.wieczor.habits && entry.wieczor.habits[habit]) {
+                            data.habits[habit]++;
+                        }
                     });
                 }
             }
-            return entriesFound > 0 ? data : null; // POPRAWKA: Pokaż dane już od pierwszego dnia
+            return entriesFound > 0 ? data : null;
         }
     }
+    
     static renderCharts(period) {
         this.destroyCharts();
         const data = this.gatherData(period);
         const placeholder = document.getElementById('stats-placeholder');
         const grid = document.querySelector('#stats-panel .stats-grid');
-        if (!data || data.labels.length < 1) {
+        if (!data) {
             if(placeholder) placeholder.classList.remove('hidden');
             if(grid) grid.classList.add('hidden');
             return;
@@ -303,14 +304,7 @@ class Settings {
             case 'appearance':
                 const theme = AppStorage.getSetting('theme') || 'las';
                 const font = AppStorage.getSetting('font') || 'sans-serif';
-                html = `
-                    <h4 class="settings-header-4">Wybierz motyw</h4>
-                    <div class="settings-group theme-selector">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option ${theme === t ? 'is-active' : ''}" data-theme="${t}"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div>
-                    <h4 class="settings-header-4">Wybierz czcionkę</h4>
-                    <div class="settings-group font-selector">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}">${{'sans-serif':'Nowoczesna','serif':'Klasyczna','rounded':'Swobodna'}[f]}</button>`).join('')}</div>
-                    <h4 class="settings-header-4">Tryb Ciemny</h4>
-                    <button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>
-                `;
+                html = `<h4 class="settings-header-4">Wybierz motyw</h4><div class="settings-group theme-selector">${['las', 'ocean', 'fokus'].map(t => `<div class="theme-option ${theme === t ? 'is-active' : ''}" data-theme="${t}"><span>${{'las':'🌱','ocean':'🌊','fokus':'⚡'}[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div><h4 class="settings-header-4">Wybierz czcionkę</h4><div class="settings-group font-selector">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}">${{'sans-serif':'Nowoczesna','serif':'Klasyczna','rounded':'Swobodna'}[f]}</button>`).join('')}</div><h4 class="settings-header-4">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`;
                 break;
             case 'poranek': case 'wieczor': html = renderList(`Pytania - ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
             case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
