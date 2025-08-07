@@ -48,6 +48,7 @@ const App = {
 
     bindMainEventListeners() {
         document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
+        document.getElementById('invite-btn').addEventListener('click', () => openModal('inviteModal'));
         document.getElementById('prev-day-btn').addEventListener('click', () => this.changeDate(-1));
         document.getElementById('next-day-btn').addEventListener('click', () => this.changeDate(1));
         document.getElementById('currentDate').addEventListener('input', e => this.loadDate(e.target.value));
@@ -205,8 +206,9 @@ class Settings {
     static init() {
         document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
         const settingsModal = document.getElementById('settingsModal');
+        const inviteModal = document.getElementById('inviteModal');
         const suggestionsModal = document.getElementById('suggestionsModal');
-        [settingsModal, suggestionsModal].forEach(modal => { modal.addEventListener('click', e => { if (e.target.closest('.close-modal-btn')) { closeModal(e.target.closest('.modal').id); } }); });
+        [settingsModal, suggestionsModal, inviteModal].forEach(modal => { modal.addEventListener('click', e => { if (e.target.closest('.close-modal-btn')) { closeModal(e.target.closest('.modal').id); } }); });
         settingsModal.addEventListener('click', e => {
             const header = e.target.closest('.settings-section-header');
             if (header) this.toggleSection(header);

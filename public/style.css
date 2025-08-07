@@ -151,3 +151,44 @@ html[data-theme='blask'] header::before {
 .sentiment-star.active {
     color: var(--accent); /* Kolor aktywnej, podświetlonej gwiazdki (np. fioletowy) */
 }
+/* Stylizacja okna z zaproszeniem */
+#inviteModal .modal-body-content h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+#inviteModal .modal-body-content p {
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+#inviteModal .modal-list {
+    list-style: none;
+    padding-left: 5px;
+    margin-bottom: 20px;
+}
+
+#inviteModal .modal-list li {
+    padding-left: 25px;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+#inviteModal .modal-list li::before {
+    content: '✅';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: var(--primary);
+}
+
+#inviteModal .highlight-box {
+    background-color: color-mix(in srgb, var(--primary) 10%, var(--bg));
+    padding: 20px;
+    border-radius: var(--border-radius-md);
+    border-left: 4px solid var(--primary);
+    margin-top: 15px;
+}
