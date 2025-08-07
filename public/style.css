@@ -59,13 +59,25 @@ header { position: relative; color: white; border-radius: var(--border-radius-lg
 header::before { content: ''; position: absolute; inset: 0; background-color: var(--header-overlay); z-index: 1; transition: background-color var(--transition); }
 header > * { position: relative; z-index: 2; }
 header h1 { color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
-.quote { font-style: normal; font-size: 1.2rem; max-width: 600px; margin: 15px auto 0; opacity: 0.95; }
+
+/* Stylizacja dla podtytułu w nagłówku */
+header h1 small {
+    display: block;
+    font-size: 0.37em;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+.quote { font-style: normal; font-size: 1rem; max-width: 600px; margin: 15px auto 0; opacity: 0.95; }
 .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; margin-bottom: 25px; }
 .btn { padding: 10px 20px; border-radius: var(--border-radius-md); border: 1px solid transparent; cursor: pointer; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: all var(--transition); user-select: none; }
 .btn:active { transform: scale(0.97); }
 .btn-primary { background: var(--primary); color: white; }
 html[data-theme='fokus'].dark-mode .btn-primary { color: #000; }
-.btn-secondary { background: var(--accent); color: var(--text-main); }
+.btn-secondary {
+    background: var(--accent);
+    color: white; /* <-- ZMIANA Z var(--text-main) NA white */
+}
 .btn-tertiary { background: var(--card); color: var(--text-main); border-color: var(--border); box-shadow: var(--shadow-sm); }
 .btn-tertiary:hover { background-color: var(--bg); border-color: color-mix(in srgb, var(--border) 80%, var(--text-muted)); }
 .tabs-container { border-bottom: 1px solid var(--border); }
@@ -107,7 +119,11 @@ label { display: block; font-weight: 600; margin-bottom: 10px; }
 .settings-section.is-open .settings-section-content { max-height: 1000px; padding: 20px 15px; }
 .settings-header-4 { margin-bottom: 15px; margin-top: 20px;}
 .settings-header-4:first-child { margin-top: 0; }
-.settings-group { display: flex; gap: 10px; }
+.settings-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* <-- TA LINIA NAPRAWIA PROBLEM */
+}
 .settings-group .btn { flex: 1; }
 .theme-option { flex: 1; text-align: center; padding: 10px; border: 2px solid var(--border); border-radius: var(--border-radius-md); cursor: pointer; }
 .theme-option.is-active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
