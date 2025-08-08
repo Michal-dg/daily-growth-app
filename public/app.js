@@ -1,15 +1,4 @@
 'use strict';
-const initialQuestions = {
-    poranek: [ {id:"m1", text:"Za co jestem dziś wdzięczny/a?"}, {id:"m2", text:"Jaki jest mój najważniejszy cel na dzisiaj?"}],
-    wieczor: [ {id:"e1", text:"Trzy dobre rzeczy, które się dzisiaj wydarzyły, to…"}, {id:"e2", text:"Czego nowego się dzisiaj nauczyłem/am?"}]
-};
-const initialHabits = ["Medytacja", "Ćwiczenia fizyczne", "Czytanie książki", "Nauka czegoś nowego"];
-const initialSentimentQuestions = [ { id: 'health', question: '💪 Jak oceniasz swoje samopoczucie fizyczne?' }, { id: 'mood', question: '😊 Jak oceniam swój nastrój?' }, { id: 'productivity', question: '🚀 Jak oceniam swoją produktywność?' }];
-const quotes = [ "Nawet najdalszą podróż zaczyna się od pierwszego kroku. 🌱", "Bądź zmianą, którą pragniesz ujrzeć w świecie. 🚀", "Jedynym sposobem na wielką pracę jest kochanie tego, co robisz. ✨", "Każdy dzień to nowa szansa, aby stać się lepszą wersją siebie.", "Małe kroki w dobrym kierunku mogą okazać się największym krokiem w Twoim życiu.", "Tajemnica postępu polega na tym, by zacząć.", "Nie licz dni, spraw, by dni się liczyły.", "Sukces to suma małych wysiłków, powtarzanych dzień po dniu.", "Wzrost i komfort nie mogą współistnieć.", "Dyscyplina to most między celami a osiągnięciami.", "Umysł jest wszystkim. Stajesz się tym, o czym myślisz.", "Jesteś silniejszy, niż myślisz. Bardziej zdolny, niż sobie wyobrażasz.", "Zacznij tam, gdzie jesteś. Użyj tego, co masz. Zrób, co możesz.", "Cierpliwość, wytrwałość i pot tworzą niezwyciężoną kombinację sukcesu.", "Nigdy nie jest za późno, by być tym, kim mogłeś być.", "W samym środku trudności kryją się możliwości.", "Charakteru nie można rozwinąć w spokoju i ciszy. Tylko przez doświadczenie prób i cierpienia można wzmocnić duszę.", "Natura nie spieszy się, a jednak wszystko jest osiągnięte.", "Spójrz głęboko w naturę, a wtedy wszystko zrozumiesz lepiej.", "Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz."];
-const suggestedMorningQuestions = ["Jaka jedna rzecz sprawiłaby, że ten dzień będzie wspaniały?", "Jak mogę dzisiaj zadbać o swoje ciało i umysł?", "Z jakim nastawieniem chcę rozpocząć ten dzień?", "Czego chcę się dziś nauczyć?", "Kto potrzebuje dzisiaj mojej dobroci?", "Jaką małą przyjemność mogę sobie dziś sprawić?", "Jaki jest pierwszy krok w kierunku mojego dużego celu?", "Jak mogę wyjść ze swojej strefy komfortu?", "Czego nie mogę się doczekać w dzisiejszym dniu?", "Jaką pozytywną energię wnoszę do świata?", "Za jaką trudną lekcję z przeszłości jestem wdzięczny?", "Jak mogę dziś okazać miłość bliskiej osobie?", "Jaki problem mogę dziś spróbować rozwiązać?", "Co mogę zrobić, aby poczuć się bardziej zorganizowanym?", "Jaka myśl dodaje mi siły?", "Jakie są moje 3 priorytety na dziś?", "Jak mogę być bardziej obecny/a w tej chwili?", "Jaką jedną rzecz mogę odpuścić?", "Co pięknego dostrzegam wokół siebie w tej chwili?", "Jaką obietnicę składam sobie na ten dzień?"];
-const suggestedEveningQuestions = ["Co dzisiaj poszło lepiej, niż się spodziewałem/am?", "Kiedy czułem/am się dzisiaj najbardziej sobą?", "Co dzisiaj wywołało mój uśmiech?", "Jaką jedną rzecz zrobiłbym/zrobiłabym inaczej?", "Kto mi dzisiaj pomógł lub kogo ja wsparłem/wsparłam?", "W jaki sposób ruszyłem/am do przodu w kierunku moich celów?", "Co dzisiaj mnie zaskoczyło?", "Czego się dzisiaj pozbyłem/pozbyłam (np. złego nawyku, negatywnej myśli)?", "Jaka była najpiękniejsza rzecz, którą dziś widziałem/widziałam?", "O czym nowym dziś myślałem/myślałam?", "Jakie uczucie dominowało w moim dniu?", "Co mogę zrobić jutro, aby było jeszcze lepsze?", "Kiedy czułem/am się najbardziej zrelaksowany/a?", "Jaka piosenka pasowałaby do dzisiejszego dnia?", "Czego nauczyła mnie dzisiejsza porażka lub wyzwanie?", "Za co chciałbym/chciałabym sobie podziękować?", "Jakie małe zwycięstwo dzisiaj odniosłem/odniosłam?", "Jak oceniłbym/oceniłabym dziś swoją cierpliwość?", "Co dobrego zjadłem/zjadłam?", "Z jaką myślą chcę zasnąć?"];
-const suggestedSummaryQuestions = ["Jaką jedną emocję najczęściej dziś odczuwałem/am?", "Co było największym wyzwaniem, z którym się zmierzyłem/am?", "Gdybym miał/a opisać ten dzień jednym słowem, jakie by to było?", "Co dzisiaj zabrało mi najwięcej energii?", "Co dzisiaj dało mi najwięcej energii?", "Czy zrobiłem/am dziś coś tylko dla siebie?", "Jaki był najbardziej pamiętny moment dnia?", "Czy moje dzisiejsze działania były zgodne z moimi wartościami?", "Jaką jedną rzecz chciałbym/chciałabym zapamiętać z tego dnia?", "Czy jestem zadowolony/a z tego, jak spędziłem/am dziś czas?"];
-const suggestedHabits = ["Picie 2l wody", "Spacer 30 minut", "Bez social mediów rano", "Joga lub rozciąganie", "Nauka 5 nowych słówek", "Pisanie dziennika", "Planowanie następnego dnia", "Zdrowy posiłek", "Kontakt z naturą", "Poświęcenie czasu na hobby", "Słuchanie podcastu rozwojowego", "Praktyka uważności (mindfulness)"];
 
 let currentQuestions, currentHabits, currentSentimentQuestions, currentDate;
 
@@ -32,7 +21,7 @@ const App = {
         applyTheme(AppStorage.getSetting('theme'));
         applyFont(AppStorage.getSetting('font'));
         document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
-        document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('dailyQuote').textContent = AppData.quotes[Math.floor(Math.random() * AppData.quotes.length)];
         this.bindMainEventListeners();
         this.rebuildAllSections();
         currentDate = dateFns.format(new Date(), 'yyyy-MM-dd');
@@ -61,9 +50,19 @@ const App = {
         }));
     },
 
-    rebuildAllSections() {
-        ['poranek', 'wieczor'].forEach(s => UI.buildSection(s, s.charAt(0).toUpperCase() + s.slice(1), { 'poranek': '🌅', 'wieczor': '🌙' }[s], `#${s}-panel`));
-    },
+rebuildAllSections() {
+    const sections = {
+        poranek: 'Poranek',
+        wieczor: 'Wieczór' // <-- Tutaj wpisujemy poprawną nazwę z 'ó'
+    };
+    const emojis = {
+        poranek: '🌅',
+        wieczor: '🌙'
+    };
+    Object.keys(sections).forEach(id => {
+        UI.buildSection(id, sections[id], emojis[id], `#${id}-panel`);
+    });
+},
 
     loadDate(newDate) {
         currentDate = newDate;
@@ -85,11 +84,11 @@ class AppStorage {
     static saveDayEntry(date, entry) { this.set(this.userKey(`entry_${date}`), entry); showNotification("Auto-zapisano ✅"); }
     static getSetting(key) { const s = this.get(this.userKey('settings')); return s ? s[key] : null; }
     static setSetting(key, value) { const s = this.get(this.userKey('settings')) || {}; s[key] = value; this.set(this.userKey('settings'), s); }
-    static getQuestions() { return this.get(this.userKey('questions')) || initialQuestions; }
+    static getQuestions() { return this.get(this.userKey('questions')) || AppData.initialQuestions; }
     static saveQuestions(q) { this.set(this.userKey('questions'), q); }
-    static getHabits() { return this.get(this.userKey('habits')) || initialHabits; }
+    static getHabits() { return this.get(this.userKey('habits')) || AppData.initialHabits; }
     static saveHabits(h) { this.set(this.userKey('habits'), h); }
-    static getSentimentQuestions() { return this.get(this.userKey('sentiments')) || initialSentimentQuestions; }
+    static getSentimentQuestions() { return this.get(this.userKey('sentiments')) || AppData.initialSentimentQuestions; }
     static saveSentimentQuestions(sq) { this.set(this.userKey('sentiments'), sq); }
 }
 
@@ -128,10 +127,11 @@ class UI {
         if (!container) return;
         const stars = container.querySelectorAll('.sentiment-star');
         const numericValue = parseInt(value, 10);
-        if (isNaN(numericValue)) { stars.forEach(star => star.classList.remove('active')); return; };
         stars.forEach(star => {
             const starValue = parseInt(star.dataset.value, 10);
-            star.classList.toggle('active', numericValue >= starValue);
+            const isActive = !isNaN(numericValue) && numericValue >= starValue;
+            star.classList.toggle('active', isActive);
+            star.textContent = isActive ? '★' : '☆';
         });
     }
 }
@@ -206,8 +206,8 @@ class Settings {
     static init() {
         document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
         const settingsModal = document.getElementById('settingsModal');
-        const inviteModal = document.getElementById('inviteModal');
         const suggestionsModal = document.getElementById('suggestionsModal');
+        const inviteModal = document.getElementById('inviteModal');
         [settingsModal, suggestionsModal, inviteModal].forEach(modal => { modal.addEventListener('click', e => { if (e.target.closest('.close-modal-btn')) { closeModal(e.target.closest('.modal').id); } }); });
         settingsModal.addEventListener('click', e => {
             const header = e.target.closest('.settings-section-header');
@@ -277,7 +277,14 @@ class Settings {
                 <h4 class="settings-header-4">Wybierz czcionkę</h4><div class="settings-group font-selector">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}">${{ 'sans-serif': 'Nowoczesna', 'serif': 'Klasyczna', 'rounded': 'Swobodna' }[f]}</button>`).join('')}</div>
                 <h4 class="settings-header-4">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`;
                 break;
-            case 'poranek': case 'wieczor': html = renderList(`Pytania - ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`, this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text'); break;
+            case 'poranek':
+case 'wieczor':
+    const titleMap = {
+        poranek: 'Pytania - Poranek',
+        wieczor: 'Pytania - Wieczór' // <-- Poprawna nazwa
+    };
+    html = renderList(titleMap[sectionId], this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text');
+    break;
             case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
             case 'habits': html = renderList('Twoje Nawyki', this.tempHabits, 'habits', 'Nazwa nawyku'); break;
         }
@@ -293,10 +300,10 @@ class Settings {
     static showSuggestions(section) {
         let suggestions = [], title = "Sugerowane Pytania";
         switch (section) {
-            case 'poranek': suggestions = suggestedMorningQuestions; title = "Sugestie - Poranek"; break;
-            case 'wieczor': suggestions = suggestedEveningQuestions; title = "Sugestie - Wieczór"; break;
-            case 'summary': suggestions = suggestedSummaryQuestions; title = "Sugerowane Pytania Podsumowujące"; break;
-            case 'habits': suggestions = suggestedHabits; title = "Sugerowane Nawyki"; break;
+            case 'poranek': suggestions = AppData.suggestedMorningQuestions; title = "Sugestie - Poranek"; break;
+            case 'wieczor': suggestions = AppData.suggestedEveningQuestions; title = "Sugestie - Wieczór"; break;
+            case 'summary': suggestions = AppData.suggestedSummaryQuestions; title = "Sugerowane Pytania Podsumowujące"; break;
+            case 'habits': suggestions = AppData.suggestedHabits; title = "Sugerowane Nawyki"; break;
         }
         const suggestionsList = document.getElementById('suggestionsList');
         if (!suggestionsList) return;
@@ -307,10 +314,10 @@ class Settings {
     static addSuggestion(section, index) {
         let textToAdd;
         switch (section) {
-            case 'poranek': textToAdd = suggestedMorningQuestions[index]; this.tempQuestions.poranek.push({ id: `m${Date.now()}`, text: textToAdd }); break;
-            case 'wieczor': textToAdd = suggestedEveningQuestions[index]; this.tempQuestions.wieczor.push({ id: `e${Date.now()}`, text: textToAdd }); break;
-            case 'summary': textToAdd = suggestedSummaryQuestions[index]; this.tempSentimentQuestions.push({ id: `s${Date.now()}`, question: textToAdd }); break;
-            case 'habits': textToAdd = suggestedHabits[index]; this.tempHabits.push(textToAdd); break;
+            case 'poranek': textToAdd = AppData.suggestedMorningQuestions[index]; this.tempQuestions.poranek.push({ id: `m${Date.now()}`, text: textToAdd }); break;
+            case 'wieczor': textToAdd = AppData.suggestedEveningQuestions[index]; this.tempQuestions.wieczor.push({ id: `e${Date.now()}`, text: textToAdd }); break;
+            case 'summary': textToAdd = AppData.suggestedSummaryQuestions[index]; this.tempSentimentQuestions.push({ id: `s${Date.now()}`, question: textToAdd }); break;
+            case 'habits': textToAdd = AppData.suggestedHabits[index]; this.tempHabits.push(textToAdd); break;
         }
         this.render(section);
     }
@@ -343,7 +350,7 @@ class Settings {
 
 function applyTheme(themeName = 'blask') {
     document.documentElement.dataset.theme = themeName;
-    AppStorage.setSetting('theme', themeName); // <-- TA LINIA ZAPISUJE MOTYW!
+    AppStorage.setSetting('theme', themeName);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--card').trim();
 }
