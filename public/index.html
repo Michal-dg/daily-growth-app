@@ -8,7 +8,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400..700;1,400..1000&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap&subset=latin-ext" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400..700;1,400..1000&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
     <link rel="manifest" href="manifest.json">
@@ -30,10 +30,9 @@
     <div id="main-app">
         <div class="container">
             <header>
-    <h1>Daily Growth</h1>
-    <p class="header-subtitle">Twój Dziennik Rozwoju</p>
-    <p class="quote" id="dailyQuote"></p>
-</header>
+                <h1>Daily Growth</h1>
+                <p class="quote" id="dailyQuote"></p>
+            </header>
 
             <div class="controls">
                 <div class="date-controls">
@@ -42,7 +41,7 @@
                     <button class="btn btn-tertiary" id="next-day-btn" aria-label="Następny dzień"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.66669 2.33398L11.3334 8.00065L5.66669 13.6673" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-tertiary" id="invite-btn">Zaproszenie do testowania</button>
+                    <button class="btn btn-secondary" id="backup-btn">Backup</button>
                     <button class="btn btn-tertiary" id="settings-btn">Ustawienia</button>
                 </div>
             </div>
@@ -55,119 +54,110 @@
                 </div>
             </div>
 
-            <div class="main-content">
-    <section id="poranek-panel" class="section active"></section>
-    <section id="wieczor-panel" class="section"></section>
-    <section id="stats-panel" class="section"></section>
-</div>
-
-            <div class="modal" id="inviteModal">
-                 <div class="content-card modal-content">
-                     <div class="modal-header">
-                         <h2 class="content-header modal-title">Witaj w Daily Growth 🌱</h2>
-                         <button class="close-modal-btn" data-modal-id="inviteModal">✖</button>
-                     </div>
-                     <div class="modal-body-content" style="text-align: left;">
-                        <h4>💡 Istota Aplikacji: Czym jest Daily Growth?</h4>
-                        <p>W swojej istocie, Daily Growth to nie gotowa, zamknięta aplikacja, ale <strong>elastyczna platforma do budowania własnego, idealnego narzędzia do autorefleksji.</strong> To jak cyfrowy notatnik z supermocami – Ty decydujesz, czym go zapełnisz.</p>
-                        
-                        <h4>✨ Jedno Narzędzie, Wiele Możliwości</h4>
-                        <p>Dzięki pełnej personalizacji pytań i nawyków, aplikacja może ewoluować razem z Tobą. Może stać się m.in.:</p>
-                        <ul class="modal-list">
-                            <li>Klasycznym Dziennikiem Rozwoju</li>
-                            <li>Dziennikiem Wdzięczności</li>
-                            <li>Monitorem Celów i Projektów</li>
-                            <li>Narzędziem Wspierającym Terapię</li>
-                            <li>Prostym Trackerem Nastroju</li>
-                        </ul>
-            
-                        <h4>❤️ Ewolucja Dzięki Tobie</h4>
-                        <p class="highlight-box"><strong>Każda uwaga, sugestia czy pomysł na nową funkcję jest dla nas bezcennym impulsem, który napędza ewolucję tego narzędzia.</strong> Twoja perspektywa pomaga nam ulepszać aplikację tak, by służyła jeszcze lepiej Tobie i innym.</p>
-                     </div>
-                 </div>
-            </div>
-
-            <div class="modal" id="settingsModal">
-                <div class="content-card modal-content">
-                    <div class="modal-header">
-                        <h2 class="content-header modal-title">Ustawienia</h2>
-                        <button class="close-modal-btn" data-modal-id="settingsModal">✖</button>
-                    </div>
-                    <div class="modal-body-content">
-                        <div class="settings-list">
-                            <div class="settings-section">
-                                <div class="settings-section-header" data-section="appearance">
-                                    <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402a3.75 3.75 0 0 0-5.304-5.304L4.098 14.6c-1.455 1.455-1.455 3.847 0 5.302Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75c.621 0 1.223.24 1.697.713l2.84 2.84c.473.473.713 1.076.713 1.697v6.024a3.75 3.75 0 0 1-5.304 5.304L7.5 16.5m9-9-9 9" /></svg></div>
-                                    <h4 class="settings-section-title">Wygląd</h4>
-                                    <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
-                                </div>
-                                <div class="settings-section-content-wrapper">
-                                    <div class="settings-section-content" id="s-appearance-panel"></div>
-                                </div>
+            <section id="poranek-panel" class="section active"></section>
+            <section id="wieczor-panel" class="section"></section>
+            <section id="stats-panel" class="section"></section>
+        </div>
+        
+        <div class="modal" id="settingsModal">
+             <div class="content-card modal-content">
+                <div class="modal-header">
+                    <h2 class="content-header modal-title">Ustawienia</h2>
+                    <button class="close-modal-btn" data-modal-id="settingsModal">✖</button>
+                </div>
+                <div class="modal-body-content">
+                    <div class="settings-list">
+                        <div class="settings-section">
+                            <div class="settings-section-header" data-section="appearance">
+                                <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402a3.75 3.75 0 0 0-5.304-5.304L4.098 14.6c-1.455 1.455-1.455 3.847 0 5.302Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75c.621 0 1.223.24 1.697.713l2.84 2.84c.473.473.713 1.076.713 1.697v6.024a3.75 3.75 0 0 1-5.304 5.304L7.5 16.5m9-9-9 9" /></svg></div>
+                                <h4 class="settings-section-title">Wygląd</h4>
+                                <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
                             </div>
-                            <div class="settings-section">
-                                <div class="settings-section-header" data-section="poranek">
-                                    <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /></svg></div>
-                                    <h4 class="settings-section-title">Pytania - Poranek</h4>
-                                    <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
-                                </div>
-                                <div class="settings-section-content-wrapper">
-                                    <div class="settings-section-content" id="s-poranek-panel"></div>
-                                </div>
+                            <div class="settings-section-content" id="s-appearance-panel"></div>
+                        </div>
+                        <div class="settings-section">
+                            <div class="settings-section-header" data-section="poranek">
+                                <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /></svg></div>
+                                <h4 class="settings-section-title">Pytania - Poranek</h4>
+                                <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
                             </div>
-                            <div class="settings-section">
-                                <div class="settings-section-header" data-section="wieczor">
-    <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /></svg></div>
-    <h4 class="settings-section-title">Pytania - Wieczór</h4>
-    <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
-</div>
-                                <div class="settings-section-content-wrapper">
-                                    <div class="settings-section-content" id="s-wieczor-panel"></div>
-                                </div>
+                            <div class="settings-section-content" id="s-poranek-panel"></div>
+                        </div>
+                        <div class="settings-section">
+                             <div class="settings-section-header" data-section="wieczor">
+                                <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /></svg></div>
+                                <h4 class="settings-section-title">Pytania - Wieczór</h4>
+                                <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
                             </div>
-                            <div class="settings-section">
-                                <div class="settings-section-header" data-section="summary">
-                                    <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h12M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-1.5m-6 0h1.5m-1.5 0h-1.5m0 0H9m1.5 0H6m3 0v3.75" /></svg></div>
-                                    <h4 class="settings-section-title">Pytania Podsumowujące</h4>
-                                    <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
-                                </div>
-                                <div class="settings-section-content-wrapper">
-                                    <div class="settings-section-content" id="s-summary-panel"></div>
-                                </div>
+                            <div class="settings-section-content" id="s-wieczor-panel"></div>
+                        </div>
+                        <div class="settings-section">
+                            <div class="settings-section-header" data-section="summary">
+                                <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h12M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-1.5m-6 0h1.5m-1.5 0h-1.5m0 0H9m1.5 0H6m3 0v3.75" /></svg></div>
+                                <h4 class="settings-section-title">Pytania Podsumowujące</h4>
+                                <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
                             </div>
-                            <div class="settings-section">
-                                <div class="settings-section-header" data-section="habits">
-                                    <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>
-                                    <h4 class="settings-section-title">Twoje Nawyki</h4>
-                                    <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
-                                </div>
-                                <div class="settings-section-content-wrapper">
-                                    <div class="settings-section-content" id="s-habits-panel"></div>
-                                </div>
+                            <div class="settings-section-content" id="s-summary-panel"></div>
+                        </div>
+                        <div class="settings-section">
+                            <div class="settings-section-header" data-section="habits">
+                                <div class="settings-section-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>
+                                <h4 class="settings-section-title">Twoje Nawyki</h4>
+                                <button class="btn btn-tertiary settings-edit-btn">Edytuj</button>
                             </div>
+                            <div class="settings-section-content" id="s-habits-panel"></div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary" id="save-settings-btn" style="width: 100%;">Zapisz i zamknij</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="save-settings-btn" style="width: 100%;">Zapisz i zamknij</button>
                 </div>
             </div>
-
-            <div class="modal" id="suggestionsModal">
-                <div class="content-card modal-content">
-                    <div class="modal-header">
-                        <h2 id="suggestionsTitle" class="content-header modal-title">Sugerowane Pytania</h2>
-                        <button class="close-modal-btn" data-modal-id="suggestionsModal">✖</button>
-                    </div>
-                    <div class="modal-body-content" id="suggestionsList"></div>
-                </div>
-            </div>
-
-            <div id="notification"></div>
         </div>
+
+        <div class="modal" id="suggestionsModal">
+             <div class="modal-content-wrapper">
+                <div class="modal-header">
+                    <h2 id="suggestionsTitle" class="content-header modal-title">Sugerowane Pytania</h2>
+                    <button class="close-modal-btn" data-modal-id="suggestionsModal">✖</button>
+                </div>
+                <div id="suggestionsList" class="modal-body"></div>
+            </div>
+        </div>
+        
+        <div class="modal" id="backupModal">
+             <div class="content-card modal-content">
+                <div class="modal-header">
+                    <h2 class="content-header modal-title">🔒 Backup Danych</h2>
+                    <button class="close-modal-btn" data-modal-id="backupModal">✖</button>
+                </div>
+                <div class="modal-body-content">
+                    <p>Zapisz wszystkie swoje dane (wpisy, pytania, nawyki) do pliku JSON lub przywróć je z wcześniej pobranego pliku.</p>
+                    <button class="btn btn-primary" id="download-backup-btn" style="width: 100%; margin-top: 20px;">Pobierz kopię zapasową</button>
+                    <hr style="margin: 20px 0; border-color: var(--border);">
+                    <p>Wybierz plik, aby przywrócić dane. Uwaga: obecne dane zostaną nadpisane.</p>
+                    <input type="file" id="restoreFile" accept=".json" style="margin-top:10px;">
+                    <button class="btn btn-secondary" id="restore-backup-btn" style="width: 100%; margin-top: 10px;">Przywróć z pliku</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="timeCapsuleModal">
+            <div class="content-card modal-content">
+                <div class="modal-header">
+                    <h2 class="content-header modal-title">🕰️ Kapsuła Czasu!</h2>
+                    <button class="close-modal-btn" data-modal-id="timeCapsuleModal">✖</button>
+                </div>
+                <div class="modal-body-content">
+                    <p>Oto Twój wpis z tego samego dnia, dokładnie rok temu. Zobacz, jak wiele się zmieniło!</p>
+                    <div id="timeCapsuleContent" style="margin-top: 20px; background: var(--bg); padding: 15px; border-radius: var(--border-radius-md);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="notification"></div>
     </div>
     
-<script src="data.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>
