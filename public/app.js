@@ -37,7 +37,6 @@ const App = {
 
     bindMainEventListeners() {
         document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
-        document.getElementById('invite-btn').addEventListener('click', () => openModal('inviteModal'));
         document.getElementById('prev-day-btn').addEventListener('click', () => this.changeDate(-1));
         document.getElementById('next-day-btn').addEventListener('click', () => this.changeDate(1));
         document.getElementById('currentDate').addEventListener('input', e => this.loadDate(e.target.value));
