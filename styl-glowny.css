@@ -1,0 +1,76 @@
+/* --- Podstawowe ustawienia i tło --- */
+body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f4f7f6; /* Jasnoszare, spokojne tło */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.main-container {
+    padding: 2rem;
+}
+
+/* --- Nagłówek --- */
+.main-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #2c3e50; /* Ciemny, stonowany kolor */
+}
+
+.main-header p {
+    font-size: 1.2rem;
+    color: #7f8c8d; /* Szary, delikatny tekst */
+    margin-bottom: 3rem;
+}
+
+/* --- Kontener na przyciski --- */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem; /* Odstęp między przyciskami */
+    flex-wrap: wrap; /* Pozwala przyciskom zawijać się na mniejszych ekranach */
+}
+
+/* --- Styl okrągłych przycisków --- */
+.round-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%; /* To tworzy koło! */
+    background-color: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    
+    color: #3498db; /* Kolor tekstu */
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    
+    transition: all 0.3s ease; /* Płynne przejście dla animacji */
+}
+
+.round-button:hover {
+    transform: translateY(-8px); /* Lekkie uniesienie przycisku */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    background-color: #3498db; /* Zmiana tła przy najechaniu */
+    color: #ffffff; /* Zmiana koloru tekstu */
+}
+
+/* --- Responsywność dla telefonów --- */
+@media (max-width: 600px) {
+    .button-container {
+        flex-direction: column; /* Ustawia przyciski jeden pod drugim */
+        align-items: center;
+    }
+    .main-header h1 {
+        font-size: 2rem;
+    }
+}
