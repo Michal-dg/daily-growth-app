@@ -36,23 +36,44 @@
 </header>
 
             <div class="controls">
-                <div class="date-controls">
-                    <button class="btn btn-tertiary" id="prev-day-btn" aria-label="Poprzedni dzień"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.3333 13.666L4.66667 7.99935L10.3333 2.33268" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-                    <input type="date" id="currentDate">
-                    <button class="btn btn-tertiary" id="next-day-btn" aria-label="Następny dzień"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.66669 2.33398L11.3334 8.00065L5.66669 13.6673" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-                </div>
-                <div class="actions">
-    <a href="centrum-celow.html" class="btn btn-tertiary">Cele</a>
-    <button class="btn btn-tertiary" id="settings-btn">Ustawienia</button>
+    <nav class="header-nav-pills">
+        <a href="../../" class="nav-pill-item" aria-label="Strona Główna" title="Strona Główna">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.495v3.505A.5.5 0 0 0 10 15h2a.5.5 0 0 0 .5-.5V8.207l-5-5L2 8.207V14.5a.5.5 0 0 0 .5.5H5a.5.5 0 0 0 .5-.5z"/></svg>
+        </a>
+        <a href="../public" class="nav-pill-item active" aria-label="Dziennik" title="Dziennik">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
+        </a>
+        <a href="../../cele/" class="nav-pill-item" aria-label="Cele" title="Cele">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/><path d="M8 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm0 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+        </a>
+        <a href="../../wizja/" class="nav-pill-item" aria-label="Wizja" title="Wizja">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>
+        </a>
+    </nav>
+
+    <div class="date-controls">
+        <button class="btn btn-tertiary" id="prev-day-btn" aria-label="Poprzedni dzień"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.3333 13.666L4.66667 7.99935L10.3333 2.33268" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <input type="date" id="currentDate">
+        <button class="btn btn-tertiary" id="next-day-btn" aria-label="Następny dzień"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.66669 2.33398L11.3334 8.00065L5.66669 13.6673" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-tertiary" id="stats-btn" aria-label="Pokaż statystyki">
+             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M2 13.3333H4V8H2V13.3333ZM6.66667 13.3333H8.66667V2.66667H6.66667V13.3333ZM11.3333 13.3333H13.3333V5.33333H11.3333V13.3333Z" /></svg>
+        </button>
+        <button class="btn btn-tertiary btn-settings-icon" id="settings-btn" aria-label="Ustawienia">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311a1.464 1.464 0 0 1-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c-1.4-.413-1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.858 2.929 2.929 0 0 1 0 5.858z"/>
+            </svg>
+        </button>
+    </div>
 </div>
-            </div>
 
             <div class="tabs-container">
                 <div class="tabs" role="tablist">
                     <div class="tab active" data-section="poranek">🌅 Poranek</div>
                     <div class="tab" data-section="wieczor">🌙 Wieczór</div>
-                    <div class="tab" data-section="stats"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 13.3333H4V8H2V13.3333ZM6.66667 13.3333H8.66667V2.66667H6.66667V13.3333ZM11.3333 13.3333H13.3333V5.33333H11.3333V13.3333Z" fill="currentColor"/></svg>Analiza</div>
-                </div>
+                   </div>
             </div>
 
             <div class="main-content">
@@ -86,7 +107,7 @@
                      </div>
                  </div>
             </div>
-
+            
             <div class="modal" id="settingsModal">
                 <div class="content-card modal-content">
                     <div class="modal-header">

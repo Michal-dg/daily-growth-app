@@ -18,9 +18,9 @@ const App = {
         if (this.isAppInitialized) return;
         this.isAppInitialized = true;
         this.loadAppData();
-        applyTheme(AppStorage.getSetting('theme'));
+        applyTheme(AppStorage.getSetting('blask'));
         applyFont(AppStorage.getSetting('font'));
-        document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode'));
+        document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode') || false);
         document.getElementById('dailyQuote').textContent = AppData.quotes[Math.floor(Math.random() * AppData.quotes.length)];
         this.bindMainEventListeners();
         this.rebuildAllSections();
@@ -397,3 +397,68 @@ function closeModal(id) {
 }
 
 App.init();
+// WKLEJ NA KOŃCU PLIKU dziennik/app.js
+(() => {
+    const applyTheme = (theme) => {
+        if (theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+    };
+
+    // Zastosuj motyw przy starcie
+    const savedTheme = localStorage.getItem('theme') || 'las'; // Domyślny motyw dla Dziennika
+    applyTheme(savedTheme);
+
+    // Nasłuchuj na zmiany z innych kart
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'theme') {
+            applyTheme(event.newValue);
+        }
+    });
+
+    // Jeśli Dziennik ma swój własny przełącznik motywów, obsłuż go
+    // Jeśli nie, ten kod nie zrobi nic złego
+    const themeSwitcherInDziennik = document.querySelector('select'); // Możesz tu dać dokładniejsze ID
+    if (themeSwitcherInDziennik) {
+         themeSwitcherInDziennik.value = savedTheme;
+         themeSwitcherInDziennik.addEventListener('change', (e) => {
+            const newTheme = e.target.value;
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+    }
+})();
+// === LOGIKA DLA NOWEGO PRZYCISKU STATYSTYK (POPRAWIONA) ===
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Znajdujemy potrzebne elementy
+    const statsBtn = document.getElementById('stats-btn');
+    const statsPanel = document.getElementById('stats-panel');
+    const allSections = document.querySelectorAll('.section');
+    const allTabs = document.querySelectorAll('.tab');
+
+    // Sprawdzamy, czy przycisk istnieje na stronie
+    if (statsBtn) {
+        // 2. Dodajemy nasłuchiwanie na kliknięcie
+        statsBtn.addEventListener('click', () => {
+            
+            // 3. Ukrywamy wszystkie inne sekcje (panele)
+            allSections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // 4. Pokazujemy tylko panel ze statystykami
+            if (statsPanel) {
+                statsPanel.classList.add('active');
+            }
+
+            // 5. Odznaczamy "aktywność" na zakładkach "Poranek" i "Wieczór"
+            allTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 6. WYWOŁUJEMY FUNKCJĘ RYSUJĄCĄ WYKRESY
+            Stats.render('#stats-panel'); 
+        });
+    }
+});
