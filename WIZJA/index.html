@@ -94,7 +94,35 @@
         .nav-icon { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; color: var(--text-tertiary); background-color: transparent; border-radius: 50%; transition: all 0.2s ease; text-decoration: none; }
         .nav-icon:hover { color: var(--text-primary); background-color: var(--bg-tertiary); }
         .nav-icon.active { color: var(--accent-primary); background-color: var(--bg-tertiary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header-date-controls { display: flex; align-items: center; gap: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); }
+        .header-date-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+.date-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.header-date-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.8rem;
+    width: 100%;
+    max-width: 300px; /* możesz zmienić np. na 400px albo całe 100% */
+    margin: 0 auto;
+}
+
+.header-date-controls .btn-primary {
+    width: 100%;
+    font-size: 1.1rem; /* większa czcionka */
+    padding: 0.8rem 1rem; /* trochę wyższy */
+    font-weight: 700; /* pogrubienie */
+    border-radius: 10px;
+}
+
         .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
 
         .header-date-controls input[type="date"] {
@@ -227,13 +255,17 @@
     </nav>
                 <!-- CZĘŚĆ ŚRODKOWA: Kontrolki daty -->
                 <div class="header-date-controls">
-                    <button class="btn btn-tertiary" id="prev-day-btn" aria-label="Poprzedni dzień">←</button>
-                    <input type="date" id="currentDate">
-                    <button class="btn btn-tertiary" id="next-day-btn" aria-label="Następny dzień">→</button>
-                </div>
+    <div class="date-nav">
+        <button class="btn btn-tertiary" id="prev-day-btn" aria-label="Poprzedni dzień">←</button>
+        <input type="date" id="currentDate">
+        <button class="btn btn-tertiary" id="next-day-btn" aria-label="Następny dzień">→</button>
+    </div>
+    <button class="btn btn-primary" id="add-goal-btn" style="margin-top: 1rem;">Nowa wizja</button>
+</div>
+
                 <!-- CZĘŚĆ PRAWA: Akcje -->
                 <div class="header-actions">
-                    <button class="btn btn-primary" id="add-goal-btn">+ Nowy Cel</button>
+                    
                     <button class="btn btn-tertiary" id="show-chart-btn" aria-label="Wykres">
                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2z"/></svg>
                     </button>
@@ -241,7 +273,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
                 </div>
-            </header>
+                        </header>
             <!-- ====================================================== -->
             <!-- END: POPRAWIONY PANEL NAWIGACYJNY                    -->
             <!-- ====================================================== -->
@@ -259,8 +291,10 @@
     <div class="modal" id="goalModal">
         <div class="content-card modal-content">
             <div class="modal-header">
-                <h2 id="goalModalTitle" class="content-header modal-title">Nowy Cel</h2>
-                <button class="close-modal-btn" data-modal-id="goalModal">✖</button>
+                <h2 id="goalModalTitle" class="add-item-container">
+    <button class="btn btn-primary" id="add-goal-btn">Nowa Wizja</button>
+</div>
+
             </div>
             <div class="modal-body-content">
                 <input type="hidden" id="goalId">
@@ -538,7 +572,7 @@ class UI {
             goal.obstacles.forEach(obs => this.addEditableListItem('goalObstaclesContainer', 'Nowa przeszkoda', obs));
             deleteBtn.style.display = 'block';
         } else {
-            title.textContent = "Nowy Cel";
+            title.textContent = "Nowa Wizja";
             idInput.value = '';
             textInput.value = '';
             deadlineInput.value = '';

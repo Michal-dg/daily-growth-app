@@ -7,19 +7,129 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400&display=swap');
-        :root { --color-bg: #000005; --color-text: rgba(255, 255, 255, 0.4); --color-text-hover: rgba(255, 255, 255, 1); --font-main: 'Lexend', sans-serif; }
-        body { background-color: var(--color-bg); margin: 0; overflow: hidden; font-family: var(--font-main); color: var(--color-text); cursor: none; opacity: 1; }
-        canvas { display: block; position: fixed; top: 0; left: 0; z-index: -1; }
-        .ui-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; pointer-events: none; }
-        .header { opacity: 0; animation: fadeIn 3s 1s forwards; }
-        h1 { font-weight: 300; font-size: 2rem; letter-spacing: 1px; margin: 0; }
-        p { font-size: 1rem; margin-top: 0.5rem; }
-        .nav { margin-top: 20vh; display: flex; gap: 8rem; opacity: 0; animation: fadeIn 3s 1.5s forwards; }
-        .nav-anchor { font-size: 1.5rem; font-weight: 400; letter-spacing: 2px; text-decoration: none; color: var(--color-text); padding: 1rem 2rem; border-radius: 50px; transition: color 0.4s ease, letter-spacing 0.4s ease; pointer-events: all; }
-        .nav-anchor.hovered { color: var(--color-text-hover); letter-spacing: 4px; }
-        .cursor { position: fixed; width: 20px; height: 20px; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; transition: transform 0.2s ease-out, background-color 0.2s ease; z-index: 9999; }
-        .cursor.holding { transform: translate(-50%, -50%) scale(1.5); background-color: rgba(255, 255, 255, 0.1); }
+        :root {
+            --color-bg: #000005;
+            --color-text: rgba(255, 255, 255, 0.4);
+            --color-text-hover: rgba(255, 255, 255, 1);
+            --font-main: 'Lexend', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            margin: 0;
+            font-family: var(--font-main);
+            color: var(--color-text);
+            opacity: 1;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .ui-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .header {
+            opacity: 0;
+            animation: fadeIn 3s 1s forwards;
+        }
+
+        h1 {
+            font-weight: 300;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        p {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .nav {
+            margin-top: 20vh;
+            display: flex;
+            gap: 8rem;
+            opacity: 0;
+            animation: fadeIn 3s 1.5s forwards;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-anchor {
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-decoration: none;
+            color: var(--color-text);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            transition: color 0.4s ease, letter-spacing 0.4s ease;
+            pointer-events: all;
+        }
+
+        .nav-anchor.hovered {
+            color: var(--color-text-hover);
+            letter-spacing: 4px;
+        }
+
+        /* Kursor tylko dla desktopów */
+        @media (hover: hover) and (pointer: fine) {
+            body { cursor: none; }
+            .cursor { display: block; }
+        }
+
+        /* Na mobile kursor znika */
+        @media (hover: none) and (pointer: coarse) {
+            .cursor { display: none !important; }
+        }
+
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: transform 0.2s ease-out, background-color 0.2s ease;
+            z-index: 9999;
+        }
+
+        .cursor.holding {
+            transform: translate(-50%, -50%) scale(1.5);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
         @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .nav {
+                gap: 2rem;
+                margin-top: 10vh;
+                flex-direction: column;
+            }
+            .nav-anchor {
+                font-size: 1.2rem;
+                padding: 0.8rem 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -54,19 +164,111 @@
         const BASE_HUE = 200;
 
         class Particle {
-            constructor() { this.x = Math.random() * width; this.y = Math.random() * height; this.size = Math.random() * 1.5 + 0.5; this.speedX = (Math.random() - 0.5) * 0.5; this.speedY = (Math.random() - 0.5) * 0.5; this.hue = BASE_HUE + Math.random() * 50; }
-            update() { let dx = this.x - mouse.x; let dy = this.y - mouse.y; let distance = Math.sqrt(dx * dx + dy * dy); if (mouse.isDown) { if (distance < 200) { this.speedX -= dx / (distance * 5); this.speedY -= dy / (distance * 5); } } else { if (distance < 100) { this.speedX += dx / (distance * 5); this.speedY += dy / (distance * 5); } } this.x += this.speedX; this.y += this.speedY; this.speedX *= 0.98; this.speedY *= 0.98; if (this.x < 0 || this.x > width) this.speedX *= -1; if (this.y < 0 || this.y > height) this.speedY *= -1; }
-            draw() { ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, 0.8)`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.hue = BASE_HUE + Math.random() * 50;
+            }
+            update() {
+                let dx = this.x - mouse.x;
+                let dy = this.y - mouse.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (mouse.isDown) {
+                    if (distance < 200) {
+                        this.speedX -= dx / (distance * 5);
+                        this.speedY -= dy / (distance * 5);
+                    }
+                } else {
+                    if (distance < 100) {
+                        this.speedX += dx / (distance * 5);
+                        this.speedY += dy / (distance * 5);
+                    }
+                }
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedX *= 0.98;
+                this.speedY *= 0.98;
+                if (this.x < 0 || this.x > width) this.speedX *= -1;
+                if (this.y < 0 || this.y > height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, 0.8)`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        function init() { for (let i = 0; i < PARTICLE_COUNT; i++) { particles.push(new Particle()); } }
-        function animate() { ctx.clearRect(0, 0, width, height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        function init() {
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push(new Particle());
+            }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
 
-        window.addEventListener('resize', () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; });
-        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; cursorElement.style.left = `${e.clientX}px`; cursorElement.style.top = `${e.clientY}px`; });
-        window.addEventListener('mousedown', () => { mouse.isDown = true; cursorElement.classList.add('holding'); });
-        window.addEventListener('mouseup', () => { mouse.isDown = false; cursorElement.classList.remove('holding'); anchors.forEach(anchor => { const rect = anchor.getBoundingClientRect(); if (mouse.x > rect.left && mouse.x < rect.right && mouse.y > rect.top && mouse.y < rect.bottom) { triggerCommit(anchor); } }); });
-        anchors.forEach(anchor => { anchor.addEventListener('mouseenter', () => anchor.classList.add('hovered')); anchor.addEventListener('mouseleave', () => anchor.classList.remove('hovered')); });
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        // Obsługa myszy
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            cursorElement.style.left = `${e.clientX}px`;
+            cursorElement.style.top = `${e.clientY}px`;
+        });
+
+        window.addEventListener('mousedown', () => {
+            mouse.isDown = true;
+            cursorElement.classList.add('holding');
+        });
+
+        window.addEventListener('mouseup', () => {
+            mouse.isDown = false;
+            cursorElement.classList.remove('holding');
+            checkClick();
+        });
+
+        // Obsługa dotyku
+        window.addEventListener('touchstart', e => {
+            mouse.isDown = true;
+            const touch = e.touches[0];
+            mouse.x = touch.clientX;
+            mouse.y = touch.clientY;
+        });
+
+        window.addEventListener('touchmove', e => {
+            const touch = e.touches[0];
+            mouse.x = touch.clientX;
+            mouse.y = touch.clientY;
+        });
+
+        window.addEventListener('touchend', () => {
+            mouse.isDown = false;
+            checkClick();
+        });
+
+        function checkClick() {
+            anchors.forEach(anchor => {
+                const rect = anchor.getBoundingClientRect();
+                if (mouse.x > rect.left && mouse.x < rect.right && mouse.y > rect.top && mouse.y < rect.bottom) {
+                    triggerCommit(anchor);
+                }
+            });
+        }
+
+        anchors.forEach(anchor => {
+            anchor.addEventListener('mouseenter', () => anchor.classList.add('hovered'));
+            anchor.addEventListener('mouseleave', () => anchor.classList.remove('hovered'));
+        });
 
         function triggerCommit(anchor) {
             console.log(`Zatwierdzono wybór: ${anchor.dataset.target}`);
