@@ -726,4 +726,7 @@ label {
     }
 
 }
-.nav-pill-item.active { color: var(--accent-primary); background-color: var(--bg-tertiary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.nav-pill-item.active {
+    background-color: var(--bg-tertiary);
+    color: var(--accent-primary); /* Poprawiony kolor ikony na złoty */
+    box-shadow: 0 0 0 2px var(--accent-primary); /* Poprawiony kolor obramowania na złoty */

@@ -9,8 +9,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400&display=swap');
         :root {
             --color-bg: #000005;
-            --color-text: rgba(255, 255, 255, 0.4);
-            --color-text-hover: rgba(255, 255, 255, 1);
+            --color-text: #ffffff; /* 👉 czcionka na biało */
+            --color-text-hover: #ffffff;
             --font-main: 'Lexend', sans-serif;
         }
 
@@ -160,8 +160,8 @@
 
         let mouse = { x: width / 2, y: height / 2, isDown: false };
         let particles = [];
-        const PARTICLE_COUNT = 1500;
-        const BASE_HUE = 200;
+        const PARTICLE_COUNT = 4500; // 👉 więcej gwiazd
+        const BASE_HUE = 300;
 
         class Particle {
             constructor() {
@@ -171,6 +171,10 @@
                 this.speedX = (Math.random() - 0.5) * 0.5;
                 this.speedY = (Math.random() - 0.5) * 0.5;
                 this.hue = BASE_HUE + Math.random() * 50;
+
+                // ⭐ Migotanie
+                this.alpha = Math.random();
+                this.alphaSpeed = (Math.random() * 0.02 + 0.005) * (Math.random() < 0.5 ? 1 : -1);
             }
             update() {
                 let dx = this.x - mouse.x;
@@ -193,9 +197,13 @@
                 this.speedY *= 0.98;
                 if (this.x < 0 || this.x > width) this.speedX *= -1;
                 if (this.y < 0 || this.y > height) this.speedY *= -1;
+
+                // migotanie
+                this.alpha += this.alphaSpeed;
+                if (this.alpha <= 0 || this.alpha >= 1) this.alphaSpeed *= -1;
             }
             draw() {
-                ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, 0.8)`;
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${this.alpha})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
