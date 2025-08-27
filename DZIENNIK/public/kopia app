@@ -8,10 +8,11 @@ const App = {
     init() {
         document.addEventListener('DOMContentLoaded', () => {
             if (!sessionStorage.getItem('dg_user')) {
-  sessionStorage.setItem('dg_user', 'default_user');
-}
-this.loadAppData(); // <--- DODAJ TĘ LINIĘ
-UI.applyTheme(AppStorage.getSetting('theme') || document.documentElement.getAttribute('data-theme') || 'jasny');
+                sessionStorage.setItem('dg_user', 'default_user');
+            }
+            this.launch();
+        });
+    },
 
     launch() {
         if (this.isAppInitialized) return;
@@ -74,32 +75,23 @@ rebuildAllSections() {
     }
 };
 
-// Zastąp starą klasę AppStorage tą nową wersją
 class AppStorage {
-  static get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
-  static set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) { console.error('Błąd zapisu do localStorage', e);} }
-  static userKey(prefix) { return `dziennik_${prefix}_${sessionStorage.getItem('dg_user')}`; }
-  
-  static getDayEntry(date) { return this.get(this.userKey(`entry_${date}`)) || {}; }
-  static saveDayEntry(date, entry) { this.set(this.userKey(`entry_${date}`), entry); showNotification('Auto-zapisano ✅'); }
-
-  static getSetting(key) {
-    const s = this.get(this.userKey('settings'));
-    return s ? s[key] : null;
-  }
-  static setSetting(key, value) {
-    const s = this.get(this.userKey('settings')) || {};
-    s[key] = value;
-    this.set(this.userKey('settings'), s);
-  }
-  
-  // NOWE FUNKCJE DO POBIERANIA DANYCH
-  static getQuestions() { return this.get(this.userKey('questions')) || AppData.initialQuestions; }
-  static getHabits() { return this.get(this.userKey('habits')) || AppData.initialHabits; }
-  static getSentimentQuestions() { return this.get(this.userKey('sentiments')) || AppData.initialSentimentQuestions; }
+    static get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
+    static set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { console.error("Błąd zapisu do localStorage", e); } }
+    static userKey(prefix) { return `dg_${prefix}_${sessionStorage.getItem('dg_user')}`; }
+    static getDayEntry(date) { return this.get(this.userKey(`entry_${date}`)) || {}; }
+    static saveDayEntry(date, entry) { this.set(this.userKey(`entry_${date}`), entry); showNotification("Auto-zapisano ✅"); }
+    static getSetting(key) { const s = this.get(this.userKey('settings')); return s ? s[key] : null; }
+    static setSetting(key, value) { const s = this.get(this.userKey('settings')) || {}; s[key] = value; this.set(this.userKey('settings'), s); }
+    static getQuestions() { return this.get(this.userKey('questions')) || AppData.initialQuestions; }
+    static saveQuestions(q) { this.set(this.userKey('questions'), q); }
+    static getHabits() { return this.get(this.userKey('habits')) || AppData.initialHabits; }
+    static saveHabits(h) { this.set(this.userKey('habits'), h); }
+    static getSentimentQuestions() { return this.get(this.userKey('sentiments')) || AppData.initialSentimentQuestions; }
+    static saveSentimentQuestions(sq) { this.set(this.userKey('sentiments'), sq); }
 }
 
-// Zastąp starą klasę UI tą nową wersją
+// W pliku app.js zastąp całą istniejącą klasę "UI" poniższym kodem
 class UI {
   static renderSection(sectionId) {
     const container = document.getElementById(`${sectionId}-panel`);
@@ -238,7 +230,6 @@ class UI {
     }
   }
 }
-
 
 
 class Stats {
