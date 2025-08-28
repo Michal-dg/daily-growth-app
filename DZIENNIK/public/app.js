@@ -1,80 +1,104 @@
 'use strict';
 
-let currentQuestions, currentHabits, currentSentimentQuestions, currentDate;
+// Globalne zmienne
+let currentDate = null;
+let currentQuestions, currentHabits, currentSentimentQuestions;
 
+// Główny obiekt aplikacji
 const App = {
-    isAppInitialized: false,
+  isAppInitialized: false,
 
-    init() {
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!sessionStorage.getItem('dg_user')) {
-  sessionStorage.setItem('dg_user', 'default_user');
-}
-this.loadAppData(); // <--- DODAJ TĘ LINIĘ
-UI.applyTheme(AppStorage.getSetting('theme') || document.documentElement.getAttribute('data-theme') || 'jasny');
+  init() {
+    document.addEventListener('DOMContentLoaded', this.launch.bind(this));
+  },
 
-    launch() {
-        if (this.isAppInitialized) return;
-        this.isAppInitialized = true;
-        this.loadAppData();
-        applyTheme(AppStorage.getSetting('blask'));
-        applyFont(AppStorage.getSetting('font'));
-        document.documentElement.classList.toggle('dark-mode', AppStorage.getSetting('darkMode') || false);
-        document.getElementById('dailyQuote').textContent = AppData.quotes[Math.floor(Math.random() * AppData.quotes.length)];
-        this.bindMainEventListeners();
-        this.rebuildAllSections();
-        currentDate = dateFns.format(new Date(), 'yyyy-MM-dd');
-        this.loadDate(currentDate);
-        Settings.init();
-    },
+  launch() {
+    if (typeof dateFns === 'undefined' || typeof Chart === 'undefined') {
+      document.body.innerHTML = '<div style="padding:2rem; text-align:center;">Błąd ładowania bibliotek. Sprawdź połączenie z internetem i odśwież stronę.</div>';
+      return;
+    }
+    if (this.isAppInitialized) return;
+    this.isAppInitialized = true;
 
-    loadAppData() {
-        currentQuestions = AppStorage.getQuestions();
-        currentHabits = AppStorage.getHabits();
-        currentSentimentQuestions = AppStorage.getSentimentQuestions();
-    },
+    if (!sessionStorage.getItem('dg_user')) {
+      sessionStorage.setItem('dg_user', 'default_user');
+    }
+    
+    this.loadAppData(); // Wczytanie danych na starcie
+    UI.applyTheme(AppStorage.getSetting('theme') || document.documentElement.getAttribute('data-theme') || 'jasny');
+    
+    document.getElementById('dailyQuote').textContent = AppData.quotes[Math.floor(Math.random() * AppData.quotes.length)];
 
-    bindMainEventListeners() {
-        document.getElementById('settings-btn').addEventListener('click', () => Settings.open());
-        document.getElementById('prev-day-btn').addEventListener('click', () => this.changeDate(-1));
-        document.getElementById('next-day-btn').addEventListener('click', () => this.changeDate(1));
-        document.getElementById('currentDate').addEventListener('input', e => this.loadDate(e.target.value));
-        document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', e => {
+    this.bindEvents();
+
+    UI.renderSection('poranek');
+    UI.renderSection('wieczor');
+    
+    currentDate = dateFns.format(new Date(), 'yyyy-MM-dd');
+    this.loadDate(currentDate);
+  },
+  
+  loadAppData() {
+    currentQuestions = AppStorage.getQuestions();
+    currentHabits = AppStorage.getHabits();
+    currentSentimentQuestions = AppStorage.getSentimentQuestions();
+  },
+
+  bindEvents() {
+    document.getElementById('settings-btn')?.addEventListener('click', () => UI.openSettingsModal());
+    // ZAKTUALIZOWANY EVENT LISTENER DLA WYKRESÓW
+    document.getElementById('show-chart-btn')?.addEventListener('click', () => {
+      Stats.render('#analiza-panel-content'); // Renderuj wykresy
+      openModal('chartModal'); // Otwórz modal
+    });
+
+    // data
+    document.getElementById('prev-day-btn')?.addEventListener('click', () => this.changeDate(-1));
+    document.getElementById('next-day-btn')?.addEventListener('click', () => this.changeDate(1));
+    document.getElementById('currentDate')?.addEventListener('input', (e) => this.loadDate(e.target.value));
+
+    // modale zamknięcia
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal') || e.target.closest('.close-modal-btn')) {
+          closeModal(modal.id);
+        }
+      });
+    });
+    
+    // Zakładki
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', e => {
             document.querySelectorAll('.tab, .section').forEach(el => el.classList.remove('active'));
             const sectionId = e.currentTarget.dataset.section;
             e.currentTarget.classList.add('active');
             document.getElementById(`${sectionId}-panel`).classList.add('active');
-            if (sectionId === 'stats') Stats.render('#stats-panel');
-        }));
-    },
-
-rebuildAllSections() {
-    const sections = {
-        poranek: 'Poranek',
-        wieczor: 'Wieczór' // <-- Tutaj wpisujemy poprawną nazwę z 'ó'
-    };
-    const emojis = {
-        poranek: '🌅',
-        wieczor: '🌙'
-    };
-    Object.keys(sections).forEach(id => {
-        UI.buildSection(id, sections[id], emojis[id], `#${id}-panel`);
+        });
     });
-},
 
-    loadDate(newDate) {
-        currentDate = newDate;
-        document.getElementById('currentDate').value = currentDate;
-        ['poranek', 'wieczor'].forEach(s => UI.loadSectionData(s, currentDate));
-    },
+    // Sync motywu między kartami
+    window.addEventListener('storage', (event) => {
+      if (event.key === AppStorage.userKey('settings')) {
+        const theme = AppStorage.getSetting('theme') || 'jasny';
+        UI.applyTheme(theme);
+      }
+    });
+  },
 
-    changeDate(offset) {
-        const newDate = dateFns.addDays(new Date(currentDate), offset);
-        this.loadDate(dateFns.format(newDate, 'yyyy-MM-dd'));
-    }
+  loadDate(newDate) {
+    currentDate = newDate;
+    const input = document.getElementById('currentDate');
+    if (input) input.value = currentDate;
+    UI.loadDailyData(currentDate);
+  },
+
+  changeDate(offset) {
+    const newDate = dateFns.addDays(new Date(currentDate), offset);
+    this.loadDate(dateFns.format(newDate, 'yyyy-MM-dd'));
+  }
 };
 
-// Zastąp starą klasę AppStorage tą nową wersją
+// Storage
 class AppStorage {
   static get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
   static set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) { console.error('Błąd zapisu do localStorage', e);} }
@@ -93,13 +117,12 @@ class AppStorage {
     this.set(this.userKey('settings'), s);
   }
   
-  // NOWE FUNKCJE DO POBIERANIA DANYCH
   static getQuestions() { return this.get(this.userKey('questions')) || AppData.initialQuestions; }
   static getHabits() { return this.get(this.userKey('habits')) || AppData.initialHabits; }
   static getSentimentQuestions() { return this.get(this.userKey('sentiments')) || AppData.initialSentimentQuestions; }
 }
 
-// Zastąp starą klasę UI tą nową wersją
+// UI
 class UI {
   static renderSection(sectionId) {
     const container = document.getElementById(`${sectionId}-panel`);
@@ -113,7 +136,6 @@ class UI {
         html += `<div class="form-group"><label for="q-${q.id}">${q.text}</label><textarea id="q-${q.id}" data-id="${q.id}" data-section="${sectionId}"></textarea></div>`;
     });
 
-    // Dodajemy oceny i nawyki tylko do sekcji "wieczór"
     if (sectionId === 'wieczor') {
         html += currentSentimentQuestions.map(sq => `<div class="form-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1, 2, 3, 4, 5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
         if (currentHabits.length > 0) {
@@ -124,7 +146,6 @@ class UI {
     html += `</div>`;
     container.innerHTML = html;
 
-    // Bindowanie eventów
     container.querySelectorAll('textarea').forEach(textarea => {
       textarea.addEventListener('input', (e) => {
         const entry = AppStorage.getDayEntry(currentDate);
@@ -149,12 +170,10 @@ class UI {
         const panel = document.getElementById(`${sectionId}-panel`);
         if (!panel) return;
 
-        // Ładowanie textareas
         panel.querySelectorAll('textarea').forEach(el => {
             el.value = sectionData[el.dataset.id] || '';
         });
 
-        // Ładowanie ocen i nawyków dla wieczoru
         if (sectionId === 'wieczor') {
             currentSentimentQuestions.forEach(sq => {
                 const container = panel.querySelector(`.sentiment-buttons[data-id="${sq.id}"]`);
@@ -239,332 +258,139 @@ class UI {
   }
 }
 
-
-
+// KLASA DO OBSŁUGI STATYSTYK
 class Stats {
     static chartInstances = {};
-    static destroyCharts() { Object.values(this.chartInstances).forEach(chart => chart.destroy()); this.chartInstances = {}; }
+
+    static destroyCharts() {
+        Object.values(this.chartInstances).forEach(chart => chart.destroy());
+        this.chartInstances = {};
+    }
+
     static render(containerSelector) {
         const panel = document.querySelector(containerSelector);
         if (!panel) return;
-        panel.innerHTML = `<div class="content-card"><div class="stats-grid"><div class="chart-container"><canvas id="sentimentChart"></canvas></div><div class="chart-container"><canvas id="habitsChart"></canvas></div></div><div id="stats-placeholder" class="hidden">Brak wystarczających danych do analizy.</div></div>`;
+        panel.innerHTML = `
+            <div class="content-card">
+                <div class="chart-container" style="height: 250px;"><canvas id="sentimentChart"></canvas></div>
+                <div class="chart-container" style="height: 250px; margin-top: 1.5rem;"><canvas id="habitsChart"></canvas></div>
+                <div id="stats-placeholder" class="hidden"></div>
+            </div>`;
         this.renderCharts();
     }
+
     static gatherData(days = 30) {
-        const data = { labels: [], sentiments: { health: [], mood: [], productivity: [] }, habits: {} };
-        const today = new Date();
+        const data = { labels: [], sentiments: {}, habits: {} };
+        currentSentimentQuestions.forEach(sq => data.sentiments[sq.id] = []);
         currentHabits.forEach(h => data.habits[h] = 0);
+        
         let entriesFound = 0;
-        for (let i = days - 1; i >= 0; i--) {
-            const date = dateFns.subDays(today, i);
+        for (let i = 0; i < days; i++) {
+            const date = dateFns.subDays(new Date(), i);
             const dateKey = dateFns.format(date, 'yyyy-MM-dd');
+            data.labels.unshift(dateKey); // Dodajemy daty od najstarszej do najnowszej
+            
             const entry = AppStorage.getDayEntry(dateKey);
-            if (entry && Object.keys(entry).length > 0) {
-                data.labels.push(dateKey);
-                if (entry.wieczor) {
-                    entriesFound++;
-                    currentSentimentQuestions.forEach(sq => { data.sentiments[sq.id].push(entry.wieczor[sq.id + 'Sent'] || null); });
-                    currentHabits.forEach(habit => { if (entry.wieczor.habits && entry.wieczor.habits[habit]) data.habits[habit]++; });
-                } else {
-                    currentSentimentQuestions.forEach(sq => data.sentiments[sq.id].push(null));
-                }
+            if (entry && entry.wieczor) {
+                entriesFound++;
+                currentSentimentQuestions.forEach(sq => {
+                    data.sentiments[sq.id].unshift(entry.wieczor[sq.id + 'Sent'] || null);
+                });
+                currentHabits.forEach(habit => {
+                    if (entry.wieczor.habits && entry.wieczor.habits[habit]) {
+                        data.habits[habit]++;
+                    }
+                });
+            } else {
+                currentSentimentQuestions.forEach(sq => data.sentiments[sq.id].unshift(null));
             }
         }
         return entriesFound > 1 ? data : null;
     }
+
     static renderCharts() {
         this.destroyCharts();
         const data = this.gatherData();
         const placeholder = document.getElementById('stats-placeholder');
-        const grid = document.querySelector('.stats-grid');
-        if (!data || data.labels.length < 2) {
-            if (placeholder) placeholder.classList.remove('hidden');
-            grid?.classList.add('hidden');
+        const chartContainers = document.querySelectorAll('.chart-container');
+
+        if (!data) {
+            if (placeholder) {
+                placeholder.classList.remove('hidden');
+                placeholder.textContent = 'Brak wystarczających danych do analizy. Wypełnij Dziennik przez co najmniej 2 dni.';
+            }
+            chartContainers.forEach(c => c.classList.add('hidden'));
             return;
         }
+
         if (placeholder) placeholder.classList.add('hidden');
-        grid?.classList.remove('hidden');
+        chartContainers.forEach(c => c.classList.remove('hidden'));
+
         const style = getComputedStyle(document.body);
         Chart.defaults.font.family = "inherit";
-        Chart.defaults.color = style.getPropertyValue('--text-muted');
-        const chartOptions = (scales) => ({
-            responsive: true, maintainAspectRatio: false, scales, plugins: { legend: { position: 'bottom' } },
-            interaction: { intersect: false, mode: 'index' }, layout: { padding: 10 }
+        Chart.defaults.color = style.getPropertyValue('--text-tertiary');
+        
+        const chartOptions = (title, scales) => ({
+            responsive: true, maintainAspectRatio: false, scales, 
+            plugins: { 
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } },
+                title: { display: true, text: title, font: { size: 16 } }
+            },
+            interaction: { intersect: false, mode: 'index' },
         });
+
         this.chartInstances.sentiment = new Chart(document.getElementById('sentimentChart'), {
-            type: 'line', data: {
-                labels: data.labels, datasets: currentSentimentQuestions.map((sq, i) => ({
-                    label: sq.question.split(' ').slice(1).join(' '), data: data.sentiments[sq.id],
-                    borderColor: [style.getPropertyValue('--primary'), style.getPropertyValue('--accent'), '#00bcd4'][i],
-                    tension: 0.4, spanGaps: true, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: currentSentimentQuestions.map((sq, i) => ({
+                    label: sq.question.split(' ').slice(2).join(' '),
+                    data: data.sentiments[sq.id],
+                    borderColor: ['#3B82F6', '#10B981', '#F59E0B'][i % 3],
+                    tension: 0.4,
+                    spanGaps: true,
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    borderWidth: 2.5
                 }))
-            }, options: chartOptions({ x: { type: 'time', time: { unit: 'day' }, grid: { display: false } }, y: { beginAtZero: true, max: 5 } }),
+            },
+            options: chartOptions('Oceny z ostatnich 30 dni', { 
+                x: { type: 'time', time: { unit: 'day', tooltipFormat: 'dd.MM.yyyy' }, grid: { display: false } }, 
+                y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } } 
+            }),
         });
+
         this.chartInstances.habits = new Chart(document.getElementById('habitsChart'), {
-            type: 'bar', data: { labels: Object.keys(data.habits), datasets: [{ label: 'Dni zrealizowane (ostatnie 30)', data: Object.values(data.habits), backgroundColor: style.getPropertyValue('--primary'), borderRadius: 4 }] },
-            options: chartOptions({ y: { max: 30 } })
+            type: 'bar',
+            data: {
+                labels: Object.keys(data.habits),
+                datasets: [{
+                    label: 'Dni zrealizowane',
+                    data: Object.values(data.habits),
+                    backgroundColor: style.getPropertyValue('--accent-secondary'),
+                    borderRadius: 4
+                }]
+            },
+            options: chartOptions('Realizacja nawyków w ostatnich 30 dniach', { 
+                y: { ticks: { stepSize: 1 } } 
+            })
         });
     }
 }
 
-class Settings {
-    static init() {
-        document.getElementById('save-settings-btn').addEventListener('click', () => this.saveAndClose());
-        const settingsModal = document.getElementById('settingsModal');
-        const suggestionsModal = document.getElementById('suggestionsModal');
-        const inviteModal = document.getElementById('inviteModal');
-        [settingsModal, suggestionsModal, inviteModal].forEach(modal => { modal.addEventListener('click', e => { if (e.target.closest('.close-modal-btn')) { closeModal(e.target.closest('.modal').id); } }); });
-        settingsModal.addEventListener('click', e => {
-            const header = e.target.closest('.settings-section-header');
-            if (header) this.toggleSection(header);
-        });
-        suggestionsModal.addEventListener('click', e => {
-            const addBtn = e.target.closest('.add-suggestion-btn');
-            if (addBtn) {
-                this.addSuggestion(addBtn.dataset.section, addBtn.dataset.index);
-                addBtn.textContent = 'Dodano ✔'; addBtn.disabled = true;
-            }
-        });
-        settingsModal.addEventListener('input', e => {
-            const { section, index, id } = e.target.dataset;
-            if (section === 'summary') this.tempSentimentQuestions[index].question = e.target.value;
-            else if (section === 'habits') this.tempHabits[index] = e.target.value;
-            else if (this.tempQuestions[section]) {
-                const question = this.tempQuestions[section].find(q => q.id === id);
-                if (question) question.text = e.target.value;
-            }
-        });
-    }
-    static toggleSection(header) {
-        const sectionEl = header.parentElement;
-        const sectionId = header.dataset.section;
-        const isOpen = sectionEl.classList.contains('is-open');
-        document.querySelectorAll('#settingsModal .settings-section.is-open').forEach(openSection => {
-            if (openSection !== sectionEl) {
-                openSection.classList.remove('is-open');
-                openSection.querySelector('.settings-edit-btn').textContent = 'Edytuj';
-            }
-        });
-        sectionEl.classList.toggle('is-open');
-        const button = header.querySelector('.settings-edit-btn');
-        if (!isOpen) { this.render(sectionId); button.textContent = 'Zwiń'; }
-        else { button.textContent = 'Edytuj'; }
-    }
-    static open() {
-        this.tempQuestions = JSON.parse(JSON.stringify(AppStorage.getQuestions()));
-        this.tempHabits = [...AppStorage.getHabits()];
-        this.tempSentimentQuestions = JSON.parse(JSON.stringify(AppStorage.getSentimentQuestions()));
-        document.querySelectorAll('#settingsModal .settings-section').forEach(section => {
-            section.classList.remove('is-open');
-            section.querySelector('.settings-edit-btn').textContent = 'Edytuj';
-            section.querySelector('.settings-section-content').innerHTML = '';
-        });
-        openModal('settingsModal');
-    }
-    static render(sectionId) {
-        const container = document.getElementById(`s-${sectionId}-panel`);
-        if (!container) return;
-        let html = '';
-        const renderItem = (value, section, index, placeholder, id = '') => `<div class="settings-item"><input type="text" data-section="${section}" data-index="${index}" ${id ? `data-id="${id}"` : ''} value="${String(value || '').replace(/"/g, '&quot;')}" placeholder="${placeholder}"><button class="btn action-btn" data-action="deleteItem" data-section="${section}" data-index="${index}">Usuń</button></div>`;
-        const renderList = (title, items, section, placeholder, textKey) => {
-            let listHtml = `<h4>${title}</h4><div class="settings-list">${items.map((item, i) => renderItem(textKey ? item[textKey] : item, section, i, placeholder, textKey ? item.id : '')).join('')}</div>
-            <div class="settings-action-buttons">
-                <button class="btn btn-tertiary action-btn" data-action="showSuggestions" data-section="${section}">Zainspiruj mnie</button>
-                <button class="btn btn-secondary action-btn" data-action="addItem" data-section="${section}">+ Dodaj</button>
-            </div>`;
-            return listHtml;
-        };
-        switch (sectionId) {
-            case 'appearance':
-                const theme = AppStorage.getSetting('theme') || 'blask';
-                const font = AppStorage.getSetting('font') || 'sans-serif';
-                html = `<h4 class="settings-header-4">Wybierz motyw</h4><div class="settings-group theme-selector">${['las', 'ocean', 'fokus', 'blask'].map(t => `<div class="theme-option ${theme === t ? 'is-active' : ''}" data-theme="${t}"><span>${{ 'las': '🌱', 'ocean': '🌊', 'fokus': '⚡', 'blask': '✨' }[t]}</span> ${t.charAt(0).toUpperCase() + t.slice(1)}</div>`).join('')}</div>
-                <h4 class="settings-header-4">Wybierz czcionkę</h4><div class="settings-group font-selector">${['sans-serif', 'serif', 'rounded'].map(f => `<button data-font="${f}" class="btn ${font === f ? 'btn-primary' : 'btn-tertiary'}">${{ 'sans-serif': 'Nowoczesna', 'serif': 'Klasyczna', 'rounded': 'Swobodna' }[f]}</button>`).join('')}</div>
-                <h4 class="settings-header-4">Tryb Ciemny</h4><button id="dark-mode-btn" class="btn btn-tertiary">${document.documentElement.classList.contains('dark-mode') ? 'Wyłącz' : 'Włącz'} tryb ciemny</button>`;
-                break;
-            case 'poranek':
-case 'wieczor':
-    const titleMap = {
-        poranek: 'Pytania - Poranek',
-        wieczor: 'Pytania - Wieczór' // <-- Poprawna nazwa
-    };
-    html = renderList(titleMap[sectionId], this.tempQuestions[sectionId], sectionId, 'Treść pytania', 'text');
-    break;
-            case 'summary': html = renderList('Pytania Podsumowujące', this.tempSentimentQuestions, 'summary', 'Treść pytania', 'question'); break;
-            case 'habits': html = renderList('Twoje Nawyki', this.tempHabits, 'habits', 'Nazwa nawyku'); break;
-        }
-        container.innerHTML = html;
-        container.querySelectorAll('.action-btn').forEach(btn => btn.addEventListener('click', e => { const { action, section, index } = e.currentTarget.dataset; if (this[action]) this[action](section, index); }));
-        container.querySelectorAll('.theme-option').forEach(opt => opt.addEventListener('click', e => this.handleThemeChange(e.currentTarget)));
-        container.querySelectorAll('.font-selector button').forEach(btn => btn.addEventListener('click', e => this.handleFontChange(e.currentTarget)));
-        const darkModeBtn = container.querySelector('#dark-mode-btn');
-        if (darkModeBtn) darkModeBtn.addEventListener('click', toggleDarkMode);
-    }
-    static handleThemeChange(option) { applyTheme(option.dataset.theme); this.render('appearance'); }
-    static handleFontChange(btn) { applyFont(btn.dataset.font); this.render('appearance'); }
-    static showSuggestions(section) {
-        let suggestions = [], title = "Sugerowane Pytania";
-        switch (section) {
-            case 'poranek': suggestions = AppData.suggestedMorningQuestions; title = "Sugestie - Poranek"; break;
-            case 'wieczor': suggestions = AppData.suggestedEveningQuestions; title = "Sugestie - Wieczór"; break;
-            case 'summary': suggestions = AppData.suggestedSummaryQuestions; title = "Sugerowane Pytania Podsumowujące"; break;
-            case 'habits': suggestions = AppData.suggestedHabits; title = "Sugerowane Nawyki"; break;
-        }
-        const suggestionsList = document.getElementById('suggestionsList');
-        if (!suggestionsList) return;
-        suggestionsList.innerHTML = suggestions.map((q, index) => `<div class="suggestion-item"><span>${q}</span><button class="btn btn-secondary add-suggestion-btn" data-section="${section}" data-index="${index}">Dodaj</button></div>`).join('');
-        document.getElementById('suggestionsTitle').textContent = title;
-        openModal('suggestionsModal');
-    }
-    static addSuggestion(section, index) {
-        let textToAdd;
-        switch (section) {
-            case 'poranek': textToAdd = AppData.suggestedMorningQuestions[index]; this.tempQuestions.poranek.push({ id: `m${Date.now()}`, text: textToAdd }); break;
-            case 'wieczor': textToAdd = AppData.suggestedEveningQuestions[index]; this.tempQuestions.wieczor.push({ id: `e${Date.now()}`, text: textToAdd }); break;
-            case 'summary': textToAdd = AppData.suggestedSummaryQuestions[index]; this.tempSentimentQuestions.push({ id: `s${Date.now()}`, question: textToAdd }); break;
-            case 'habits': textToAdd = AppData.suggestedHabits[index]; this.tempHabits.push(textToAdd); break;
-        }
-        this.render(section);
-    }
-    static addItem(section) {
-        if (section === 'habits') this.tempHabits.push('');
-        else if (section === 'summary') this.tempSentimentQuestions.push({ id: `s${Date.now()}`, question: '' });
-        else { this.tempQuestions[section].push({ id: `${section.charAt(0)}${Date.now()}`, text: '' }); }
-        this.render(section);
-    }
-    static deleteItem(section, index) {
-        if (section === 'habits') this.tempHabits.splice(index, 1);
-        else if (section === 'summary') this.tempSentimentQuestions.splice(index, 1);
-        else { this.tempQuestions[section].splice(index, 1); }
-        this.render(section);
-    }
-    static saveAndClose() {
-        Object.keys(this.tempQuestions).forEach(s => this.tempQuestions[s] = this.tempQuestions[s].filter(q => q.text.trim()));
-        this.tempHabits = this.tempHabits.filter(h => h.trim());
-        this.tempSentimentQuestions = this.tempSentimentQuestions.filter(q => q.question.trim());
-        AppStorage.saveQuestions(this.tempQuestions);
-        AppStorage.saveHabits(this.tempHabits);
-        AppStorage.saveSentimentQuestions(this.tempSentimentQuestions);
-        App.loadAppData();
-        App.rebuildAllSections();
-        App.loadDate(currentDate);
-        closeModal('settingsModal');
-        showNotification("Ustawienia zapisane! ✅");
-    }
+// Pomocnicze
+function openModal(id) { document.getElementById(id)?.classList.add('active'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+
+let notificationTimeout;
+function showNotification(msg) {
+  const el = document.getElementById('notification');
+  if (!el) return;
+  clearTimeout(notificationTimeout);
+  el.textContent = msg;
+  el.classList.add('active');
+  notificationTimeout = setTimeout(() => el.classList.remove('active'), 2600);
 }
 
-function applyTheme(themeName = 'blask') {
-    document.documentElement.dataset.theme = themeName;
-    AppStorage.setSetting('theme', themeName);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--card').trim();
-}
-
-function applyFont(fontName = 'sans-serif') {
-    document.body.classList.remove('font-serif', 'font-rounded');
-    if (fontName === 'serif') document.body.classList.add('font-serif');
-    else if (fontName === 'rounded') document.body.classList.add('font-rounded');
-    AppStorage.setSetting('font', fontName);
-}
-
-function toggleDarkMode() {
-    const isDark = document.documentElement.classList.toggle('dark-mode');
-    AppStorage.setSetting('darkMode', isDark);
-    applyTheme(AppStorage.getSetting('theme'));
-    const btn = document.getElementById('dark-mode-btn');
-    if (btn) btn.textContent = `${isDark ? 'Wyłącz' : 'Włącz'} tryb ciemny`;
-}
-
-function showNotification(msg, withReloadButton = false) {
-    const el = document.getElementById('notification');
-    if (el) {
-        el.innerHTML = msg;
-        if (withReloadButton) {
-            const reloadBtn = document.createElement('button');
-            reloadBtn.textContent = 'Odśwież';
-            reloadBtn.className = 'btn btn-primary';
-            reloadBtn.style.marginLeft = '15px';
-            reloadBtn.onclick = () => window.location.reload();
-            el.appendChild(reloadBtn);
-        }
-        el.classList.add('active');
-        if (!withReloadButton) {
-            setTimeout(() => el.classList.remove('active'), 2800);
-        }
-    }
-}
-
-function openModal(id) {
-    document.getElementById(id)?.classList.add('active');
-}
-
-function closeModal(id) {
-    document.getElementById(id)?.classList.remove('active');
-}
-
+// Start
 App.init();
-// WKLEJ NA KOŃCU PLIKU dziennik/app.js
-(() => {
-    const applyTheme = (theme) => {
-        if (theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-        }
-    };
-
-    // Zastosuj motyw przy starcie
-    const savedTheme = localStorage.getItem('theme') || 'las'; // Domyślny motyw dla Dziennika
-    applyTheme(savedTheme);
-
-    // Nasłuchuj na zmiany z innych kart
-    window.addEventListener('storage', (event) => {
-        if (event.key === 'theme') {
-            applyTheme(event.newValue);
-        }
-    });
-
-    // Jeśli Dziennik ma swój własny przełącznik motywów, obsłuż go
-    // Jeśli nie, ten kod nie zrobi nic złego
-    const themeSwitcherInDziennik = document.querySelector('select'); // Możesz tu dać dokładniejsze ID
-    if (themeSwitcherInDziennik) {
-         themeSwitcherInDziennik.value = savedTheme;
-         themeSwitcherInDziennik.addEventListener('change', (e) => {
-            const newTheme = e.target.value;
-            localStorage.setItem('theme', newTheme);
-            applyTheme(newTheme);
-        });
-    }
-})();
-// === LOGIKA DLA NOWEGO PRZYCISKU STATYSTYK (POPRAWIONA) ===
-
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Znajdujemy potrzebne elementy
-    const statsBtn = document.getElementById('stats-btn');
-    const statsPanel = document.getElementById('stats-panel');
-    const allSections = document.querySelectorAll('.section');
-    const allTabs = document.querySelectorAll('.tab');
-
-    // Sprawdzamy, czy przycisk istnieje na stronie
-    if (statsBtn) {
-        // 2. Dodajemy nasłuchiwanie na kliknięcie
-        statsBtn.addEventListener('click', () => {
-            
-            // 3. Ukrywamy wszystkie inne sekcje (panele)
-            allSections.forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // 4. Pokazujemy tylko panel ze statystykami
-            if (statsPanel) {
-                statsPanel.classList.add('active');
-            }
-
-            // 5. Odznaczamy "aktywność" na zakładkach "Poranek" i "Wieczór"
-            allTabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // 6. WYWOŁUJEMY FUNKCJĘ RYSUJĄCĄ WYKRESY
-            Stats.render('#stats-panel'); 
-        });
-    }
-});

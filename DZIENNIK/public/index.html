@@ -107,10 +107,19 @@
     /* Formularze */
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-weight: 700; color: var(--text-secondary); margin-bottom: .5rem; font-size: .95rem; }
-    textarea, input[type="text"], input[type="date"] {
+    textarea {
       width: 100%; background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: 8px; padding: .75rem; color: var(--text-primary); font-family: var(--font-ui);
+      min-height: 120px;
     }
-    textarea { min-height: 120px; }
+    
+    /* Oceny i Nawyki */
+    .sentiment-buttons { display: flex; gap: 8px; }
+    .sentiment-star { font-size: 2.5rem; color: var(--border-primary); cursor: pointer; transition: transform 0.2s ease, color 0.2s ease; line-height: 1; }
+    .sentiment-star:hover { transform: scale(1.2); }
+    .sentiment-star.active { color: var(--accent-primary); }
+    .habit-container { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .habit-item label { display: flex; align-items: center; gap: .5rem; font-weight: normal; }
+    .habit-item input { width: auto; }
 
     /* Modale */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; }
@@ -209,29 +218,62 @@
           </div>
         </div>
       </div>
-
-      <div class="modal" id="chartModal">
-        <div class="content-card modal-content">
-          <div class="modal-header">
-            <h2 class="content-header modal-title">Analiza Postępów</h2>
-            <button class="close-modal-btn" data-modal-id="chartModal" aria-label="Zamknij">✖</button>
-          </div>
-          <div class="modal-body-content">
-            <div id="analiza-panel-content"></div>
-          </div>
-        </div>
+  
+<!-- Wklej ten kod w miejsce starego bloku <div class="modal" id="chartModal"> -->
+<div class="modal" id="chartModal">
+    <div class="content-card modal-content">
+      <div class="modal-header">
+        <h2 class="content-header modal-title">Analiza Postępów</h2>
+        <button class="close-modal-btn" data-modal-id="chartModal" aria-label="Zamknij">✖</button>
       </div>
+      <div class="modal-body-content">
+        <!-- TEN KONTENER BYŁ BRAKUJĄCY -->
+        <div id="analiza-panel-content"></div>
+        
+      </div>
+    </div>
+</div>
+
 
       <div id="notification"></div>
     </div>
   </div>
     
   <script>
-    
-    // Global
-    let currentDate = null;
+    'use strict';
 
-    // App
+    // Dane startowe
+    const AppData = {
+      quotes: [
+        "Każdy dzień to nowa szansa na rozwój. Wykorzystaj ją.",
+        "Małe kroki każdego dnia prowadzą do wielkich rezultatów.",
+        "Twoja przyszłość jest tworzona przez to, co robisz dzisiaj, a nie jutro."
+      ],
+      initialQuestions: { 
+        poranek: [
+            {id:'p1',text:'Za co jestem dziś wdzięczny/a?'},
+            {id:'p2',text:'Co sprawi, że ten dzień będzie wspaniały?'},
+            {id:'p3',text:'Moja dzisiejsza afirmacja:'}
+        ], 
+        wieczor: [
+            {id:'w1',text:'3 niesamowite rzeczy, które się dzisiaj wydarzyły:'},
+            {id:'w2',text:'Czego się dzisiaj nauczyłem/am?'},
+            {id:'w3',text:'Jak mogłem/am uczynić ten dzień jeszcze lepszym?'}
+        ] 
+      },
+      initialHabits: ['Medytacja', 'Ćwiczenia', 'Czytanie'],
+      initialSentimentQuestions: [
+        {id:'mood', question:'Jak oceniasz swój nastrój?'}, 
+        {id:'energy', question:'Jak oceniasz swoją energię?'}, 
+        {id:'productivity', question:'Jak oceniasz swoją produktywność?'}
+      ]
+    };
+
+    // Globalne zmienne
+    let currentDate = null;
+    let currentQuestions, currentHabits, currentSentimentQuestions;
+
+    // Główny obiekt aplikacji
     const App = {
       isAppInitialized: false,
 
@@ -245,15 +287,17 @@
           return;
         }
         if (this.isAppInitialized) return;
-        this.isAppInitialized = true;
+this.isAppInitialized = true;
+this.loadAppData(); // <--- DODAJ TĘ LINIĘ
 
         if (!sessionStorage.getItem('dg_user')) {
           sessionStorage.setItem('dg_user', 'default_user');
         }
+        
+        this.loadAppData();
         UI.applyTheme(AppStorage.getSetting('theme') || document.documentElement.getAttribute('data-theme') || 'jasny');
-
-        document.getElementById('dailyQuote').textContent =
-          'Każdy dzień to nowa szansa na rozwój. Wykorzystaj ją.';
+        
+        document.getElementById('dailyQuote').textContent = AppData.quotes[Math.floor(Math.random() * AppData.quotes.length)];
 
         this.bindEvents();
 
@@ -263,10 +307,16 @@
         currentDate = dateFns.format(new Date(), 'yyyy-MM-dd');
         this.loadDate(currentDate);
       },
+      
+      loadAppData() {
+        currentQuestions = AppStorage.getQuestions();
+        currentHabits = AppStorage.getHabits();
+        currentSentimentQuestions = AppStorage.getSentimentQuestions();
+      },
 
       bindEvents() {
         document.getElementById('settings-btn')?.addEventListener('click', () => UI.openSettingsModal());
-        document.getElementById('stats-btn')?.addEventListener('click', () => {
+        document.getElementById('show-chart-btn')?.addEventListener('click', () => {
           // Tutaj logika dla statystyk
           openModal('chartModal');
         });
@@ -335,6 +385,10 @@
         s[key] = value;
         this.set(this.userKey('settings'), s);
       }
+      
+      static getQuestions() { return this.get(this.userKey('questions')) || AppData.initialQuestions; }
+      static getHabits() { return this.get(this.userKey('habits')) || AppData.initialHabits; }
+      static getSentimentQuestions() { return this.get(this.userKey('sentiments')) || AppData.initialSentimentQuestions; }
     }
 
     // UI
@@ -343,25 +397,21 @@
         const container = document.getElementById(`${sectionId}-panel`);
         if (!container) return;
         
-        const questions = {
-            poranek: [
-                { id: 'p1', text: 'Za co jestem dziś wdzięczny/a?' },
-                { id: 'p2', text: 'Co sprawi, że ten dzień będzie wspaniały?' },
-                { id: 'p3', text: 'Moja dzisiejsza afirmacja:' },
-            ],
-            wieczor: [
-                { id: 'w1', text: '3 niesamowite rzeczy, które się dzisiaj wydarzyły:' },
-                { id: 'w2', text: 'Czego się dzisiaj nauczyłem/am?' },
-                { id: 'w3', text: 'Jak mogłem/am uczynić ten dzień jeszcze lepszym?' },
-            ]
-        };
-
+        const questions = currentQuestions[sectionId] || [];
         const title = sectionId === 'poranek' ? '🌅 Poranek' : '🌙 Wieczór';
 
         let html = `<div class="content-card"><h2 class="content-header">${title}</h2>`;
-        questions[sectionId].forEach(q => {
+        questions.forEach(q => {
             html += `<div class="form-group"><label for="q-${q.id}">${q.text}</label><textarea id="q-${q.id}" data-id="${q.id}" data-section="${sectionId}"></textarea></div>`;
         });
+
+        if (sectionId === 'wieczor') {
+            html += currentSentimentQuestions.map(sq => `<div class="form-group"><label>${sq.question}</label><div class="sentiment-buttons" data-id="${sq.id}">${[1, 2, 3, 4, 5].map(v => `<span class="sentiment-star" data-value="${v}">☆</span>`).join('')}</div></div>`).join('');
+            if (currentHabits.length > 0) {
+                html += `<div class="form-group"><label>Nawyki</label><div class="habit-container">${currentHabits.map(h => `<div class="habit-item"><label><input type="checkbox" data-habit-name="${h}"> ${h}</label></div>`).join('')}</div></div>`;
+            }
+        }
+
         html += `</div>`;
         container.innerHTML = html;
 
@@ -375,16 +425,67 @@
             AppStorage.saveDayEntry(currentDate, entry);
           });
         });
+
+        if (sectionId === 'wieczor') {
+            container.querySelectorAll('.sentiment-star').forEach(star => star.addEventListener('click', e => UI.setSentiment(e.currentTarget)));
+            container.querySelectorAll('input[type="checkbox"]').forEach(el => el.addEventListener('change', e => UI.saveHabitStatus(e.target)));
+        }
       }
 
       static loadDailyData(date) {
         const entry = AppStorage.getDayEntry(date);
         ['poranek', 'wieczor'].forEach(sectionId => {
             const sectionData = entry[sectionId] || {};
-            Object.keys(sectionData).forEach(qId => {
-                const el = document.getElementById(`q-${qId}`);
-                if (el) el.value = sectionData[qId];
+            const panel = document.getElementById(`${sectionId}-panel`);
+            if (!panel) return;
+
+            panel.querySelectorAll('textarea').forEach(el => {
+                el.value = sectionData[el.dataset.id] || '';
             });
+
+            if (sectionId === 'wieczor') {
+                currentSentimentQuestions.forEach(sq => {
+                    const container = panel.querySelector(`.sentiment-buttons[data-id="${sq.id}"]`);
+                    UI.updateStars(container, sectionData[sq.id + 'Sent']);
+                });
+                const habits = sectionData.habits || {};
+                currentHabits.forEach(h => {
+                    const cb = panel.querySelector(`[data-habit-name="${h}"]`);
+                    if (cb) cb.checked = habits[h] || false;
+                });
+            }
+        });
+      }
+
+      static saveHabitStatus(checkbox) {
+          const name = checkbox.dataset.habitName;
+          const entry = AppStorage.getDayEntry(currentDate);
+          if (!entry.wieczor) entry.wieczor = {};
+          if (!entry.wieczor.habits) entry.wieczor.habits = {};
+          entry.wieczor.habits[name] = checkbox.checked;
+          AppStorage.saveDayEntry(currentDate, entry);
+      }
+
+      static setSentiment(starEl) {
+          const value = starEl.dataset.value;
+          const container = starEl.parentElement;
+          const catId = container.dataset.id;
+          UI.updateStars(container, value);
+          const entry = AppStorage.getDayEntry(currentDate);
+          if (!entry.wieczor) entry.wieczor = {};
+          entry.wieczor[catId + 'Sent'] = value;
+          AppStorage.saveDayEntry(currentDate, entry);
+      }
+
+      static updateStars(container, value) {
+        if (!container) return;
+        const stars = container.querySelectorAll('.sentiment-star');
+        const numericValue = parseInt(value, 10);
+        stars.forEach(star => {
+            const starValue = parseInt(star.dataset.value, 10);
+            const isActive = !isNaN(numericValue) && numericValue >= starValue;
+            star.classList.toggle('active', isActive);
+            star.textContent = isActive ? '★' : '☆';
         });
       }
 
